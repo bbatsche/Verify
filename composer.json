@@ -1,5 +1,5 @@
 {
-    "name": "bb/verify",
+    "name": "bbat/verify",
     "description": "BDD assertion library for PHPUnit",
     "keywords": [
         "bdd", "assertions", "unit testing", "unit test", "phpunit", "codeception", "unit", "test", "testing"

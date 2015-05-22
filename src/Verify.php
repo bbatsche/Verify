@@ -1,5 +1,5 @@
 <?php
-namespace BB;
+namespace BBat;
 
 use \PHPUnit_Framework_Assert as a;
 
