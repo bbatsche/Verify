@@ -261,21 +261,6 @@ class Verify {
         a::assertNotSame($expected, $this->actual, $this->description);
     }
 
-    public function selectorCount($selector, $count)
-    {
-        a::assertSelectCount($selector, $count, $this->actual, $this->description);
-    }
-
-    public function selectorEquals($selector, $content, $count)
-    {
-        a::assertSelectEquals($selector, $content,  $count, $this->actual, $this->description);
-    }
-
-    public function selectorMatchesRegExp($selector, $pattern, $count)
-    {
-        a::assertSelectRegExp($selector, $pattern,  $count, $this->actual, $this->description);
-    }
-
     public function endsWith($suffix)
     {
         a::assertStringEndsWith($suffix, $this->actual, $this->description);
@@ -304,11 +289,6 @@ class Verify {
     public function doesNotStartWith($prefix)
     {
         a::assertStringStartsNotWith($prefix, $this->actual, $this->description);
-    }
-
-    public function matchesTag($matcher)
-    {
-        a::assertTag($matcher, $this->actual, $this->description);
     }
 
     public function equalsXmlFile($file)

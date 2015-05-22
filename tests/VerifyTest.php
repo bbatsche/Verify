@@ -173,24 +173,6 @@ class VerifyTest extends PHPUnit_Framework_TestCase {
         expect(1)->notSame(true);
     }
 
-    public function testSelectCount()
-    {
-        expect($this->xml)->selectorCount('foo bar', true);
-        expect($this->xml)->selectorCount('foo bar', 2);
-    }
-
-    public function testSelectEquals()
-    {
-        expect($this->xml)->selectorEquals('foo bar', 'Baz', true);
-        expect($this->xml)->selectorEquals('foo bar', 'Baz', 2);
-    }
-
-    public function testSelectRegExp()
-    {
-        expect($this->xml)->selectorMatchesRegExp('foo bar', '/Ba.*/', true);
-        expect($this->xml)->selectorMatchesRegExp('foo bar', '/Ba.*/', 2);
-    }
-
     public function testEndsWith()
     {
         expect('A completely not funny string')->endsWith('ny string');
@@ -207,15 +189,6 @@ class VerifyTest extends PHPUnit_Framework_TestCase {
     {
         expect('A completely not funny string')->startsWith('A completely');
         expect('A completely not funny string')->doesNotStartWith('string');
-    }
-
-    public function testTag()
-    {
-        $matcher = array(
-            'tag' => 'bar',
-            'parent' => array('tag' => 'foo')
-        );
-        expect($this->xml)->matchesTag($matcher);
     }
 
     public function testEqualsXmlFile()
