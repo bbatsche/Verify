@@ -3,8 +3,8 @@ namespace BBat;
 
 use \PHPUnit_Framework_Assert as a;
 
-class Verify {
-
+class Verify
+{
     protected $actual = null;
     protected $description = '';
     protected $isFileExpectation = false;
@@ -78,22 +78,32 @@ class Verify {
         a::assertLessThanOrEqual($expected, $this->actual, $this->description);
     }
 
-    public function true()
+    public function isTrue()
     {
         a::assertTrue($this->actual, $this->description);
     }
 
-    public function false()
+    public function isNotTrue()
+    {
+        a::assertNotTrue($this->actual, $this->description);
+    }
+
+    public function isFalse()
     {
         a::assertFalse($this->actual, $this->description);
     }
 
-    public function null()
+    public function isNotFalse()
+    {
+        a::assertNotFalse($this->actual, $this->description);
+    }
+
+    public function isNull()
     {
         a::assertNull($this->actual, $this->description);
     }
 
-    public function notNull()
+    public function isNotNull()
     {
         a::assertNotNull($this->actual, $this->description);
     }
@@ -140,7 +150,7 @@ class Verify {
 
     public function hasAttribute($attribute)
     {
-        if ( is_string($attribute)) {
+        if (is_string($this->actual)) {
             a::assertClassHasAttribute($attribute, $this->actual, $this->description);
         } else {
             a::assertObjectHasAttribute($attribute, $this->actual, $this->description);
@@ -149,7 +159,7 @@ class Verify {
 
     public function doesNotHaveAttribute($attribute)
     {
-        if ( is_string($attribute)) {
+        if (is_string($this->actual)) {
             a::assertClassNotHasAttribute($attribute, $this->actual, $this->description);
         } else {
             a::assertObjectNotHasAttribute($attribute, $this->actual, $this->description);
@@ -181,14 +191,24 @@ class Verify {
         a::assertContainsOnlyInstancesOf($class, $this->actual, $this->description);
     }
 
-    public function count($array)
+    public function hasCount($count)
     {
-        a::assertCount($array, $this->actual, $this->description);
+        a::assertCount($count, $this->actual, $this->description);
     }
 
-    public function notCount($array)
+    public function doesNotHaveCount($count)
     {
-        a::assertNotCount($array, $this->actual, $this->description);
+        a::assertNotCount($count, $this->actual, $this->description);
+    }
+
+    public function sameSizeAs($expected)
+    {
+        a::assertSameSize($expected, $this->actual, $this->description);
+    }
+
+    public function notSameSizeAs($expected)
+    {
+        a::assertNotSameSize($expected, $this->actual, $this->description);
     }
 
     public function xmlStructurEquals($xml, $checkAttributes = FALSE)
@@ -210,6 +230,11 @@ class Verify {
             throw new \Exception('doesNotExist() expectation should be called with expect_file()');
         }
         a::assertFileNotExists($this->actual, $this->description);
+    }
+
+    public function isJson()
+    {
+        a::assertJson($this->actual, $this->description);
     }
 
     public function equalsJsonFile($file)
@@ -251,12 +276,12 @@ class Verify {
         a::assertStringNotMatchesFormatFile($formatFile, $this->actual, $this->description);
     }
 
-    public function same($expected)
+    public function sameAs($expected)
     {
         a::assertSame($expected, $this->actual, $this->description);
     }
 
-    public function notSame($expected)
+    public function notSameAs($expected)
     {
         a::assertNotSame($expected, $this->actual, $this->description);
     }

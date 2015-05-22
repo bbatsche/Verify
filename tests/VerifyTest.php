@@ -38,12 +38,12 @@ class VerifyTest extends PHPUnit_Framework_TestCase {
 
     public function testTrueFalseNull()
     {
-        verify(true)->true();
-        verify(false)->false();
-        verify(null)->null();
-        verify(true)->notNull();
-        verify('something should be false', false)->false();
-        verify('something should be true', true)->true();
+        verify(true)->isTrue();
+        verify(false)->isFalse();
+        verify(null)->isNull();
+        verify(true)->isNotNull();
+        verify('something should be false', false)->isFalse();
+        verify('something should be true', true)->isTrue();
     }
 
     public function testEmptyNotEmpty()
@@ -120,8 +120,8 @@ class VerifyTest extends PHPUnit_Framework_TestCase {
 
     public function testCount()
     {
-        expect(array(1,2,3))->count(3);
-        expect(array(1,2,3))->notCount(2);
+        expect(array(1,2,3))->hasCount(3);
+        expect(array(1,2,3))->doesNotHaveCount(2);
     }
 
     public function testEqualXMLStructure()
@@ -169,8 +169,8 @@ class VerifyTest extends PHPUnit_Framework_TestCase {
 
     public function testSame()
     {
-        expect(1)->same(0+1);
-        expect(1)->notSame(true);
+        expect(1)->sameAs(0+1);
+        expect(1)->notSameAs(true);
     }
 
     public function testEndsWith()
@@ -206,8 +206,6 @@ class VerifyTest extends PHPUnit_Framework_TestCase {
     }
 
 }
-
-
 
 class FakeClassForTesting
 {
