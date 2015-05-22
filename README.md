@@ -7,8 +7,14 @@ This is very tiny wrapper for PHPUnit assertions, that are aimed to make tests a
 With BDD assertions influenced by Chai, Jasmine, and RSpec your assertions would be a bit closer to natural language.
 
 [![Stories in Ready](https://badge.waffle.io/bbatsche/Verify.png?label=ready&title=Ready)](https://waffle.io/bbatsche/Verify)
-[![Build Status](https://travis-ci.org/Codeception/Verify.png?branch=master)](https://travis-ci.org/Codeception/Verify) [![Latest Stable Version](https://poser.pugx.org/codeception/verify/v/stable.png)](https://packagist.org/packages/codeception/verify)
 
+[![Latest Stable Version](https://poser.pugx.org/bbat/verify/v/stable)](https://packagist.org/packages/bbat/verify)
+[![Latest Unstable Version](https://poser.pugx.org/bbat/verify/v/unstable)](https://packagist.org/packages/bbat/verify)
+[![Monthly Downloads](https://poser.pugx.org/bbat/verify/d/monthly)](https://packagist.org/packages/bbat/verify)
+[![Total Downloads](https://poser.pugx.org/bbat/verify/downloads)](https://packagist.org/packages/bbat/verify)
+[![License](https://poser.pugx.org/bbat/verify/license)](https://packagist.org/packages/bbat/verify)
+
+[![Build Status](https://travis-ci.org/bbatsche/Verify.png?branch=master)](https://travis-ci.org/Codeception/Verify)
 
 ``` php
 <?php
