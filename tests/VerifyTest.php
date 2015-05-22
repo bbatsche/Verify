@@ -1,5 +1,5 @@
 <?php
-include __DIR__.'/../src/Codeception/function.php';
+include __DIR__.'/../src/function.php';
 
 class VerifyTest extends PHPUnit_Framework_TestCase {
 

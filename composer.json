@@ -1,5 +1,5 @@
 {
-    "name": "codeception/verify",
+    "name": "bb/verify",
     "description": "BDD assertion library for PHPUnit",
     "minimum-stability": "stable",
     "authors": [
@@ -11,8 +11,11 @@
     "require-dev": {
         "phpunit/phpunit": "3.7.*"
     },
+    "replace": {
+        "codeception/verify": "0.*"
+    },
     "autoload": {
-        "files": ["src/Codeception/function.php"]
+        "files": ["src/function.php"]
     }
 
 }

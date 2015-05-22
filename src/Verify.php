@@ -1,5 +1,5 @@
 <?php
-namespace Codeception;
+namespace BB;
 
 use \PHPUnit_Framework_Assert as a;
 
