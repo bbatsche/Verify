@@ -1,213 +1,267 @@
 <?php
-include __DIR__.'/../src/function.php';
 
-class VerifyTest extends PHPUnit_Framework_TestCase {
-
-    protected $xml;
+class VerifyTest extends PHPUnit_Framework_TestCase
+{
+    protected $mockAssert;
 
     protected function setUp()
     {
-        $this->xml = new DomDocument;
-        $this->xml->loadXML('<foo><bar>Baz</bar><bar>Baz</bar></foo>');
-    }
-    public function testEquals()
-    {
-        verify(5)->equals(5);
-        verify("hello")->equals("hello");
-        verify("user have 5 posts", 5)->equals(5);
-        verify(3)->doesNotEqual(5);
-        verify_file(__FILE__)->equals(__FILE__);
-        verify_file(__FILE__)->doesNotEqual(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'composer.json');
+        $this->mockAssert = Mockery::mock('alias:BBat\Verify\Asserts');
     }
 
-    public function testContains()
+    protected function tearDown()
     {
-        verify(array(3, 2))->contains(3);
-        verify("user have 5 posts", array(3, 2))->doesNotContain(5);
+        Mockery::close();
     }
 
-    public function testGreaterLowerThen()
+    protected function fireSingleValueTest($verifyMethod, $assertMethod)
     {
-        verify(7)->isGreaterThan(5);
-        verify(7)->isLessThan(10);
-        verify(7)->isLessOrEqualTo(7);
-        verify(7)->isLessOrEqualTo(8);
-        verify(7)->isGreaterOrEqualTo(7);
-        verify(7)->isGreaterOrEqualTo(5);
+        $this->mockAssert->shouldReceive($assertMethod)->with('subject 1', Mockery::any())->once();
+        $this->mockAssert->shouldReceive($assertMethod)->with('subject 2', 'message')->once();
+
+        $this->assertNull(verify('subject 1')->$verifyMethod());
+        $this->assertNull(verify('message', 'subject 2')->$verifyMethod());
     }
 
-    public function testTrueFalseNull()
+    protected function fireTwoValueTest($verifyMethod, $assertMethod)
     {
-        verify(true)->isTrue();
-        verify(false)->isFalse();
-        verify(null)->isNull();
-        verify(true)->isNotNull();
-        verify('something should be false', false)->isFalse();
-        verify('something should be true', true)->isTrue();
+        $this->mockAssert->shouldReceive($assertMethod)->with('test 1', 'subject 1', Mockery::any())->once();
+        $this->mockAssert->shouldReceive($assertMethod)->with('test 2', 'subject 2', 'message')->once();
+
+        $this->assertNull(verify('subject 1')->$verifyMethod('test 1'));
+        $this->assertNull(verify('message', 'subject 2')->$verifyMethod('test 2'));
     }
 
-    public function testEmptyNotEmpty()
+    public function testVerifyFunction()
     {
-        verify(array('3', '5'))->isNotEmpty();
-        verify(array())->isEmpty();
-    }
+        $obj = verify('value');
 
-    public function testVerifyThat()
-    {
-        verify_that(12);
-        verify_that('hello world');
-        verify_that(array('hello'));
-    }
+        $this->assertAttributeEquals('value', 'actual', $obj);
+        $this->assertAttributeEmpty('description', $obj);
 
-    public function testVerifyNot()
-    {
-        verify_not(false);
-        verify_not(null);
-        verify_not(array());
+        $obj = verify('message', 'value');
+
+        $this->assertAttributeEquals('value', 'actual', $obj);
+        $this->assertAttributeEquals('message', 'description', $obj);
     }
 
     public function testExpectFunctions()
     {
-        expect(12)->equals(12);
-        expect_that(true);
-        expect_not(false);
+        $obj = expect('value');
+
+        $this->assertAttributeEquals('value', 'actual', $obj);
+        $this->assertAttributeEmpty('description', $obj);
+
+        $obj = expect('message', 'value');
+
+        $this->assertAttributeEquals('value', 'actual', $obj);
+        $this->assertAttributeEquals('message', 'description', $obj);
     }
 
-    public function testArrayHasKey()
+    public function testShortHandMethods()
     {
-        $errors = array('title' => 'You should add title');
-        expect($errors)->hasKey('title');
-        expect($errors)->doesNotHaveKey('body');
+        $this->mockAssert->shouldReceive('assertNotEmpty')->with('subject', Mockery::any())->twice();
+        $this->mockAssert->shouldReceive('assertEmpty')->with('subject', Mockery::any())->twice();
+
+        $this->assertNull(verify_that('subject'));
+        $this->assertNull(expect_that('subject'));
+        $this->assertNull(verify_not('subject'));
+        $this->assertNull(expect_not('subject'));
     }
 
-    public function testIsInstanceOf()
+    public function testEquals()
     {
-        $testClass = new DateTime();
-        expect($testClass)->isInstanceOf('DateTime');
-        expect($testClass)->isNotInstanceOf('DateTimeZone');
+        $this->fireTwoValueTest('equals', 'assertEquals');
+        $this->fireTwoValueTest('doesNotEqual', 'assertNotEquals');
+    }
+
+    public function testContains()
+    {
+        $this->fireTwoValueTest('contains', 'assertContains');
+        $this->fireTwoValueTest('doesNotContain', 'assertNotContains');
+    }
+
+    public function testRelativeInequality()
+    {
+        $this->fireTwoValueTest('isGreaterThan',      'assertGreaterThan');
+        $this->fireTwoValueTest('isLessThan',         'assertLessThan');
+        $this->fireTwoValueTest('isGreaterOrEqualTo', 'assertGreaterThanOrEqual');
+        $this->fireTwoValueTest('isLessOrEqualTo',    'assertLessThanOrEqual');
+    }
+
+    public function testTrueFalseNullEmpty()
+    {
+        $this->fireSingleValueTest('isTrue',     'assertTrue');
+        $this->fireSingleValueTest('isNotTrue',  'assertNotTrue');
+        $this->fireSingleValueTest('isFalse',    'assertFalse');
+        $this->fireSingleValueTest('isNotFalse', 'assertNotFalse');
+        $this->fireSingleValueTest('isNull',     'assertNull');
+        $this->fireSingleValueTest('isNotNull',  'assertNotNull');
+        $this->fireSingleValueTest('isEmpty',    'assertEmpty');
+        $this->fireSingleValueTest('isNotEmpty', 'assertNotEmpty');
+    }
+
+    public function testHasKey()
+    {
+        $this->fireTwoValueTest('hasKey',         'assertArrayHasKey');
+        $this->fireTwoValueTest('doesNotHaveKey', 'assertArrayNotHasKey');
+    }
+
+    public function testInstanceOf()
+    {
+        $this->fireTwoValueTest('isInstanceOf',    'assertInstanceOf');
+        $this->fireTwoValueTest('isNotInstanceOf', 'assertNotInstanceOf');
     }
 
     public function testInternalType()
     {
-        $testVar = array();
-        expect($testVar)->isInternalType('array');
-        expect($testVar)->isNotInternalType('boolean');
+        $this->fireTwoValueTest('isInternalType',    'assertInternalType');
+        $this->fireTwoValueTest('isNotInternalType', 'assertNotInternalType');
     }
 
     public function testHasAttribute()
     {
-        expect('Exception')->hasAttribute('message');
-        expect('Exception')->doesNotHaveAttribute('fakeproperty');
-    }
+        $obj = new stdClass();
 
-    public function testHasStaticAttribute()
-    {
-        expect('FakeClassForTesting')->hasStaticAttribute('staticProperty');
-        expect('FakeClassForTesting')->doesNotHaveStaticAttribute('fakeProperty');
+        $this->mockAssert->shouldReceive('assertClassHasAttribute')
+            ->with('attribute1', 'ClassA', Mockery::any())->once();
+        $this->mockAssert->shouldReceive('assertClassHasAttribute')
+            ->with('attribute2', 'ClassB', 'message')->once();
+
+        $this->mockAssert->shouldReceive('assertObjectHasAttribute')
+            ->with('attribute3', $obj, Mockery::any())->once();
+        $this->mockAssert->shouldReceive('assertObjectHasAttribute')
+            ->with('attribute4', $obj, 'message')->once();
+
+        $this->mockAssert->shouldReceive('assertClassNotHasAttribute')
+            ->with('attribute5', 'ClassC', Mockery::any())->once();
+        $this->mockAssert->shouldReceive('assertClassNotHasAttribute')
+            ->with('attribute6', 'ClassD', 'message')->once();
+
+        $this->mockAssert->shouldReceive('assertObjectNotHasAttribute')
+            ->with('attribute7', $obj, Mockery::any())->once();
+        $this->mockAssert->shouldReceive('assertObjectNotHasAttribute')
+            ->with('attribute8', $obj, 'message')->once();
+
+        $this->mockAssert->shouldReceive('assertClassHasStaticAttribute')
+            ->with('attribute9', 'ClassE', Mockery::any())->once();
+        $this->mockAssert->shouldReceive('assertClassHasStaticAttribute')
+            ->with('attributeA', 'ClassF', 'message')->once();
+
+        $this->mockAssert->shouldReceive('assertClassNotHasStaticAttribute')
+            ->with('attributeB', 'ClassG', Mockery::any())->once();
+        $this->mockAssert->shouldReceive('assertClassNotHasStaticAttribute')
+            ->with('attributeC', 'ClassH', 'message')->once();
+
+        $this->assertNull(verify('ClassA')->hasAttribute('attribute1'));
+        $this->assertNull(verify('message', 'ClassB')->hasAttribute('attribute2'));
+
+        $this->assertNull(verify($obj)->hasAttribute('attribute3'));
+        $this->assertNull(verify('message', $obj)->hasAttribute('attribute4'));
+
+        $this->assertNull(verify('ClassC')->doesNotHaveAttribute('attribute5'));
+        $this->assertNull(verify('message', 'ClassD')->doesNotHaveAttribute('attribute6'));
+
+        $this->assertNull(verify($obj)->doesNotHaveAttribute('attribute7'));
+        $this->assertNull(verify('message', $obj)->doesNotHaveAttribute('attribute8'));
+
+        $this->assertNull(verify('ClassE')->hasStaticAttribute('attribute9'));
+        $this->assertNull(verify('message', 'ClassF')->hasStaticAttribute('attributeA'));
+
+        $this->assertNull(verify('ClassG')->doesNotHaveStaticAttribute('attributeB'));
+        $this->assertNull(verify('message', 'ClassH')->doesNotHaveStaticAttribute('attributeC'));
     }
 
     public function testContainsOnly()
     {
-        expect(array('1', '2', '3'))->containsOnly('string');
-        expect(array('1', '2', 3))->doesNotContainOnly('string');
+        $obj = new stdClass();
+
+        $this->mockAssert->shouldReceive('assertContainsOnly')
+            ->with('TypeA', $obj, null, Mockery::any())->once();
+        $this->mockAssert->shouldReceive('assertContainsOnly')
+            ->with('TypeB', $obj, null, 'message')->once();
+        $this->mockAssert->shouldReceive('assertNotContainsOnly')
+            ->with('TypeC', $obj, null, Mockery::any())->once();
+        $this->mockAssert->shouldReceive('assertNotContainsOnly')
+            ->with('TypeD', $obj, null, 'message')->once();
+
+        $this->assertNull(verify($obj)->containsOnly('TypeA'));
+        $this->assertNull(verify('message', $obj)->containsOnly('TypeB'));
+
+        $this->assertNull(verify($obj)->doesNotContainOnly('TypeC'));
+        $this->assertNull(verify('message', $obj)->doesNotContainOnly('TypeD'));
     }
 
-    public function testContainsOnlyInstancesOf()
+    public function testCountAndSize()
     {
-        expect(array(new FakeClassForTesting(), new FakeClassForTesting(), new FakeClassForTesting()))
-            ->containsOnlyInstancesOf('FakeClassForTesting');
+        $this->fireTwoValueTest('hasCount',         'assertCount');
+        $this->fireTwoValueTest('doesNotHaveCount', 'assertNotCount');
+
+        $this->fireTwoValueTest('sameSizeAs',    'assertSameSize');
+        $this->fireTwoValueTest('notSameSizeAs', 'assertNotSameSize');
     }
 
-    public function testCount()
+    public function testJsonMethods()
     {
-        expect(array(1,2,3))->hasCount(3);
-        expect(array(1,2,3))->doesNotHaveCount(2);
+        $this->fireSingleValueTest('isJson', 'assertJson');
+
+        $this->fireTwoValueTest('equalsJsonString',       'assertJsonStringEqualsJsonString');
+        $this->fireTwoValueTest('doesNotEqualJsonString', 'assertJsonStringNotEqualsJsonString');
+
+        $this->fireTwoValueTest('equalsJsonFile',       'assertJsonStringEqualsJsonFile');
+        $this->fireTwoValueTest('doesNotEqualJsonFile', 'assertJsonStringNotEqualsJsonFile');
     }
 
-    public function testEqualXMLStructure()
+    public function testRegExpFormats()
     {
-        $expected = new DOMElement('foo');
-        $actual = new DOMElement('foo');
+        $this->fireTwoValueTest('matchesRegExp',      'assertRegExp');
+        $this->fireTwoValueTest('doesNotMatchRegExp', 'assertNotRegExp');
 
-        expect($expected)->xmlStructurEquals($actual);
-    }
+        $this->fireTwoValueTest('matchesFormat',      'assertStringMatchesFormat');
+        $this->fireTwoValueTest('doesNotMatchFormat', 'assertStringNotMatchesFormat');
 
-    public function testFileExists()
-    {
-        expect_file(__FILE__)->exists();
-        expect_file('completelyrandomfilename.txt')->doesNotExist();
-    }
-
-    public function testEqualsJsonFile()
-    {
-        expect_file(__DIR__ . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'json-test-file.json')
-            ->equalsJsonFile(__DIR__ . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'equal-json-test-file.json');
-        expect('{"some" : "data"}')->equalsJsonFile(__DIR__ . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'equal-json-test-file.json');
-    }
-
-    public function testEqualsJsonString()
-    {
-        expect('{"some" : "data"}')->equalsJsonString('{"some" : "data"}');
-    }
-
-    public function testRegExp()
-    {
-        expect('somestring')->matchesRegExp('/string/');
-    }
-
-    public function testMatchesFormat()
-    {
-        expect('somestring')->matchesFormat('%s');
-        expect('somestring')->doesNotMatchFormat('%i');
-    }
-
-    public function testMatchesFormatFile()
-    {
-        expect('23')->matchesFormatFile(__DIR__ . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'format-file.txt');
-        expect('asdfas')->doesNotMatchFormatFile(__DIR__ . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'format-file.txt');
+        $this->fireTwoValueTest('matchesFormatFile',      'assertStringMatchesFormatFile');
+        $this->fireTwoValueTest('doesNotMatchFormatFile', 'assertStringNotMatchesFormatFile');
     }
 
     public function testSame()
     {
-        expect(1)->sameAs(0+1);
-        expect(1)->notSameAs(true);
+        $this->fireTwoValueTest('sameAs',    'assertSame');
+        $this->fireTwoValueTest('notSameAs', 'assertNotSame');
     }
 
-    public function testEndsWith()
+    public function testStartsEndsWith()
     {
-        expect('A completely not funny string')->endsWith('ny string');
-        expect('A completely not funny string')->doesNotEndWith('A completely');
+        $this->fireTwoValueTest('startsWith',       'assertStringStartsWith');
+        $this->fireTwoValueTest('doesNotStartWith', 'assertStringStartsNotWith');
+
+        $this->fireTwoValueTest('endsWith',       'assertStringEndsWith');
+        $this->fireTwoValueTest('doesNotEndWith', 'assertStringEndsNotWith');
     }
 
     public function testEqualsFile()
     {
-        expect('%i')->equalsFile(__DIR__ . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'format-file.txt');
-        expect('Another string')->doesNotEqualFile(__DIR__ . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'format-file.txt');
+        $this->fireTwoValueTest('equalsFile',       'assertStringEqualsFile');
+        $this->fireTwoValueTest('doesNotEqualFile', 'assertStringNotEqualsFile');
     }
 
-    public function testStartsWith()
+    public function testXmlMethods()
     {
-        expect('A completely not funny string')->startsWith('A completely');
-        expect('A completely not funny string')->doesNotStartWith('string');
+        $subject = new DOMDocument();
+        $target  = new DOMDocument();
+
+        $this->mockAssert->shouldReceive('assertEqualXMLStructure')
+            ->with($target, $subject, false, Mockery::any())->once();
+        $this->mockAssert->shouldReceive('assertEqualXMLStructure')
+            ->with($target, $subject, false, 'message')->once();
+
+        $this->assertNull(verify($subject)->equalsXmlStructure($target));
+        $this->assertNull(verify('message', $subject)->equalsXmlStructure($target));
+
+        $this->fireTwoValueTest('equalsXmlFile',       'assertXmlStringEqualsXmlFile');
+        $this->fireTwoValueTest('doesNotEqualXmlFile', 'assertXmlStringNotEqualsXmlFile');
+
+        $this->fireTwoValueTest('equalsXmlString',       'assertXmlStringEqualsXmlString');
+        $this->fireTwoValueTest('doesNotEqualXmlString', 'assertXmlStringNotEqualsXmlString');
     }
-
-    public function testEqualsXmlFile()
-    {
-        expect_file(__DIR__ . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'xml-test-file.xml')
-            ->equalsXmlFile(__DIR__ . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'xml-test-file.xml');
-        expect('<foo><bar>Baz</bar><bar>Baz</bar></foo>')
-            ->equalsXmlFile(__DIR__ . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'xml-test-file.xml');
-    }
-
-    public function testEqualsXmlString()
-    {
-        expect('<foo><bar>Baz</bar><bar>Baz</bar></foo>')
-            ->equalsXmlString('<foo><bar>Baz</bar><bar>Baz</bar></foo>');
-    }
-
-}
-
-class FakeClassForTesting
-{
-    static $staticProperty;
 }

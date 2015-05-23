@@ -1,4 +1,5 @@
 <?php
+
 if (!function_exists('verify')) {
 
     /**
@@ -7,9 +8,7 @@ if (!function_exists('verify')) {
      * @return \BBat\Verify
      */
     function verify($description) {
-        include_once __DIR__.'/Verify.php';
-
-        $reflect  = new ReflectionClass('\BBat\Verify');
+        $reflect = new ReflectionClass('\BBat\Verify\Verify');
         return $reflect->newInstanceArgs(func_get_args());
     }
 
@@ -51,12 +50,8 @@ if (!function_exists('verify_file')) {
      * @return \BBat\Verify
      */
     function verify_file() {
-        include_once __DIR__.'/Verify.php';
-
-        $reflect  = new ReflectionClass('\BBat\Verify');
-        $verify =  $reflect->newInstanceArgs(func_get_args());
-        $verify->setIsFileExpectation(true);
-        return $verify;
+        $reflect = new ReflectionClass('\BBat\Verify\VerifyFile');
+        return $reflect->newInstanceArgs(func_get_args());
     }
 }
 

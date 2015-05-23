@@ -20,6 +20,9 @@
     "require": {
         "phpunit/phpunit": "~4.0"
     },
+    "require-dev": {
+        "mockery/mockery": "~0.9"
+    },
     "replace": {
         "codeception/verify": "0.*"
     },
@@ -27,7 +30,10 @@
         "codeception/specify": "Highly readable test code blocks for PHPUnit and Codeception"
     },
     "autoload": {
-        "files": ["src/function.php"]
+        "files": ["src/function.php"],
+        "psr-4": {
+            "BBat\\Verify\\": "src"
+        }
     },
     "extra": {
         "branch-alias": {

@@ -1,13 +1,11 @@
-<?php
-namespace BBat;
+<?php namespace BBat\Verify;
 
-use \PHPUnit_Framework_Assert as a;
+use BBat\Verify\Asserts as a;
 
 class Verify
 {
     protected $actual = null;
     protected $description = '';
-    protected $isFileExpectation = false;
 
     public function __construct($description)
     {
@@ -22,30 +20,14 @@ class Verify
         }
     }
 
-    /**
-     * @param boolean $isFileExpectation
-     */
-    public function setIsFileExpectation($isFileExpectation)
-    {
-        $this->isFileExpectation = $isFileExpectation;
-    }
-
     public function equals($expected)
     {
-        if ( ! $this->isFileExpectation ) {
-            a::assertEquals($expected, $this->actual, $this->description);
-        } else {
-            a::assertFileEquals($expected, $this->actual, $this->description);
-        }
+        a::assertEquals($expected, $this->actual, $this->description);
     }
 
     public function doesNotEqual($expected)
     {
-        if ( ! $this->isFileExpectation ) {
-            a::assertNotEquals($expected, $this->actual, $this->description);
-        } else {
-            a::assertFileNotEquals($expected, $this->actual, $this->description);
-        }
+        a::assertNotEquals($expected, $this->actual, $this->description);
     }
 
     public function contains($needle)
@@ -176,19 +158,14 @@ class Verify
         a::assertClassNotHasStaticAttribute($attribute, $this->actual, $this->description);
     }
 
-    public function containsOnly($type, $isNativeType = NULL)
+    public function containsOnly($type)
     {
-        a::assertContainsOnly($type, $this->actual, $isNativeType, $this->description);
+        a::assertContainsOnly($type, $this->actual, null, $this->description);
     }
 
-    public function doesNotContainOnly($type, $isNativeType = NULL)
+    public function doesNotContainOnly($type)
     {
-        a::assertNotContainsOnly($type, $this->actual, $isNativeType, $this->description);
-    }
-
-    public function containsOnlyInstancesOf($class)
-    {
-        a::assertContainsOnlyInstancesOf($class, $this->actual, $this->description);
+        a::assertNotContainsOnly($type, $this->actual, null, $this->description);
     }
 
     public function hasCount($count)
@@ -211,39 +188,9 @@ class Verify
         a::assertNotSameSize($expected, $this->actual, $this->description);
     }
 
-    public function xmlStructurEquals($xml, $checkAttributes = FALSE)
-    {
-        a::assertEqualXMLStructure($xml, $this->actual, $checkAttributes, $this->description);
-    }
-
-    public function exists()
-    {
-        if ( ! $this->isFileExpectation ) {
-            throw new \Exception('exists() expectation should be called with expect_file()');
-        }
-        a::assertFileExists($this->actual, $this->description);
-    }
-
-    public function doesNotExist()
-    {
-        if ( ! $this->isFileExpectation ) {
-            throw new \Exception('doesNotExist() expectation should be called with expect_file()');
-        }
-        a::assertFileNotExists($this->actual, $this->description);
-    }
-
     public function isJson()
     {
         a::assertJson($this->actual, $this->description);
-    }
-
-    public function equalsJsonFile($file)
-    {
-        if ( ! $this->isFileExpectation ) {
-            a::assertJsonStringEqualsJsonFile($file, $this->actual, $this->description);
-        } else {
-            a::assertJsonFileEqualsJsonFile($file, $this->actual, $this->description);
-        }
     }
 
     public function equalsJsonString($string)
@@ -251,9 +198,29 @@ class Verify
         a::assertJsonStringEqualsJsonString($string, $this->actual, $this->description);
     }
 
+    public function doesNotEqualJsonString($string)
+    {
+        a::assertJsonStringNotEqualsJsonString($string, $this->actual, $this->description);
+    }
+
+    public function equalsJsonFile($file)
+    {
+        a::assertJsonStringEqualsJsonFile($file, $this->actual, $this->description);
+    }
+
+    public function doesNotEqualJsonFile($file)
+    {
+        a::assertJsonStringNotEqualsJsonFile($file, $this->actual, $this->description);
+    }
+
     public function matchesRegExp($expression)
     {
         a::assertRegExp($expression, $this->actual, $this->description);
+    }
+
+    public function doesNotMatchRegExp($expression)
+    {
+        a::assertNotRegExp($expression, $this->actual, $this->description);
     }
 
     public function matchesFormat($format)
@@ -286,6 +253,16 @@ class Verify
         a::assertNotSame($expected, $this->actual, $this->description);
     }
 
+    public function startsWith($prefix)
+    {
+        a::assertStringStartsWith($prefix, $this->actual, $this->description);
+    }
+
+    public function doesNotStartWith($prefix)
+    {
+        a::assertStringStartsNotWith($prefix, $this->actual, $this->description);
+    }
+
     public function endsWith($suffix)
     {
         a::assertStringEndsWith($suffix, $this->actual, $this->description);
@@ -306,23 +283,19 @@ class Verify
         a::assertStringNotEqualsFile($file, $this->actual, $this->description);
     }
 
-    public function startsWith($prefix)
+    public function equalsXmlStructure($xml)
     {
-        a::assertStringStartsWith($prefix, $this->actual, $this->description);
-    }
-
-    public function doesNotStartWith($prefix)
-    {
-        a::assertStringStartsNotWith($prefix, $this->actual, $this->description);
+        a::assertEqualXMLStructure($xml, $this->actual, false, $this->description);
     }
 
     public function equalsXmlFile($file)
     {
-        if ( ! $this->isFileExpectation ) {
-            a::assertXmlStringEqualsXmlFile($file, $this->actual, $this->description);
-        } else {
-            a::assertXmlFileEqualsXmlFile($file, $this->actual, $this->description);
-        }
+        a::assertXmlStringEqualsXmlFile($file, $this->actual, $this->description);
+    }
+
+    public function doesNotEqualXmlFile($file)
+    {
+        a::assertXmlStringNotEqualsXmlFile($file, $this->actual, $this->description);
     }
 
     public function equalsXmlString($xmlString)
@@ -330,5 +303,8 @@ class Verify
         a::assertXmlStringEqualsXmlString($xmlString, $this->actual, $this->description);
     }
 
+    public function doesNotEqualXmlString($xmlString)
+    {
+        a::assertXmlStringNotEqualsXmlString($xmlString, $this->actual, $this->description);
+    }
 }
-
