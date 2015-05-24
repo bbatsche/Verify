@@ -2,24 +2,8 @@
 
 use BBat\Verify\Asserts as a;
 
-class Verify
+class Verify extends VerifyBase
 {
-    protected $actual = null;
-    protected $description = '';
-
-    public function __construct($description)
-    {
-        $descriptionGiven = (func_num_args() == 2);
-
-        if (!$descriptionGiven) {
-            $this->actual = $description;
-        } else {
-            $actual = func_get_args();
-            $this->actual = $actual[1];
-            $this->description = $description;
-        }
-    }
-
     public function equals($expected)
     {
         a::assertEquals($expected, $this->actual, $this->description);
