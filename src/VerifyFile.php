@@ -7,7 +7,7 @@ class VerifyFile
     protected $actual;
     protected $description;
 
-    public function __constrcut()
+    public function __construct()
     {
         switch(func_num_args()) {
             case 1:
@@ -47,8 +47,18 @@ class VerifyFile
         a::assertJsonFileEqualsJsonFile($file, $this->actual, $this->description);
     }
 
+    public function doesNotEqualJsonFile($file)
+    {
+        a::assertJsonFileNotEqualsJsonFile($file, $this->actual, $this->description);
+    }
+
     public function equalsXmlFile($file)
     {
         a::assertXmlFileEqualsXmlFile($file, $this->actual, $this->description);
+    }
+
+    public function doesNotEqualXmlFile($file)
+    {
+        a::assertXmlFileNotEqualsXmlFile($file, $this->actual, $this->description);
     }
 }

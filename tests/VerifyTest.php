@@ -1,35 +1,12 @@
 <?php
 
-class VerifyTest extends PHPUnit_Framework_TestCase
+require_once 'UnitTestBase.php';
+
+class VerifyTest extends UnitTestBase
 {
-    protected $mockAssert;
-
-    protected function setUp()
+    public static function setUpBeforeClass()
     {
-        $this->mockAssert = Mockery::mock('alias:BBat\Verify\Asserts');
-    }
-
-    protected function tearDown()
-    {
-        Mockery::close();
-    }
-
-    protected function fireSingleValueTest($verifyMethod, $assertMethod)
-    {
-        $this->mockAssert->shouldReceive($assertMethod)->with('subject 1', Mockery::any())->once();
-        $this->mockAssert->shouldReceive($assertMethod)->with('subject 2', 'message')->once();
-
-        $this->assertNull(verify('subject 1')->$verifyMethod());
-        $this->assertNull(verify('message', 'subject 2')->$verifyMethod());
-    }
-
-    protected function fireTwoValueTest($verifyMethod, $assertMethod)
-    {
-        $this->mockAssert->shouldReceive($assertMethod)->with('test 1', 'subject 1', Mockery::any())->once();
-        $this->mockAssert->shouldReceive($assertMethod)->with('test 2', 'subject 2', 'message')->once();
-
-        $this->assertNull(verify('subject 1')->$verifyMethod('test 1'));
-        $this->assertNull(verify('message', 'subject 2')->$verifyMethod('test 2'));
+        static::$verifyMethod = 'verify';
     }
 
     public function testVerifyFunction()
@@ -39,10 +16,14 @@ class VerifyTest extends PHPUnit_Framework_TestCase
         $this->assertAttributeEquals('value', 'actual', $obj);
         $this->assertAttributeEmpty('description', $obj);
 
+        $this->assertInstanceOf('BBat\Verify\Verify', $obj);
+
         $obj = verify('message', 'value');
 
         $this->assertAttributeEquals('value', 'actual', $obj);
         $this->assertAttributeEquals('message', 'description', $obj);
+
+        $this->assertInstanceOf('BBat\Verify\Verify', $obj);
     }
 
     public function testExpectFunctions()
@@ -52,10 +33,14 @@ class VerifyTest extends PHPUnit_Framework_TestCase
         $this->assertAttributeEquals('value', 'actual', $obj);
         $this->assertAttributeEmpty('description', $obj);
 
+        $this->assertInstanceOf('BBat\Verify\Verify', $obj);
+
         $obj = expect('message', 'value');
 
         $this->assertAttributeEquals('value', 'actual', $obj);
         $this->assertAttributeEquals('message', 'description', $obj);
+
+        $this->assertInstanceOf('BBat\Verify\Verify', $obj);
     }
 
     public function testShortHandMethods()
