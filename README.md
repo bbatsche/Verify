@@ -1,5 +1,4 @@
-Verify
-======
+# Verify
 
 BDD Assertions for PHPUnit and Codeception
 
@@ -13,81 +12,179 @@ With BDD assertions influenced by Chai, Jasmine, and RSpec your assertions would
 [![License](https://poser.pugx.org/bbat/verify/license)](https://packagist.org/packages/bbat/verify)
 [![Build Status](https://travis-ci.org/bbatsche/Verify.png?branch=master)](https://travis-ci.org/Codeception/Verify)
 
-``` php
-<?php
-$user = User::find(1);
+Most of the original work was done by [@DavertMik](http://github.com/DavertMik) and [@Ragazzo](http://github.com/Ragazzo) in the [Codeception/Verify](http://github.com/Codeception/Verify) repo. This fork was created when it became apparent the original library was missing some key features and was all but abandoned.
 
-// equal
-verify($user->getName())->equals('davert');
-verify("user have 5 posts", $user->getNumPosts())->equals(5);
-verify($user->getNumPosts())->notEquals(3);
+## Contents
 
-// contains
-verify('first user is admin', $user->getRoles())->contains('admin');
-verify("first user is not banned", $user->getRoles())->notContains('banned');
-
-// greater / less
-$rate = $user->getRate();
-verify('first user rate is 7', $rate)->equals(7);
-
-verify($rate)->greaterThan(5);
-verify($rate)->lessThen(10);
-verify($rate)->lessOrEquals(7);
-verify($rate)->lessOrEquals(8);
-verify($rate)->greaterOrEquals(7);
-verify($rate)->greaterOrEquals(5);
-
-// true/false/null
-verify($user->isAdmin())->true();
-verify($user->isBanned())->false();
-verify($user->invitedBy)->null();
-verify($user->getPosts())->notNull();
-
-// empty
-verify($user->getComments())->isEmpty();
-verify($user->getRoles())->notEmpty();
-?>
-```
-
-Shorthands for testing truth/fallacy:
-
-``` php
-<?php
-verify_that($user->isActivated());
-verify_not($user->isBanned());
-?>
-```
-
-This 2 functions doesn't check for strict true/false matching, rather `empty` function is used.
-`verify_that` checks that result is not empty value, `verify_not` does the opposite.
-
-## Alternative Syntax
-
-If you follow TDD/BDD you'd rather use `expect` instead of `verify`. Which is just an alias functions:
-
-``` php
-expect("user have 5 posts", $user->getNumPosts())->equals(5);
-expect_that($user->isActive());
-expect_not($user->isBanned());
-```
-
+- [Installation](#installation)
+- [Basic Usage](#basic-usage)
+    - [Shorthand Functions](#shorthand-functions)
+    - [Alternate Functions](#alternate-functions)
+- [Available Assertions](#available-assertions)
+    - [File Assertions](#file-assertions)
 
 ## Installation
 
-With Composer:
+To install the current version of Verify from [Packagist](https://packagist.org/packages/bbat/verify), run the following in your project directory:
 
-```
-"require-dev": {
-    "codeception/verify": "*"
-}
+```bash
+composer require --dev bbat/verify:~1.0@beta
 ```
 
-## Usage
+Verify will be added to your `composer.json` under `require-dev` and installed in your `vendor` directory. You can then start using it in your unit tests.
 
-Use in any test `verify` function instead of `$this->assert*` methods.
+## Basic Usage
 
-## Extending
+To use Verify in your unit tests, call the `verify()` along with your expectation, like the following:
 
-`Codeception\Verify` class can be extended with custom assertions. You write your own`verify` function that would instantiate your extended version of Verify class.
+```php
+$testValue = true;
 
-**License: MIT**
+verify($testValue)->isTrue();
+```
+
+That's it! You've now asserted that your `$testValue` is `true`! You can pass along a more detailed message for PHPUnit to display if your assertion fails like so:
+
+```php
+verify('test value should be false', $testValue)->isFalse();
+```
+
+### Shorthand Functions
+
+There are two shortcut functions to quickly and easily assert a value is true or false (or more accurately, empty or not).
+
+```php
+verify_that($user->isActivated());
+
+verify_not($user->isBanned());
+```
+
+### Alternate Functions
+
+To better match TDD/BDD style, Verify also comes with `expect()` and `expect_*()` functions that act as aliases of the `verify()` function.
+
+```php
+expect($testValue)->equals('some other value');
+
+expect('test value should not equal "bad value"', $testValue)->doesNotEqual("bad value");
+
+expect_that($testModel->isValid());
+
+expect_not($testModel->hasError());
+```
+
+## Available Assertions
+
+By now you have hopefully noticed that Verify assertions read almost like plain English. The Verify assertions are crafted to optimize readability and understanding. Easy to parse tests are good tests. Currently, Verify supports the following assertions:
+
+``` php
+// Equity
+verify($test)->equals('expected value');
+verify($test)->doesNotEqual('unexpected value');
+
+verify($objectInstance)->sameAs($sameObjectInstance);
+verify($objectInstance)->notSameAs($aDifferentObject);
+
+verify($test)->equalsFile('/path/to/file.txt');
+verify($test)->doesNotEqualFile('/path/to/other/file.txt');
+
+// Truthiness
+verify($value)->isTrue();
+verify($value)->isNotTrue();
+verify($value)->isFalse();
+verify($value)->isNotFalse();
+
+verify($value)->isNull();
+verify($value)->isNotNull();
+
+verify($value)->isEmpty();
+verify($value)->isNotEmpty();
+
+// Numeric Comparison
+verify($numericValue)->isGreaterThan($tooSmall);
+verify($numericValue)->isGreaterOrEqualTo($min);
+verify($numericValue)->isLessThan($tooBig);
+verify($numericValue)->isLessOrEqualTo($max);
+
+// String Values
+verify($stringTest)->contains('expected value');
+verify($stringTest)->doesNotContain('unexpected value');
+
+verify($stringTest)->startsWith('start of string');
+verify($stringTest)->doesNotStartWith('not start');
+verify($stringTest)->endsWith('end of string');
+verify($stringTest)->doesNotEndWIth('not the end');
+
+verify($stringTest)->matchesRegExp('/[a-zA-Z]+/');
+verify($stringTest)->doesNotMatchRegExp('/[0-9]+/');
+
+verify($stringTest)->matchesFormat('%i');
+verify($stringTest)->matchesFormatFile('/path/to/format.txt');
+verify($stringTest)->doesNotMatchFormat('%x');
+verify($stringTest)->doesNotMatchFormatFile('/path/to/other_format.txt');
+
+// Array Elements
+verify($arrayValue)->contains('expected value');
+verify($arrayValue)->doesNotContain('unexpected value');
+
+verify($arrayValue)->hasKey('some-key');
+verify($arrayValue)->doesNotHaveKey('some-other-key');
+
+verify($arrayValue)->hasCount(4);
+verify($arrayValue)->doesNotHaveCount(1);
+verify($arrayValue)->sameSizeAs($someOtherArray);
+verify($arrayValue)->notSameSizeAs($aDifferentArray);
+
+// // Contains only methods work for both object instances and internal types
+verify($arrayValue)->containsOnly('string');
+verify($arrayValue)->doesNotContainOnly('ClassName');
+
+// Objects, Classes, and Internal Types
+verify($object)->isInstanceOf('ClassName');
+verify($object)->isNotInstanceOf('DifferentClassName');
+
+verify($value)->isInternalType('int');
+verify($value)->isNotInternalType('boolean');
+
+verify($object)->hasAttribute('attributeName');
+verify($object)->doesNotHaveAttribute('differentAttributeName');
+
+verify('ClassName')->hasAttribute('attributeName');
+verify('ClassName')->doesNotHaveAttribute('differentAttributeName');
+
+verify('ClassName')->hasStaticAttribute('attributeName');
+verify('ClassName')->doesNotHaveStaticAttribute('differentAttributeName');
+
+// JSON and XML
+verify($jsonValue)->isJson();
+
+verify($jsonValue)->equalsJsonString('{"json": "string"}');
+verify($jsonValue)->equalsJsonFile('/path/to/file.json');
+verify($jsonValue)->doesNotEqualJsonString('{"bad": "json"}');
+verify($jsonValue)->doesNotEqualJsonFile('/path/to/bad.json');
+
+verify($domObj)->equalsXmlStructure($validDomObj);
+
+verify($xmlString)->equalsXmlString('<valid><xml /></valid>');
+verify($xmlString)->equalsXmlFile('/path/to/file.xml');
+verify($xmlString)->doesNotEqualXmlString('<bad><xml /></bad>');
+verify($xmlString)->doesNotEqualXmlFile('/path/to/bad.xml');
+```
+
+### File Assertions
+
+If the subject under test is actually a file, you must use the `verify_file()` (or `expect_file()`) methods to access filesystem assertions.
+
+```php
+verify_file('/path/to/test.txt')->exists();
+verify_file('/path/to/other.txt')->doesNotExist();
+
+verify_file('/path/to/test.txt')->equals('/path/to/b.txt');
+verify_file('/path/to/test.txt')->doesNotEqual('/path/to/c.txt');
+
+verify_file('/path/to/test.json')->equalsJsonFile('/path/to/other.json');
+verify_file('/path/to/test.json')->doesNotEqualJsonFile('/path/to/bad.json');
+
+verify_file('/path/to/test.xml')->equalsXmlFile('/path/to/other.xml');
+verify_file('/path/to/test.xml')->doesNotEqualXmlFile('/path/to/bad.xml');
+```
