@@ -1,6 +1,6 @@
 <?php namespace BBat\Verify;
 
-use BBat\Verify\Asserts as a;
+use BBat\Verify\Assert as a;
 
 class VerifyFile extends VerifyBase
 {

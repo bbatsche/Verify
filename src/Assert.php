@@ -1,6 +1,5 @@
 <?php namespace BBat\Verify;
 
-
 /**
  * Assert Class
  *
@@ -10,8 +9,6 @@
  * having to test full integration.
  *
  * @package BBat\Verify
+ * @abstract
  */
-abstract class Asserts extends \PHPUnit_Framework_Assert
-{
-
-}
+abstract class Assert extends \PHPUnit_Framework_Assert {}
