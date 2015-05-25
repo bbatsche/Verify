@@ -1,5 +1,8 @@
 <?php
 
+use BBat\Verify\Verify;
+use BBat\Verify\VerifyFile;
+
 if (!function_exists('verify')) {
 
     /**
@@ -7,9 +10,15 @@ if (!function_exists('verify')) {
      * @param null $actual
      * @return \BBat\Verify
      */
-    function verify($description) {
-        $reflect = new ReflectionClass('\BBat\Verify\Verify');
-        return $reflect->newInstanceArgs(func_get_args());
+    function verify() {
+        switch(func_num_args()) {
+            case 1:
+                return new Verify(func_get_arg(0));
+            case 2:
+                return new Verify(func_get_arg(1), func_get_arg(0));
+            default:
+                throw new \BadMethodCallException('VerifyFile must take 1 or 2 arguments.');
+        }
     }
 
     function verify_that($truth) {
@@ -50,8 +59,14 @@ if (!function_exists('verify_file')) {
      * @return \BBat\Verify
      */
     function verify_file() {
-        $reflect = new ReflectionClass('\BBat\Verify\VerifyFile');
-        return $reflect->newInstanceArgs(func_get_args());
+        switch(func_num_args()) {
+            case 1:
+                return new VerifyFile(func_get_arg(0));
+            case 2:
+                return new VerifyFile(func_get_arg(1), func_get_arg(0));
+            default:
+                throw new \BadMethodCallException('VerifyFile must take 1 or 2 arguments.');
+        }
     }
 }
 
