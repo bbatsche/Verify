@@ -21,7 +21,8 @@
         "phpunit/phpunit": "~4.0"
     },
     "require-dev": {
-        "mockery/mockery": "~0.9"
+        "mockery/mockery": "~0.9",
+        "apigen/apigen": "~4.1"
     },
     "replace": {
         "codeception/verify": "0.*"
