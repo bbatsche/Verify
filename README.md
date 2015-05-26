@@ -22,6 +22,7 @@ Most of the original work was done by [@DavertMik](http://github.com/DavertMik) 
     - [Alternate Functions](#alternate-functions)
 - [Available Assertions](#available-assertions)
     - [File Assertions](#file-assertions)
+- [Additional Information](#additional-information)
 
 ## Installation
 
@@ -188,3 +189,7 @@ verify_file('/path/to/test.json')->doesNotEqualJsonFile('/path/to/bad.json');
 verify_file('/path/to/test.xml')->equalsXmlFile('/path/to/other.xml');
 verify_file('/path/to/test.xml')->doesNotEqualXmlFile('/path/to/bad.xml');
 ```
+
+## Additional Information
+
+Full API documentation can be found on [GitHub Pages](http://bbatsche.github.io/Verify/). Any issues or questions can be submitted to [Waffle.io](https://waffle.io/bbatsche/Verify).
