@@ -13,6 +13,7 @@ use BeBat\Verify\Assert as a;
 class Verify extends VerifyBase
 {
     protected $floatDelta = 0.0;
+    protected $maxDepth   = 10;
 
     public function within($delta)
     {
@@ -28,7 +29,7 @@ class Verify extends VerifyBase
      */
     public function equals($expected)
     {
-        a::assertEquals($expected, $this->actual, $this->description, $this->floatDelta);
+        a::assertEquals($expected, $this->actual, $this->description, $this->floatDelta, $this->maxDepth);
     }
 
     /**
@@ -39,7 +40,7 @@ class Verify extends VerifyBase
      */
     public function doesNotEqual($expected)
     {
-        a::assertNotEquals($expected, $this->actual, $this->description, $this->floatDelta);
+        a::assertNotEquals($expected, $this->actual, $this->description, $this->floatDelta, $this->maxDepth);
     }
 
     /**
