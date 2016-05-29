@@ -12,6 +12,14 @@ use BeBat\Verify\Assert as a;
  */
 class Verify extends VerifyBase
 {
+    protected $floatDelta = 0.0;
+
+    public function within($delta)
+    {
+        $this->floatDelta = $delta;
+
+        return $this;
+    }
     /**
      * Assert SUT equals a given value
      *
@@ -20,7 +28,7 @@ class Verify extends VerifyBase
      */
     public function equals($expected)
     {
-        a::assertEquals($expected, $this->actual, $this->description);
+        a::assertEquals($expected, $this->actual, $this->description, $this->floatDelta);
     }
 
     /**
@@ -31,7 +39,7 @@ class Verify extends VerifyBase
      */
     public function doesNotEqual($expected)
     {
-        a::assertNotEquals($expected, $this->actual, $this->description);
+        a::assertNotEquals($expected, $this->actual, $this->description, $this->floatDelta);
     }
 
     /**

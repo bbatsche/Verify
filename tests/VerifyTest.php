@@ -56,8 +56,37 @@ class VerifyTest extends UnitTestBase
 
     public function testEquals()
     {
-        $this->fireTwoValueTest('equals', 'assertEquals');
-        $this->fireTwoValueTest('doesNotEqual', 'assertNotEquals');
+        $this->mockAssert->shouldReceive('assertEquals')->with('test 1', 'subject 1', Mockery::any(), Mockery::any())->once();
+        $this->mockAssert->shouldReceive('assertEquals')->with('test 2', 'subject 2', 'message', Mockery::any())->once();
+
+        $this->assertNull(verify('subject 1')->equals('test 1'));
+        $this->assertNull(verify('message', 'subject 2')->equals('test 2'));
+    }
+
+    public function testNotEquals()
+    {
+        $this->mockAssert->shouldReceive('assertNotEquals')->with('test 1', 'subject 1', Mockery::any(), Mockery::any())->once();
+        $this->mockAssert->shouldReceive('assertNotEquals')->with('test 2', 'subject 2', 'message', Mockery::any())->once();
+
+        $this->assertNull(verify('subject 1')->doesNotEqual('test 1'));
+        $this->assertNull(verify('message', 'subject 2')->doesNotEqual('test 2'));
+    }
+
+    public function testFloatingPointEquals()
+    {
+        // Default: 0.0
+        $this->mockAssert->shouldReceive('assertEquals')->with('test 1', 'subject 1', Mockery::any(), 0.0)->once();
+        $this->mockAssert->shouldReceive('assertEquals')->with('test 2', 'subject 2', 'message 2', 0.0)->once();
+
+        $this->assertNull(verify('subject 1')->equals('test 1'));
+        $this->assertNull(verify('message 2', 'subject 2')->equals('test 2'));
+
+        // Specified value: 1.0
+        $this->mockAssert->shouldReceive('assertEquals')->with('test 3', 'subject 3', Mockery::any(), 1.0)->once();
+        $this->mockAssert->shouldReceive('assertEquals')->with('test 4', 'subject 4', 'message 4', 1.0)->once();
+
+        $this->assertNull(verify('subject 3')->within(1.0)->equals('test 3'));
+        $this->assertNull(verify('message 4', 'subject 4')->within(1.0)->equals('test 4'));
     }
 
     public function testContains()
