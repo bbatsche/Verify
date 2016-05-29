@@ -1,13 +1,13 @@
-<?php namespace BBat\Verify;
+<?php namespace BeBat\Verify;
 
-use BBat\Verify\Assert as a;
+use BeBat\Verify\Assert as a;
 
 /**
  * Verify Files
  *
  * Collection of assertions specific to filesystem objects.
  *
- * @package BBat\Verify
+ * @package BeBat\Verify
  */
 class VerifyFile extends VerifyBase
 {

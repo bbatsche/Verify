@@ -1,7 +1,7 @@
 <?php
 
-use BBat\Verify\Verify;
-use BBat\Verify\VerifyFile;
+use BeBat\Verify\Verify;
+use BeBat\Verify\VerifyFile;
 
 if (!function_exists('verify')) {
     /**

@@ -16,14 +16,14 @@ class VerifyFileTest extends UnitTestBase
         $this->assertAttributeEquals('filename', 'actual', $obj);
         $this->assertAttributeEmpty('description', $obj);
 
-        $this->assertInstanceOf('BBat\Verify\VerifyFile', $obj);
+        $this->assertInstanceOf('BeBat\Verify\VerifyFile', $obj);
 
         $obj = verify_file('message', 'filename');
 
         $this->assertAttributeEquals('filename', 'actual', $obj);
         $this->assertAttributeEquals('message', 'description', $obj);
 
-        $this->assertInstanceOf('BBat\Verify\VerifyFile', $obj);
+        $this->assertInstanceOf('BeBat\Verify\VerifyFile', $obj);
     }
 
     public function testExpectFileFunction()
@@ -33,14 +33,14 @@ class VerifyFileTest extends UnitTestBase
         $this->assertAttributeEquals('filename', 'actual', $obj);
         $this->assertAttributeEmpty('description', $obj);
 
-        $this->assertInstanceOf('BBat\Verify\VerifyFile', $obj);
+        $this->assertInstanceOf('BeBat\Verify\VerifyFile', $obj);
 
         $obj = expect_file('message', 'filename');
 
         $this->assertAttributeEquals('filename', 'actual', $obj);
         $this->assertAttributeEquals('message', 'description', $obj);
 
-        $this->assertInstanceOf('BBat\Verify\VerifyFile', $obj);
+        $this->assertInstanceOf('BeBat\Verify\VerifyFile', $obj);
     }
 
     public function testEquals()

@@ -1,4 +1,4 @@
-<?php namespace BBat\Verify;
+<?php namespace BeBat\Verify;
 
 /**
  * Assert Class
@@ -8,7 +8,7 @@
  * where Mockery can inject itself so we can unit test API calls without
  * having to test full integration.
  *
- * @package BBat\Verify
+ * @package BeBat\Verify
  * @abstract
  */
 abstract class Assert extends \PHPUnit_Framework_Assert {}

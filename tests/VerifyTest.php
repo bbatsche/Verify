@@ -16,14 +16,14 @@ class VerifyTest extends UnitTestBase
         $this->assertAttributeEquals('value', 'actual', $obj);
         $this->assertAttributeEmpty('description', $obj);
 
-        $this->assertInstanceOf('BBat\Verify\Verify', $obj);
+        $this->assertInstanceOf('BeBat\Verify\Verify', $obj);
 
         $obj = verify('message', 'value');
 
         $this->assertAttributeEquals('value', 'actual', $obj);
         $this->assertAttributeEquals('message', 'description', $obj);
 
-        $this->assertInstanceOf('BBat\Verify\Verify', $obj);
+        $this->assertInstanceOf('BeBat\Verify\Verify', $obj);
     }
 
     public function testExpectFunctions()
@@ -33,14 +33,14 @@ class VerifyTest extends UnitTestBase
         $this->assertAttributeEquals('value', 'actual', $obj);
         $this->assertAttributeEmpty('description', $obj);
 
-        $this->assertInstanceOf('BBat\Verify\Verify', $obj);
+        $this->assertInstanceOf('BeBat\Verify\Verify', $obj);
 
         $obj = expect('message', 'value');
 
         $this->assertAttributeEquals('value', 'actual', $obj);
         $this->assertAttributeEquals('message', 'description', $obj);
 
-        $this->assertInstanceOf('BBat\Verify\Verify', $obj);
+        $this->assertInstanceOf('BeBat\Verify\Verify', $obj);
     }
 
     public function testShortHandMethods()

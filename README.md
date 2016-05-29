@@ -7,10 +7,10 @@ With BDD assertions influenced by Chai, Jasmine, and RSpec your assertions would
 
 [![Ready Stories](https://badge.waffle.io/bbatsche/Verify.png?label=ready&title=Ready)](https://waffle.io/bbatsche/Verify)
 [![Stories In Progress](https://badge.waffle.io/bbatsche/Verify.png?label=in+progress&title=In+Progress)](https://waffle.io/bbatsche/Verify)
-[![Latest Stable Version](https://img.shields.io/packagist/v/bbat/verify.svg?style=plastic)](https://packagist.org/packages/bbat/verify)
-[![Latest Unstable Version](https://img.shields.io/packagist/vpre/bbat/verify.svg?style=plastic)](https://packagist.org/packages/bbat/verify)
-[![Total Downloads](https://img.shields.io/packagist/dt/bbat/verify.svg?style=plastic)](https://packagist.org/packages/bbat/verify)
-[![License](https://img.shields.io/packagist/l/bbat/verify.svg?style=plastic)](https://packagist.org/packages/bbat/verify)
+[![Latest Stable Version](https://img.shields.io/packagist/v/bebat/verify.svg?style=plastic)](https://packagist.org/packages/bebat/verify)
+[![Latest Unstable Version](https://img.shields.io/packagist/vpre/bebat/verify.svg?style=plastic)](https://packagist.org/packages/bebat/verify)
+[![Total Downloads](https://img.shields.io/packagist/dt/bebat/verify.svg?style=plastic)](https://packagist.org/packages/bebat/verify)
+[![License](https://img.shields.io/packagist/l/bebat/verify.svg?style=plastic)](https://packagist.org/packages/bebat/verify)
 [![Build Status](https://img.shields.io/travis/bbatsche/Verify.svg?style=plastic)](https://travis-ci.org/bbatsche/Verify)
 
 Most of the original work was done by [@DavertMik](http://github.com/DavertMik) and [@Ragazzo](http://github.com/Ragazzo) in the [Codeception/Verify](http://github.com/Codeception/Verify) repo. This fork was created when it became apparent the original library was missing some key features and was all but abandoned.
@@ -27,10 +27,10 @@ Most of the original work was done by [@DavertMik](http://github.com/DavertMik) 
 
 ## Installation
 
-To install the current version of Verify from [Packagist](https://packagist.org/packages/bbat/verify), run the following in your project directory:
+To install the current version of Verify from [Packagist](https://packagist.org/packages/bebat/verify), run the following in your project directory:
 
 ```bash
-composer require --dev bbat/verify:~1.0
+composer require --dev bebat/verify:~1.0
 ```
 
 Verify will be added to your `composer.json` under `require-dev` and installed in your `vendor` directory. You can then start using it in your unit tests.

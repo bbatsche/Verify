@@ -1,5 +1,5 @@
 {
-    "name": "bbat/verify",
+    "name": "bebat/verify",
     "description": "BDD assertion library for PHPUnit",
     "keywords": [
         "bdd", "assertions", "unit testing", "unit test", "phpunit", "codeception", "unit", "test", "testing"
@@ -34,7 +34,7 @@
     "autoload": {
         "files": ["src/function.php"],
         "psr-4": {
-            "BBat\\Verify\\": "src"
+            "BeBat\\Verify\\": "src"
         }
     },
     "extra": {

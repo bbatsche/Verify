@@ -1,14 +1,14 @@
-<?php namespace BBat\Verify;
+<?php namespace BeBat\Verify;
 
-use BBat\Verify\Assert as a;
+use BeBat\Verify\Assert as a;
 
 /**
  * Verify Class
  *
  * Bassic set of assertions
  *
- * @package BBat\Verify
- * @uses \BBat\Verify\Assert
+ * @package BeBat\Verify
+ * @uses \BeBat\Verify\Assert
  */
 class Verify extends VerifyBase
 {

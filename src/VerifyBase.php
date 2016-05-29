@@ -1,4 +1,4 @@
-<?php namespace BBat\Verify;
+<?php namespace BeBat\Verify;
 
 /**
  * VerifyBase Class
@@ -6,7 +6,7 @@
  * Base class for other verify classes to inherit functionality from.
  * At this point, just the constructor and common properties to both.
  *
- * @package BBat\Verify
+ * @package BeBat\Verify
  * @abstract
  */
 abstract class VerifyBase
