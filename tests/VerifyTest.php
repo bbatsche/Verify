@@ -57,9 +57,25 @@ class VerifyTest extends UnitTestBase
     public function testEquals()
     {
         $this->mockAssert->shouldReceive('assertEquals')
-            ->with('test 1', 'subject 1', Mockery::any(), Mockery::any(), Mockery::any(), Mockery::any())->once();
+            ->with(
+                'test 1',
+                'subject 1',
+                Mockery::any(), // Message
+                Mockery::any(), // Delta
+                Mockery::any(), // Max Depth
+                Mockery::any(), // Canonicalize
+                Mockery::any()  // Ignore Case
+            )->once();
         $this->mockAssert->shouldReceive('assertEquals')
-            ->with('test 2', 'subject 2', 'message', Mockery::any(), Mockery::any(), Mockery::any())->once();
+            ->with(
+                'test 2',
+                'subject 2',
+                'message',
+                Mockery::any(),
+                Mockery::any(),
+                Mockery::any(),
+                Mockery::any()
+            )->once();
 
         $this->assertNull(verify('subject 1')->equals('test 1'));
         $this->assertNull(verify('message', 'subject 2')->equals('test 2'));
@@ -68,9 +84,25 @@ class VerifyTest extends UnitTestBase
     public function testNotEquals()
     {
         $this->mockAssert->shouldReceive('assertNotEquals')
-            ->with('test 1', 'subject 1', Mockery::any(), Mockery::any(), Mockery::any(), Mockery::any())->once();
+            ->with(
+                'test 1',
+                'subject 1',
+                Mockery::any(), // Message
+                Mockery::any(), // Delta
+                Mockery::any(), // Max Depth
+                Mockery::any(), // Canonicalize
+                Mockery::any()  // Ignore Case
+            )->once();
         $this->mockAssert->shouldReceive('assertNotEquals')
-            ->with('test 2', 'subject 2', 'message', Mockery::any(), Mockery::any(), Mockery::any())->once();
+            ->with(
+                'test 2',
+                'subject 2',
+                'message',
+                Mockery::any(),
+                Mockery::any(),
+                Mockery::any(),
+                Mockery::any()
+            )->once();
 
         $this->assertNull(verify('subject 1')->doesNotEqual('test 1'));
         $this->assertNull(verify('message', 'subject 2')->doesNotEqual('test 2'));
@@ -80,18 +112,50 @@ class VerifyTest extends UnitTestBase
     {
         // Default: 0.0
         $this->mockAssert->shouldReceive('assertEquals')
-            ->with('test 1', 'subject 1', Mockery::any(), 0.0, Mockery::any(), Mockery::any())->once();
+            ->with(
+                'test 1',
+                'subject 1',
+                Mockery::any(), // Message
+                0.0,
+                Mockery::any(), // Max Depth
+                Mockery::any(), // Canonicalize
+                Mockery::any()  // Ignore Case
+            )->once();
         $this->mockAssert->shouldReceive('assertEquals')
-            ->with('test 2', 'subject 2', 'message 2', 0.0, Mockery::any(), Mockery::any())->once();
+            ->with(
+                'test 2',
+                'subject 2',
+                'message 2',
+                0.0,
+                Mockery::any(),
+                Mockery::any(),
+                Mockery::any()
+            )->once();
 
         $this->assertNull(verify('subject 1')->equals('test 1'));
         $this->assertNull(verify('message 2', 'subject 2')->equals('test 2'));
 
         // Specified value: 1.0
         $this->mockAssert->shouldReceive('assertEquals')
-            ->with('test 3', 'subject 3', Mockery::any(), 1.0, Mockery::any(), Mockery::any())->once();
+            ->with(
+                'test 3',
+                'subject 3',
+                Mockery::any(),
+                1.0,
+                Mockery::any(),
+                Mockery::any(),
+                Mockery::any()
+            )->once();
         $this->mockAssert->shouldReceive('assertEquals')
-            ->with('test 4', 'subject 4', 'message 4', 1.0, Mockery::any(), Mockery::any())->once();
+            ->with(
+                'test 4',
+                'subject 4',
+                'message 4',
+                1.0,
+                Mockery::any(),
+                Mockery::any(),
+                Mockery::any()
+            )->once();
 
         $this->assertNull(verify('subject 3')->within(1.0)->equals('test 3'));
         $this->assertNull(verify('message 4', 'subject 4')->within(1.0)->equals('test 4'));
@@ -101,18 +165,50 @@ class VerifyTest extends UnitTestBase
     {
         // Default: 0.0
         $this->mockAssert->shouldReceive('assertNotEquals')
-            ->with('test 1', 'subject 1', Mockery::any(), 0.0, Mockery::any(), Mockery::any())->once();
+            ->with(
+                'test 1',
+                'subject 1',
+                Mockery::any(), // Message
+                0.0,
+                Mockery::any(), // Max Depth
+                Mockery::any(), // Canonicalize
+                Mockery::any()  // Ignore Case
+            )->once();
         $this->mockAssert->shouldReceive('assertNotEquals')
-            ->with('test 2', 'subject 2', 'message 2', 0.0, Mockery::any(), Mockery::any())->once();
+            ->with(
+                'test 2',
+                'subject 2',
+                'message 2',
+                0.0,
+                Mockery::any(),
+                Mockery::any(),
+                Mockery::any()
+            )->once();
 
         $this->assertNull(verify('subject 1')->doesNotEqual('test 1'));
         $this->assertNull(verify('message 2', 'subject 2')->doesNotEqual('test 2'));
 
         // Specified value: 1.0
         $this->mockAssert->shouldReceive('assertNotEquals')
-            ->with('test 3', 'subject 3', Mockery::any(), 1.0, Mockery::any(), Mockery::any())->once();
+            ->with(
+                'test 3',
+                'subject 3',
+                Mockery::any(),
+                1.0,
+                Mockery::any(),
+                Mockery::any(),
+                Mockery::any()
+            )->once();
         $this->mockAssert->shouldReceive('assertNotEquals')
-            ->with('test 4', 'subject 4', 'message 4', 1.0, Mockery::any(), Mockery::any())->once();
+            ->with(
+                'test 4',
+                'subject 4',
+                'message 4',
+                1.0,
+                Mockery::any(),
+                Mockery::any(),
+                Mockery::any()
+            )->once();
 
         $this->assertNull(verify('subject 3')->within(1.0)->doesNotEqual('test 3'));
         $this->assertNull(verify('message 4', 'subject 4')->within(1.0)->doesNotEqual('test 4'));
@@ -122,27 +218,75 @@ class VerifyTest extends UnitTestBase
     {
         // Default: false
         $this->mockAssert->shouldReceive('assertEquals')
-            ->with('test 1', 'subject 1', Mockery::any(), Mockery::any(), Mockery::any(), false)->once();
+            ->with(
+                'test 1',
+                'subject 1',
+                Mockery::any(), // Message
+                Mockery::any(), // Delta
+                Mockery::any(), // Max Depth
+                false,
+                Mockery::any()  // Ignore Case
+            )->once();
         $this->mockAssert->shouldReceive('assertEquals')
-            ->with('test 2', 'subject 2', 'message 2', Mockery::any(), Mockery::any(), false)->once();
+            ->with(
+                'test 2',
+                'subject 2',
+                'message 2',
+                Mockery::any(),
+                Mockery::any(),
+                false,
+                Mockery::any()
+            )->once();
 
         $this->assertNull(verify('subject 1')->equals('test 1'));
         $this->assertNull(verify('message 2', 'subject 2')->equals('test 2'));
 
         // Explicitly false
         $this->mockAssert->shouldReceive('assertEquals')
-            ->with('test 3', 'subject 3', Mockery::any(), Mockery::any(), Mockery::any(), false)->once();
+            ->with(
+                'test 3',
+                'subject 3',
+                Mockery::any(),
+                Mockery::any(),
+                Mockery::any(),
+                false,
+                Mockery::any()
+            )->once();
         $this->mockAssert->shouldReceive('assertEquals')
-            ->with('test 4', 'subject 4', 'message 4', Mockery::any(), Mockery::any(), false)->once();
+            ->with(
+                'test 4',
+                'subject 4',
+                'message 4',
+                Mockery::any(),
+                Mockery::any(),
+                false,
+                Mockery::any()
+            )->once();
 
         $this->assertNull(verify('subject 3')->withSameOrder()->equals('test 3'));
         $this->assertNull(verify('message 4', 'subject 4')->withSameOrder()->equals('test 4'));
 
         // Explicitly true
         $this->mockAssert->shouldReceive('assertEquals')
-            ->with('test 5', 'subject 5', Mockery::any(), Mockery::any(), Mockery::any(), true)->once();
+            ->with(
+                'test 5',
+                'subject 5',
+                Mockery::any(),
+                Mockery::any(),
+                Mockery::any(),
+                true,
+                Mockery::any()
+            )->once();
         $this->mockAssert->shouldReceive('assertEquals')
-            ->with('test 6', 'subject 6', 'message 6', Mockery::any(), Mockery::any(), true)->once();
+            ->with(
+                'test 6',
+                'subject 6',
+                'message 6',
+                Mockery::any(),
+                Mockery::any(),
+                true,
+                Mockery::any()
+            )->once();
 
         $this->assertNull(verify('subject 5')->withAnyOrder()->equals('test 5'));
         $this->assertNull(verify('message 6', 'subject 6')->withAnyOrder()->equals('test 6'));
@@ -152,30 +296,156 @@ class VerifyTest extends UnitTestBase
     {
         // Default: false
         $this->mockAssert->shouldReceive('assertNotEquals')
-            ->with('test 1', 'subject 1', Mockery::any(), Mockery::any(), Mockery::any(), false)->once();
+            ->with(
+                'test 1',
+                'subject 1',
+                Mockery::any(), // Message
+                Mockery::any(), // Delta
+                Mockery::any(), // Max Depth
+                false,
+                Mockery::any()  // Ignore Case
+            )->once();
         $this->mockAssert->shouldReceive('assertNotEquals')
-            ->with('test 2', 'subject 2', 'message 2', Mockery::any(), Mockery::any(), false)->once();
+            ->with(
+                'test 2',
+                'subject 2',
+                'message 2',
+                Mockery::any(),
+                Mockery::any(),
+                false,
+                Mockery::any()
+            )->once();
 
         $this->assertNull(verify('subject 1')->doesNotEqual('test 1'));
         $this->assertNull(verify('message 2', 'subject 2')->doesNotEqual('test 2'));
 
         // Explicitly false
         $this->mockAssert->shouldReceive('assertNotEquals')
-            ->with('test 3', 'subject 3', Mockery::any(), Mockery::any(), Mockery::any(), false)->once();
+            ->with(
+                'test 3',
+                'subject 3',
+                Mockery::any(),
+                Mockery::any(),
+                Mockery::any(),
+                false,
+                Mockery::any()
+            )->once();
         $this->mockAssert->shouldReceive('assertNotEquals')
-            ->with('test 4', 'subject 4', 'message 4', Mockery::any(), Mockery::any(), false)->once();
+            ->with(
+                'test 4',
+                'subject 4',
+                'message 4',
+                Mockery::any(),
+                Mockery::any(),
+                false,
+                Mockery::any()
+            )->once();
 
         $this->assertNull(verify('subject 3')->withSameOrder()->doesNotEqual('test 3'));
         $this->assertNull(verify('message 4', 'subject 4')->withSameOrder()->doesNotEqual('test 4'));
 
         // Explicitly true
         $this->mockAssert->shouldReceive('assertNotEquals')
-            ->with('test 5', 'subject 5', Mockery::any(), Mockery::any(), Mockery::any(), true)->once();
+            ->with(
+                'test 5',
+                'subject 5',
+                Mockery::any(),
+                Mockery::any(),
+                Mockery::any(),
+                true,
+                Mockery::any()
+            )->once();
         $this->mockAssert->shouldReceive('assertNotEquals')
-            ->with('test 6', 'subject 6', 'message 6', Mockery::any(), Mockery::any(), true)->once();
+            ->with(
+                'test 6',
+                'subject 6',
+                'message 6',
+                Mockery::any(),
+                Mockery::any(),
+                true,
+                Mockery::any()
+            )->once();
 
         $this->assertNull(verify('subject 5')->withAnyOrder()->doesNotEqual('test 5'));
         $this->assertNull(verify('message 6', 'subject 6')->withAnyOrder()->doesNotEqual('test 6'));
+    }
+
+    public function testIgnoreCaseEquals()
+    {
+        // Default: false
+        $this->mockAssert->shouldReceive('assertNotEquals')
+            ->with(
+                'test 1',
+                'subject 1',
+                Mockery::any(), // Message
+                Mockery::any(), // Delta
+                Mockery::any(), // Max Depth
+                Mockery::any(), // Canonicalize
+                false
+            )->once();
+        $this->mockAssert->shouldReceive('assertNotEquals')
+            ->with(
+                'test 2',
+                'subject 2',
+                'message 2',
+                Mockery::any(),
+                Mockery::any(),
+                Mockery::any(),
+                false
+            )->once();
+
+        $this->assertNull(verify('subject 1')->doesNotEqual('test 1'));
+        $this->assertNull(verify('message 2', 'subject 2')->doesNotEqual('test 2'));
+
+        // Explicitly false
+        $this->mockAssert->shouldReceive('assertNotEquals')
+            ->with(
+                'test 3',
+                'subject 3',
+                Mockery::any(),
+                Mockery::any(),
+                Mockery::any(),
+                Mockery::any(),
+                false
+            )->once();
+        $this->mockAssert->shouldReceive('assertNotEquals')
+            ->with(
+                'test 4',
+                'subject 4',
+                'message 4',
+                Mockery::any(),
+                Mockery::any(),
+                Mockery::any(),
+                false
+            )->once();
+
+        $this->assertNull(verify('subject 3')->withCase()->doesNotEqual('test 3'));
+        $this->assertNull(verify('message 4', 'subject 4')->withCase()->doesNotEqual('test 4'));
+
+        // Explicitly true
+        $this->mockAssert->shouldReceive('assertNotEquals')
+            ->with(
+                'test 5',
+                'subject 5',
+                Mockery::any(),
+                Mockery::any(),
+                Mockery::any(),
+                Mockery::any(),
+                true
+            )->once();
+        $this->mockAssert->shouldReceive('assertNotEquals')
+            ->with(
+                'test 6',
+                'subject 6',
+                'message 6',
+                Mockery::any(),
+                Mockery::any(),
+                Mockery::any(),
+                true
+            )->once();
+
+        $this->assertNull(verify('subject 5')->withoutCase()->doesNotEqual('test 5'));
+        $this->assertNull(verify('message 6', 'subject 6')->withoutCase()->doesNotEqual('test 6'));
     }
 
     public function testContains()

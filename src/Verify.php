@@ -15,6 +15,7 @@ class Verify extends VerifyBase
     protected $floatDelta    = 0.0;
     protected $maxDepth      = 10;
     protected $presortValues = false;
+    protected $ignoreCase    = false;
 
     public function within($delta)
     {
@@ -37,6 +38,20 @@ class Verify extends VerifyBase
         return $this;
     }
 
+    public function withCase()
+    {
+        $this->ignoreCase = false;
+
+        return $this;
+    }
+
+    public function withoutCase()
+    {
+        $this->ignoreCase = true;
+
+        return $this;
+    }
+
     /**
      * Assert SUT equals a given value
      *
@@ -51,7 +66,8 @@ class Verify extends VerifyBase
             $this->description,
             $this->floatDelta,
             $this->maxDepth,
-            $this->presortValues
+            $this->presortValues,
+            $this->ignoreCase
         );
     }
 
@@ -69,7 +85,8 @@ class Verify extends VerifyBase
             $this->description,
             $this->floatDelta,
             $this->maxDepth,
-            $this->presortValues
+            $this->presortValues,
+            $this->ignoreCase
         );
     }
 
