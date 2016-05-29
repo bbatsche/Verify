@@ -263,8 +263,8 @@ class VerifyTest extends UnitTestBase
                 Mockery::any()
             )->once();
 
-        $this->assertNull(verify('subject 3')->withSameOrder()->equals('test 3'));
-        $this->assertNull(verify('message 4', 'subject 4')->withSameOrder()->equals('test 4'));
+        $this->assertNull(verify('subject 3')->withoutOrder()->equals('test 3'));
+        $this->assertNull(verify('message 4', 'subject 4')->withoutOrder()->equals('test 4'));
 
         // Explicitly true
         $this->mockAssert->shouldReceive('assertEquals')
@@ -288,8 +288,8 @@ class VerifyTest extends UnitTestBase
                 Mockery::any()
             )->once();
 
-        $this->assertNull(verify('subject 5')->withAnyOrder()->equals('test 5'));
-        $this->assertNull(verify('message 6', 'subject 6')->withAnyOrder()->equals('test 6'));
+        $this->assertNull(verify('subject 5')->withOrder()->equals('test 5'));
+        $this->assertNull(verify('message 6', 'subject 6')->withOrder()->equals('test 6'));
     }
 
     public function testSortingArraysNotEquals()
@@ -341,8 +341,8 @@ class VerifyTest extends UnitTestBase
                 Mockery::any()
             )->once();
 
-        $this->assertNull(verify('subject 3')->withSameOrder()->doesNotEqual('test 3'));
-        $this->assertNull(verify('message 4', 'subject 4')->withSameOrder()->doesNotEqual('test 4'));
+        $this->assertNull(verify('subject 3')->withoutOrder()->doesNotEqual('test 3'));
+        $this->assertNull(verify('message 4', 'subject 4')->withoutOrder()->doesNotEqual('test 4'));
 
         // Explicitly true
         $this->mockAssert->shouldReceive('assertNotEquals')
@@ -366,8 +366,8 @@ class VerifyTest extends UnitTestBase
                 Mockery::any()
             )->once();
 
-        $this->assertNull(verify('subject 5')->withAnyOrder()->doesNotEqual('test 5'));
-        $this->assertNull(verify('message 6', 'subject 6')->withAnyOrder()->doesNotEqual('test 6'));
+        $this->assertNull(verify('subject 5')->withOrder()->doesNotEqual('test 5'));
+        $this->assertNull(verify('message 6', 'subject 6')->withOrder()->doesNotEqual('test 6'));
     }
 
     public function testIgnoreCaseEquals()

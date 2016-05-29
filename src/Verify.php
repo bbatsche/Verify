@@ -24,14 +24,14 @@ class Verify extends VerifyBase
         return $this;
     }
 
-    public function withAnyOrder()
+    public function withOrder()
     {
         $this->presortValues = true;
 
         return $this;
     }
 
-    public function withSameOrder()
+    public function withoutOrder()
     {
         $this->presortValues = false;
 
