@@ -528,8 +528,84 @@ class VerifyTest extends UnitTestBase
 
     public function testContains()
     {
-        $this->fireTwoValueTest('contains', 'assertContains');
-        $this->fireTwoValueTest('doesNotContain', 'assertNotContains');
+        $this->mockAssert->shouldReceive('assertContains')
+            ->with('test 1', 'subject 1', Mockery::any(), Mockery::any())->once();
+        $this->mockAssert->shouldReceive('assertContains')
+            ->with('test 2', 'subject 2', 'message', Mockery::any())->once();
+
+        $this->assertNull(verify('subject 1')->contains('test 1'));
+        $this->assertNull(verify('message', 'subject 2')->contains('test 2'));
+    }
+
+    public function testNotContain()
+    {
+        $this->mockAssert->shouldReceive('assertNotContains')
+            ->with('test 1', 'subject 1', Mockery::any(), Mockery::any())->once();
+        $this->mockAssert->shouldReceive('assertNotContains')
+            ->with('test 2', 'subject 2', 'message', Mockery::any())->once();
+
+        $this->assertNull(verify('subject 1')->doesNotContain('test 1'));
+        $this->assertNull(verify('message', 'subject 2')->doesNotContain('test 2'));
+    }
+
+    public function testIgnoreCaseContains()
+    {
+        // Default: false
+        $this->mockAssert->shouldReceive('assertContains')
+            ->with('test 1', 'subject 1', Mockery::any(), false)->once();
+        $this->mockAssert->shouldReceive('assertContains')
+            ->with('test 2', 'subject 2', 'message 2', false)->once();
+
+        $this->assertNull(verify('subject 1')->contains('test 1'));
+        $this->assertNull(verify('message 2', 'subject 2')->contains('test 2'));
+
+        // Explicitly false
+        $this->mockAssert->shouldReceive('assertContains')
+            ->with('test 3', 'subject 3', Mockery::any(), false)->once();
+        $this->mockAssert->shouldReceive('assertContains')
+            ->with('test 4', 'subject 4', 'message 4', false)->once();
+
+        $this->assertNull(verify('subject 3')->withCase()->contains('test 3'));
+        $this->assertNull(verify('message 4', 'subject 4')->withCase()->contains('test 4'));
+
+        // Explicitly false
+        $this->mockAssert->shouldReceive('assertContains')
+            ->with('test 5', 'subject 5', Mockery::any(), true)->once();
+        $this->mockAssert->shouldReceive('assertContains')
+            ->with('test 6', 'subject 6', 'message 6', true)->once();
+
+        $this->assertNull(verify('subject 5')->withoutCase()->contains('test 5'));
+        $this->assertNull(verify('message 6', 'subject 6')->withoutCase()->contains('test 6'));
+    }
+
+    public function testIgnoreCaseNotContain()
+    {
+        // Default: false
+        $this->mockAssert->shouldReceive('assertNotContains')
+            ->with('test 1', 'subject 1', Mockery::any(), false)->once();
+        $this->mockAssert->shouldReceive('assertNotContains')
+            ->with('test 2', 'subject 2', 'message 2', false)->once();
+
+        $this->assertNull(verify('subject 1')->doesNotContain('test 1'));
+        $this->assertNull(verify('message 2', 'subject 2')->doesNotContain('test 2'));
+
+        // Explicitly false
+        $this->mockAssert->shouldReceive('assertNotContains')
+            ->with('test 3', 'subject 3', Mockery::any(), false)->once();
+        $this->mockAssert->shouldReceive('assertNotContains')
+            ->with('test 4', 'subject 4', 'message 4', false)->once();
+
+        $this->assertNull(verify('subject 3')->withCase()->doesNotContain('test 3'));
+        $this->assertNull(verify('message 4', 'subject 4')->withCase()->doesNotContain('test 4'));
+
+        // Explicitly false
+        $this->mockAssert->shouldReceive('assertNotContains')
+            ->with('test 5', 'subject 5', Mockery::any(), true)->once();
+        $this->mockAssert->shouldReceive('assertNotContains')
+            ->with('test 6', 'subject 6', 'message 6', true)->once();
+
+        $this->assertNull(verify('subject 5')->withoutCase()->doesNotContain('test 5'));
+        $this->assertNull(verify('message 6', 'subject 6')->withoutCase()->doesNotContain('test 6'));
     }
 
     public function testRelativeInequality()

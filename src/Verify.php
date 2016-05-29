@@ -98,7 +98,7 @@ class Verify extends VerifyBase
      */
     public function contains($needle)
     {
-        a::assertContains($needle, $this->actual, $this->description);
+        a::assertContains($needle, $this->actual, $this->description, $this->ignoreCase);
     }
 
     /**
@@ -109,7 +109,7 @@ class Verify extends VerifyBase
      */
     public function doesNotContain($needle)
     {
-        a::assertNotContains($needle, $this->actual, $this->description);
+        a::assertNotContains($needle, $this->actual, $this->description, $this->ignoreCase);
     }
 
     /**
