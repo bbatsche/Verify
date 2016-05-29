@@ -14,10 +14,25 @@ class Verify extends VerifyBase
 {
     protected $floatDelta    = 0.0;
     protected $maxDepth      = 10;
+    protected $presortValues = false;
 
     public function within($delta)
     {
         $this->floatDelta = $delta;
+
+        return $this;
+    }
+
+    public function withAnyOrder()
+    {
+        $this->presortValues = true;
+
+        return $this;
+    }
+
+    public function withSameOrder()
+    {
+        $this->presortValues = false;
 
         return $this;
     }

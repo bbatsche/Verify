@@ -11,6 +11,8 @@ use BeBat\Verify\Assert as a;
  */
 class VerifyFile extends VerifyBase
 {
+    protected $presortValues = false;
+
     /**
      * Assert contents of SUT are equal to another given file's contents
      *

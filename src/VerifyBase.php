@@ -25,8 +25,6 @@ abstract class VerifyBase
      */
     protected $description = '';
 
-    protected $presortValues = false;
-
     /**
      * Constructor; shared between Verify and VerifyFile
      *
@@ -37,19 +35,5 @@ abstract class VerifyBase
     {
         $this->actual      = $actual;
         $this->description = $description;
-    }
-
-    public function withAnyOrder()
-    {
-        $this->presortValues = true;
-
-        return $this;
-    }
-
-    public function withSameOrder()
-    {
-        $this->presortValues = false;
-
-        return $this;
     }
 }
