@@ -373,7 +373,7 @@ class VerifyTest extends UnitTestBase
     public function testIgnoreCaseEquals()
     {
         // Default: false
-        $this->mockAssert->shouldReceive('assertNotEquals')
+        $this->mockAssert->shouldReceive('assertEquals')
             ->with(
                 'test 1',
                 'subject 1',
@@ -383,7 +383,7 @@ class VerifyTest extends UnitTestBase
                 Mockery::any(), // Canonicalize
                 false
             )->once();
-        $this->mockAssert->shouldReceive('assertNotEquals')
+        $this->mockAssert->shouldReceive('assertEquals')
             ->with(
                 'test 2',
                 'subject 2',
@@ -394,11 +394,11 @@ class VerifyTest extends UnitTestBase
                 false
             )->once();
 
-        $this->assertNull(verify('subject 1')->doesNotEqual('test 1'));
-        $this->assertNull(verify('message 2', 'subject 2')->doesNotEqual('test 2'));
+        $this->assertNull(verify('subject 1')->equals('test 1'));
+        $this->assertNull(verify('message 2', 'subject 2')->equals('test 2'));
 
         // Explicitly false
-        $this->mockAssert->shouldReceive('assertNotEquals')
+        $this->mockAssert->shouldReceive('assertEquals')
             ->with(
                 'test 3',
                 'subject 3',
@@ -408,7 +408,7 @@ class VerifyTest extends UnitTestBase
                 Mockery::any(),
                 false
             )->once();
-        $this->mockAssert->shouldReceive('assertNotEquals')
+        $this->mockAssert->shouldReceive('assertEquals')
             ->with(
                 'test 4',
                 'subject 4',
@@ -419,11 +419,11 @@ class VerifyTest extends UnitTestBase
                 false
             )->once();
 
-        $this->assertNull(verify('subject 3')->withCase()->doesNotEqual('test 3'));
-        $this->assertNull(verify('message 4', 'subject 4')->withCase()->doesNotEqual('test 4'));
+        $this->assertNull(verify('subject 3')->withCase()->equals('test 3'));
+        $this->assertNull(verify('message 4', 'subject 4')->withCase()->equals('test 4'));
 
         // Explicitly true
-        $this->mockAssert->shouldReceive('assertNotEquals')
+        $this->mockAssert->shouldReceive('assertEquals')
             ->with(
                 'test 5',
                 'subject 5',
@@ -433,7 +433,7 @@ class VerifyTest extends UnitTestBase
                 Mockery::any(),
                 true
             )->once();
-        $this->mockAssert->shouldReceive('assertNotEquals')
+        $this->mockAssert->shouldReceive('assertEquals')
             ->with(
                 'test 6',
                 'subject 6',
@@ -444,8 +444,8 @@ class VerifyTest extends UnitTestBase
                 true
             )->once();
 
-        $this->assertNull(verify('subject 5')->withoutCase()->doesNotEqual('test 5'));
-        $this->assertNull(verify('message 6', 'subject 6')->withoutCase()->doesNotEqual('test 6'));
+        $this->assertNull(verify('subject 5')->withoutCase()->equals('test 5'));
+        $this->assertNull(verify('message 6', 'subject 6')->withoutCase()->equals('test 6'));
     }
 
     public function testContains()
