@@ -115,7 +115,7 @@ At this point, just the constructor and common properties to both.</p>
 		<b>Namespace:</b> <a href="namespace-BeBat.html">BeBat</a>\<a href="namespace-BeBat.Verify.html">Verify</a><br>
 		<b>Package:</b> BeBat\Verify<br>
 
-			<b>Located at</b> <a href="source-class-BeBat.Verify.VerifyBase.html#3-39" title="Go to source code">VerifyBase.php</a>
+			<b>Located at</b> <a href="source-class-BeBat.Verify.VerifyBase.html#3-77" title="Go to source code">VerifyBase.php</a>
 		<br>
 	</div>
 
@@ -135,7 +135,7 @@ At this point, just the constructor and common properties to both.</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#___construct">#</a>
-		<code><a href="source-class-BeBat.Verify.VerifyBase.html#28-38" title="Go to source code">__construct</a>( <span>mixed <var>$actual</var></span>, <span>string <var>$description</var> = <span class="php-quote">''</span></span> )</code>
+		<code><a href="source-class-BeBat.Verify.VerifyBase.html#42-52" title="Go to source code">__construct</a>( <span>mixed <var>$actual</var></span>, <span>string <var>$description</var> = <span class="php-quote">''</span></span> )</code>
 
 		<div class="description short">
 			<p>Constructor; shared between Verify and VerifyFile</p>
@@ -153,6 +153,74 @@ At this point, just the constructor and common properties to both.</p>
 					<dd>Optional description if the assertion fails</dd>
 				</dl></div>
 
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="withCase" id="_withCase">
+
+		<td class="attributes"><code>
+			 public 
+
+			<code><a href="class-BeBat.Verify.VerifyBase.html">BeBat\Verify\VerifyBase</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_withCase">#</a>
+		<code><a href="source-class-BeBat.Verify.VerifyBase.html#54-64" title="Go to source code">withCase</a>( )</code>
+
+		<div class="description short">
+			<p>Turn on case sensitivity when checking SUT</p>
+		</div>
+
+		<div class="description detailed hidden">
+			<p>Turn on case sensitivity when checking SUT</p>
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><a href="class-BeBat.Verify.VerifyBase.html">BeBat\Verify\VerifyBase</a></code>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="withoutCase" id="_withoutCase">
+
+		<td class="attributes"><code>
+			 public 
+
+			<code><a href="class-BeBat.Verify.VerifyBase.html">BeBat\Verify\VerifyBase</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_withoutCase">#</a>
+		<code><a href="source-class-BeBat.Verify.VerifyBase.html#66-76" title="Go to source code">withoutCase</a>( )</code>
+
+		<div class="description short">
+			<p>Turn off case sensitivity when checking SUT</p>
+		</div>
+
+		<div class="description detailed hidden">
+			<p>Turn off case sensitivity when checking SUT</p>
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><a href="class-BeBat.Verify.VerifyBase.html">BeBat\Verify\VerifyBase</a></code>
+				</div>
 
 
 
@@ -222,6 +290,56 @@ At this point, just the constructor and common properties to both.</p>
 			<div>
 				<a href="#$description" class="anchor">#</a>
 				<code><span class="php-quote">''</span></code>
+			</div>
+		</td>
+	</tr>
+	<tr data-order="ignoreCase" id="$ignoreCase">
+		<td class="attributes"><code>
+			protected  
+			boolean
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-BeBat.Verify.VerifyBase.html#28-33" title="Go to source code"><var>$ignoreCase</var></a>
+
+			<div class="description short">
+				<p>Ignore case when checking SUT</p>
+			</div>
+
+			<div class="description detailed hidden">
+				<p>Ignore case when checking SUT</p>
+
+			</div>
+		</td>
+		<td class="value">
+			<div>
+				<a href="#$ignoreCase" class="anchor">#</a>
+				<code><span class="php-keyword1">false</span></code>
+			</div>
+		</td>
+	</tr>
+	<tr data-order="ignoreOrder" id="$ignoreOrder">
+		<td class="attributes"><code>
+			protected  
+			boolean
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-BeBat.Verify.VerifyBase.html#35-40" title="Go to source code"><var>$ignoreOrder</var></a>
+
+			<div class="description short">
+				<p>Ignore element ordering when checking array values</p>
+			</div>
+
+			<div class="description detailed hidden">
+				<p>Ignore element ordering when checking array values</p>
+
+			</div>
+		</td>
+		<td class="value">
+			<div>
+				<a href="#$ignoreOrder" class="anchor">#</a>
+				<code><span class="php-keyword1">false</span></code>
 			</div>
 		</td>
 	</tr>

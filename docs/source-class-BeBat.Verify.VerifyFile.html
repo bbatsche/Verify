@@ -118,7 +118,7 @@
 </span></span><span id="19" class="l"><span class="php-comment">     */</span>
 </span><span id="20" class="l">    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> equals(<span class="php-var">$expected</span>)
 </span><span id="21" class="l">    {
-</span><span id="22" class="l">        a::assertFileEquals(<span class="php-var">$expected</span>, <span class="php-var">$this</span>-&gt;actual, <span class="php-var">$this</span>-&gt;description);
+</span><span id="22" class="l">        a::assertFileEquals(<span class="php-var">$expected</span>, <span class="php-var">$this</span>-&gt;actual, <span class="php-var">$this</span>-&gt;description, <span class="php-var">$this</span>-&gt;ignoreOrder, <span class="php-var">$this</span>-&gt;ignoreCase);
 </span><span id="23" class="l">    }
 </span><span id="24" class="l">
 </span><span id="25" class="l">    <span class="php-comment">/**
@@ -129,7 +129,7 @@
 </span></span><span id="30" class="l"><span class="php-comment">     */</span>
 </span><span id="31" class="l">    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> doesNotEqual(<span class="php-var">$expected</span>)
 </span><span id="32" class="l">    {
-</span><span id="33" class="l">        a::assertFileNotEquals(<span class="php-var">$expected</span>, <span class="php-var">$this</span>-&gt;actual, <span class="php-var">$this</span>-&gt;description);
+</span><span id="33" class="l">        a::assertFileNotEquals(<span class="php-var">$expected</span>, <span class="php-var">$this</span>-&gt;actual, <span class="php-var">$this</span>-&gt;description, <span class="php-var">$this</span>-&gt;ignoreOrder, <span class="php-var">$this</span>-&gt;ignoreCase);
 </span><span id="34" class="l">    }
 </span><span id="35" class="l">
 </span><span id="36" class="l">    <span class="php-comment">/**
