@@ -234,6 +234,17 @@ class Verify extends VerifyBase
     }
 
     /**
+     * Assert SUT contains a given subset of values
+     *
+     * @param array $array Subset expected to be in SUT
+     * @return void
+     */
+    public function hasSubset($array)
+    {
+        a::assertArraySubset($array, $this->actual, $this->dataType, $this->description);
+    }
+
+    /**
      * Assert SUT is greater than a given value
      *
      * @param int|float $expected Value SUT is expected to be greater than

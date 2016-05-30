@@ -1020,6 +1020,47 @@ class VerifyTest extends UnitTestBase
         $this->assertNull(verify('message 6', 'subject 6')->withType()->doesNotContain('test 6'));
     }
 
+    public function testArraySubset()
+    {
+        $this->mockAssert->shouldReceive('assertArraySubset')
+            ->with('test 1', 'subject 1', Mockery::any(), Mockery::any())->once();
+        $this->mockAssert->shouldReceive('assertArraySubset')
+            ->with('test 2', 'subject 2', Mockery::any(), 'message')->once();
+
+        $this->assertNull(verify('subject 1')->hasSubset('test 1'));
+        $this->assertNull(verify('message', 'subject 2')->hasSubset('test 2'));
+    }
+
+    public function testDataTypeArraySubset()
+    {
+        // Default: false
+        $this->mockAssert->shouldReceive('assertArraySubset')
+            ->with('test 1', 'subject 1', false, Mockery::any())->once();
+        $this->mockAssert->shouldReceive('assertArraySubset')
+            ->with('test 2', 'subject 2', false, 'message 2')->once();
+
+        $this->assertNull(verify('subject 1')->hasSubset('test 1'));
+        $this->assertNull(verify('message 2', 'subject 2')->hasSubset('test 2'));
+
+        // Explicitly false
+        $this->mockAssert->shouldReceive('assertArraySubset')
+            ->with('test 3', 'subject 3', false, Mockery::any())->once();
+        $this->mockAssert->shouldReceive('assertArraySubset')
+            ->with('test 4', 'subject 4', false, 'message 4')->once();
+
+        $this->assertNull(verify('subject 3')->withoutType()->hasSubset('test 3'));
+        $this->assertNull(verify('message 4', 'subject 4')->withoutType()->hasSubset('test 4'));
+
+        // Explicitly true
+        $this->mockAssert->shouldReceive('assertArraySubset')
+            ->with('test 5', 'subject 5', true, Mockery::any())->once();
+        $this->mockAssert->shouldReceive('assertArraySubset')
+            ->with('test 6', 'subject 6', true, 'message 6')->once();
+
+        $this->assertNull(verify('subject 5')->withType()->hasSubset('test 5'));
+        $this->assertNull(verify('message 6', 'subject 6')->withType()->hasSubset('test 6'));
+    }
+
     public function testRelativeInequality()
     {
         $this->fireTwoValueTest('isGreaterThan',      'assertGreaterThan');
