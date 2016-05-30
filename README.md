@@ -129,6 +129,8 @@ verify($stringTest)->doesNotMatchFormatFile('/path/to/other_format.txt');
 verify($arrayValue)->contains('expected value');
 verify($arrayValue)->doesNotContain('unexpected value');
 
+verify($arrayValue)->hasSubset($subsetOfValues);
+
 verify($arrayValue)->hasKey('some-key');
 verify($arrayValue)->doesNotHaveKey('some-other-key');
 
