@@ -25,7 +25,19 @@ abstract class VerifyBase
      */
     protected $description = '';
 
+    /**
+     * Ignore case when checking SUT
+     *
+     * @var bool
+     */
     protected $ignoreCase = false;
+
+    /**
+     * Ignore element ordering when checking array values
+     *
+     * @var bool
+     */
+    protected $ignoreOrder = false;
 
     /**
      * Constructor; shared between Verify and VerifyFile
@@ -39,6 +51,11 @@ abstract class VerifyBase
         $this->description = $description;
     }
 
+    /**
+     * Turn on case sensitivity when checking SUT
+     *
+     * @return self
+     */
     public function withCase()
     {
         $this->ignoreCase = false;
@@ -46,6 +63,11 @@ abstract class VerifyBase
         return $this;
     }
 
+    /**
+     * Turn off case sensitivity when checking SUT
+     *
+     * @return self
+     */
     public function withoutCase()
     {
         $this->ignoreCase = true;

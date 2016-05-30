@@ -12,13 +12,50 @@ use BeBat\Verify\Assert as a;
  */
 class Verify extends VerifyBase
 {
-    protected $floatDelta     = 0.0;
-    protected $maxDepth       = 10;
-    protected $presortValues  = false;
-    protected $objectIdentity = true;
-    protected $dataType       = false;
-    protected $xmlAttributes  = false;
+    /**
+     * Acceptable range when checking for floating point equality
+     *
+     * @var float
+     */
+    protected $floatDelta = 0.0;
 
+    /**
+     * Maximum depth when checking array equality
+     *
+     * PHPUnit does not use this value in any way, it's included here for consistency.
+     * There is no exposed API for modifying this value.
+     *
+     * @var int
+     */
+    protected $maxDepth = 10;
+
+    /**
+     * Check for object identity when checking array contents in SUT
+     *
+     * @var bool
+     */
+    protected $objectIdentity = true;
+
+    /**
+     * Check internal datatype when checking SUT contents
+     *
+     * @var bool
+     */
+    protected $dataType = false;
+
+    /**
+     * Compare attributes when checking XML structure of SUT
+     *
+     * @var bool
+     */
+    protected $xmlAttributes = false;
+
+    /**
+     * Specify an acceptable range when checking a floating point SUT's equality
+     *
+     * @param float $delta range within which floating point values will be considered "equal"
+     * @return self
+     */
     public function within($delta)
     {
         $this->floatDelta = $delta;
@@ -26,20 +63,35 @@ class Verify extends VerifyBase
         return $this;
     }
 
+    /**
+     * Include element ordering when comparing SUT to an array
+     *
+     * @return self
+     */
     public function withOrder()
     {
-        $this->presortValues = true;
+        $this->ignoreOrder = false;
 
         return $this;
     }
 
+    /**
+     * Ignore element ordering when comparing SUT to an array
+     *
+     * @return self
+     */
     public function withoutOrder()
     {
-        $this->presortValues = false;
+        $this->ignoreOrder = true;
 
         return $this;
     }
 
+    /**
+     * Compare objects within SUT based on their identity, not just value
+     *
+     * @return self
+     */
     public function withIdentity()
     {
         $this->objectIdentity = true;
@@ -47,6 +99,11 @@ class Verify extends VerifyBase
         return $this;
     }
 
+    /**
+     * Compare objects within SUT based solely on their value
+     *
+     * @return self
+     */
     public function withoutIdentity()
     {
         $this->objectIdentity = false;
@@ -54,6 +111,11 @@ class Verify extends VerifyBase
         return $this;
     }
 
+    /**
+     * Compare both type and value for elements in SUT
+     *
+     * @return self
+     */
     public function withType()
     {
         $this->dataType = true;
@@ -61,6 +123,11 @@ class Verify extends VerifyBase
         return $this;
     }
 
+    /**
+     * Ignore type when comparing elements in SUT
+     *
+     * @return self
+     */
     public function withoutType()
     {
         $this->dataType = false;
@@ -68,6 +135,11 @@ class Verify extends VerifyBase
         return $this;
     }
 
+    /**
+     * Check element attributes when comparing SUT to an XML document
+     *
+     * @return self
+     */
     public function withAttributes()
     {
         $this->xmlAttributes = true;
@@ -75,6 +147,11 @@ class Verify extends VerifyBase
         return $this;
     }
 
+    /**
+     * Ignore element attributes when comparing SUT to an XML document
+     *
+     * @return self
+     */
     public function withoutAttributes()
     {
         $this->xmlAttributes = false;
@@ -96,7 +173,7 @@ class Verify extends VerifyBase
             $this->description,
             $this->floatDelta,
             $this->maxDepth,
-            $this->presortValues,
+            $this->ignoreOrder,
             $this->ignoreCase
         );
     }
@@ -115,7 +192,7 @@ class Verify extends VerifyBase
             $this->description,
             $this->floatDelta,
             $this->maxDepth,
-            $this->presortValues,
+            $this->ignoreOrder,
             $this->ignoreCase
         );
     }

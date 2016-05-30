@@ -11,8 +11,6 @@ use BeBat\Verify\Assert as a;
  */
 class VerifyFile extends VerifyBase
 {
-    protected $presortValues = false;
-
     /**
      * Assert contents of SUT are equal to another given file's contents
      *
@@ -21,7 +19,7 @@ class VerifyFile extends VerifyBase
      */
     public function equals($expected)
     {
-        a::assertFileEquals($expected, $this->actual, $this->description, $this->presortValues, $this->ignoreCase);
+        a::assertFileEquals($expected, $this->actual, $this->description, $this->ignoreOrder, $this->ignoreCase);
     }
 
     /**
@@ -32,7 +30,7 @@ class VerifyFile extends VerifyBase
      */
     public function doesNotEqual($expected)
     {
-        a::assertFileNotEquals($expected, $this->actual, $this->description, $this->presortValues, $this->ignoreCase);
+        a::assertFileNotEquals($expected, $this->actual, $this->description, $this->ignoreOrder, $this->ignoreCase);
     }
 
     /**

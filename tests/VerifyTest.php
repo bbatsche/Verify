@@ -214,7 +214,7 @@ class VerifyTest extends UnitTestBase
         $this->assertNull(verify('message 4', 'subject 4')->within(1.0)->doesNotEqual('test 4'));
     }
 
-    public function testSortingArraysEquals()
+    public function testIgnoreOrderEquals()
     {
         // Default: false
         $this->mockAssert->shouldReceive('assertEquals')
@@ -263,8 +263,8 @@ class VerifyTest extends UnitTestBase
                 Mockery::any()
             )->once();
 
-        $this->assertNull(verify('subject 3')->withoutOrder()->equals('test 3'));
-        $this->assertNull(verify('message 4', 'subject 4')->withoutOrder()->equals('test 4'));
+        $this->assertNull(verify('subject 3')->withOrder()->equals('test 3'));
+        $this->assertNull(verify('message 4', 'subject 4')->withOrder()->equals('test 4'));
 
         // Explicitly true
         $this->mockAssert->shouldReceive('assertEquals')
@@ -288,11 +288,11 @@ class VerifyTest extends UnitTestBase
                 Mockery::any()
             )->once();
 
-        $this->assertNull(verify('subject 5')->withOrder()->equals('test 5'));
-        $this->assertNull(verify('message 6', 'subject 6')->withOrder()->equals('test 6'));
+        $this->assertNull(verify('subject 5')->withoutOrder()->equals('test 5'));
+        $this->assertNull(verify('message 6', 'subject 6')->withoutOrder()->equals('test 6'));
     }
 
-    public function testSortingArraysNotEquals()
+    public function testIgnoreOrderNotEquals()
     {
         // Default: false
         $this->mockAssert->shouldReceive('assertNotEquals')
@@ -341,8 +341,8 @@ class VerifyTest extends UnitTestBase
                 Mockery::any()
             )->once();
 
-        $this->assertNull(verify('subject 3')->withoutOrder()->doesNotEqual('test 3'));
-        $this->assertNull(verify('message 4', 'subject 4')->withoutOrder()->doesNotEqual('test 4'));
+        $this->assertNull(verify('subject 3')->withOrder()->doesNotEqual('test 3'));
+        $this->assertNull(verify('message 4', 'subject 4')->withOrder()->doesNotEqual('test 4'));
 
         // Explicitly true
         $this->mockAssert->shouldReceive('assertNotEquals')
@@ -366,8 +366,8 @@ class VerifyTest extends UnitTestBase
                 Mockery::any()
             )->once();
 
-        $this->assertNull(verify('subject 5')->withOrder()->doesNotEqual('test 5'));
-        $this->assertNull(verify('message 6', 'subject 6')->withOrder()->doesNotEqual('test 6'));
+        $this->assertNull(verify('subject 5')->withoutOrder()->doesNotEqual('test 5'));
+        $this->assertNull(verify('message 6', 'subject 6')->withoutOrder()->doesNotEqual('test 6'));
     }
 
     public function testIgnoreCaseEquals()
