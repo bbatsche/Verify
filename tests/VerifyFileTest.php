@@ -43,6 +43,18 @@ class VerifyFileTest extends UnitTestBase
         $this->assertInstanceOf('BeBat\Verify\VerifyFile', $obj);
     }
 
+    public function testVerifyFileTooManyArgs()
+    {
+        $this->setExpectedException('BadMethodCallException');
+        verify_file('arg1', 'arg2', 'arg3');
+    }
+
+    public function testVerifyFileTooFewArgs()
+    {
+        $this->setExpectedException('BadMethodCallException');
+        verify_file();
+    }
+
     public function testEquals()
     {
         $this->mockAssert->shouldReceive('assertFileEquals')

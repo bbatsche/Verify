@@ -24,7 +24,7 @@ if (!function_exists('verify')) {
             case 2:
                 return new Verify(func_get_arg(1), func_get_arg(0));
             default:
-                throw new \BadMethodCallException('VerifyFile must take 1 or 2 arguments.');
+                throw new \BadMethodCallException('verify() must be called with exactly 1 or 2 arguments.');
         }
     }
 
@@ -111,7 +111,7 @@ if (!function_exists('verify_file')) {
             case 2:
                 return new VerifyFile(func_get_arg(1), func_get_arg(0));
             default:
-                throw new \BadMethodCallException('VerifyFile must take 1 or 2 arguments.');
+                throw new \BadMethodCallException('verify_file() must be called with exactly 1 or 2 arguments.');
         }
     }
 }

@@ -26,6 +26,18 @@ class VerifyTest extends UnitTestBase
         $this->assertInstanceOf('BeBat\Verify\Verify', $obj);
     }
 
+    public function testVerifyTooManyArgs()
+    {
+        $this->setExpectedException('BadMethodCallException');
+        verify('arg1', 'arg2', 'arg3');
+    }
+
+    public function testVerifyTooFewArgs()
+    {
+        $this->setExpectedException('BadMethodCallException');
+        verify();
+    }
+
     public function testExpectFunctions()
     {
         $obj = expect('value');
