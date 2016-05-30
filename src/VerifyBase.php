@@ -25,6 +25,8 @@ abstract class VerifyBase
      */
     protected $description = '';
 
+    protected $ignoreCase = false;
+
     /**
      * Constructor; shared between Verify and VerifyFile
      *
@@ -35,5 +37,19 @@ abstract class VerifyBase
     {
         $this->actual      = $actual;
         $this->description = $description;
+    }
+
+    public function withCase()
+    {
+        $this->ignoreCase = false;
+
+        return $this;
+    }
+
+    public function withoutCase()
+    {
+        $this->ignoreCase = true;
+
+        return $this;
     }
 }

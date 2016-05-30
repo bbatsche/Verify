@@ -15,7 +15,6 @@ class Verify extends VerifyBase
     protected $floatDelta     = 0.0;
     protected $maxDepth       = 10;
     protected $presortValues  = false;
-    protected $ignoreCase     = false;
     protected $objectIdentity = true;
     protected $dataType       = false;
     protected $xmlAttributes  = false;
@@ -37,20 +36,6 @@ class Verify extends VerifyBase
     public function withoutOrder()
     {
         $this->presortValues = false;
-
-        return $this;
-    }
-
-    public function withCase()
-    {
-        $this->ignoreCase = false;
-
-        return $this;
-    }
-
-    public function withoutCase()
-    {
-        $this->ignoreCase = true;
 
         return $this;
     }

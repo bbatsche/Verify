@@ -21,7 +21,7 @@ class VerifyFile extends VerifyBase
      */
     public function equals($expected)
     {
-        a::assertFileEquals($expected, $this->actual, $this->description, $this->presortValues);
+        a::assertFileEquals($expected, $this->actual, $this->description, $this->presortValues, $this->ignoreCase);
     }
 
     /**
@@ -32,7 +32,7 @@ class VerifyFile extends VerifyBase
      */
     public function doesNotEqual($expected)
     {
-        a::assertFileNotEquals($expected, $this->actual, $this->description, $this->presortValues);
+        a::assertFileNotEquals($expected, $this->actual, $this->description, $this->presortValues, $this->ignoreCase);
     }
 
     /**
