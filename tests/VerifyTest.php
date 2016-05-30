@@ -768,8 +768,180 @@ class VerifyTest extends UnitTestBase
 
     public function testEqualsFile()
     {
-        $this->fireTwoValueTest('equalsFile',       'assertStringEqualsFile');
-        $this->fireTwoValueTest('doesNotEqualFile', 'assertStringNotEqualsFile');
+        $this->mockAssert->shouldReceive('assertStringEqualsFile')
+            ->with(
+                'test 1',
+                'subject 1',
+                Mockery::any(), // Message
+                Mockery::any(), // Canonicalize
+                Mockery::any()  // Ignore Case
+            )->once();
+        $this->mockAssert->shouldReceive('assertStringEqualsFile')
+            ->with(
+                'test 2',
+                'subject 2',
+                'message',
+                Mockery::any(),
+                Mockery::any()
+            )->once();
+
+        $this->assertNull(verify('subject 1')->equalsFile('test 1'));
+        $this->assertNull(verify('message', 'subject 2')->equalsFile('test 2'));
+    }
+
+    public function testNotEqualsFile()
+    {
+        $this->mockAssert->shouldReceive('assertStringNotEqualsFile')
+            ->with(
+                'test 1',
+                'subject 1',
+                Mockery::any(), // Message
+                Mockery::any(), // Canonicalize
+                Mockery::any()  // Ignore Case
+            )->once();
+        $this->mockAssert->shouldReceive('assertStringNotEqualsFile')
+            ->with(
+                'test 2',
+                'subject 2',
+                'message',
+                Mockery::any(),
+                Mockery::any()
+            )->once();
+
+        $this->assertNull(verify('subject 1')->doesNotEqualFile('test 1'));
+        $this->assertNull(verify('message', 'subject 2')->doesNotEqualFile('test 2'));
+    }
+
+    public function testIgnoreCaseEqualsFile()
+    {
+        // Default: false
+        $this->mockAssert->shouldReceive('assertStringEqualsFile')
+            ->with(
+                'test 1',
+                'subject 1',
+                Mockery::any(), // Message
+                Mockery::any(), // Canonicalize
+                false
+            )->once();
+        $this->mockAssert->shouldReceive('assertStringEqualsFile')
+            ->with(
+                'test 2',
+                'subject 2',
+                'message 2',
+                Mockery::any(),
+                false
+            )->once();
+
+        $this->assertNull(verify('subject 1')->equalsFile('test 1'));
+        $this->assertNull(verify('message 2', 'subject 2')->equalsFile('test 2'));
+
+        // Explicitly false
+        $this->mockAssert->shouldReceive('assertStringEqualsFile')
+            ->with(
+                'test 3',
+                'subject 3',
+                Mockery::any(), // Message
+                Mockery::any(), // Canonicalize
+                false
+            )->once();
+        $this->mockAssert->shouldReceive('assertStringEqualsFile')
+            ->with(
+                'test 4',
+                'subject 4',
+                'message 4',
+                Mockery::any(),
+                false
+            )->once();
+
+        $this->assertNull(verify('subject 3')->withCase()->equalsFile('test 3'));
+        $this->assertNull(verify('message 4', 'subject 4')->withCase()->equalsFile('test 4'));
+
+        // Explicitly true
+        $this->mockAssert->shouldReceive('assertStringEqualsFile')
+            ->with(
+                'test 5',
+                'subject 5',
+                Mockery::any(), // Message
+                Mockery::any(), // Canonicalize
+                true
+            )->once();
+        $this->mockAssert->shouldReceive('assertStringEqualsFile')
+            ->with(
+                'test 6',
+                'subject 6',
+                'message 6',
+                Mockery::any(),
+                true
+            )->once();
+
+        $this->assertNull(verify('subject 5')->withoutCase()->equalsFile('test 5'));
+        $this->assertNull(verify('message 6', 'subject 6')->withoutCase()->equalsFile('test 6'));
+    }
+
+    public function testIgnoreCaseNotEqualsFile()
+    {
+        // Default: false
+        $this->mockAssert->shouldReceive('assertStringNotEqualsFile')
+            ->with(
+                'test 1',
+                'subject 1',
+                Mockery::any(), // Message
+                Mockery::any(), // Canonicalize
+                false
+            )->once();
+        $this->mockAssert->shouldReceive('assertStringNotEqualsFile')
+            ->with(
+                'test 2',
+                'subject 2',
+                'message 2',
+                Mockery::any(),
+                false
+            )->once();
+
+        $this->assertNull(verify('subject 1')->doesNotEqualFile('test 1'));
+        $this->assertNull(verify('message 2', 'subject 2')->doesNotEqualFile('test 2'));
+
+        // Explicitly false
+        $this->mockAssert->shouldReceive('assertStringNotEqualsFile')
+            ->with(
+                'test 3',
+                'subject 3',
+                Mockery::any(), // Message
+                Mockery::any(), // Canonicalize
+                false
+            )->once();
+        $this->mockAssert->shouldReceive('assertStringNotEqualsFile')
+            ->with(
+                'test 4',
+                'subject 4',
+                'message 4',
+                Mockery::any(),
+                false
+            )->once();
+
+        $this->assertNull(verify('subject 3')->withCase()->doesNotEqualFile('test 3'));
+        $this->assertNull(verify('message 4', 'subject 4')->withCase()->doesNotEqualFile('test 4'));
+
+        // Explicitly true
+        $this->mockAssert->shouldReceive('assertStringNotEqualsFile')
+            ->with(
+                'test 5',
+                'subject 5',
+                Mockery::any(), // Message
+                Mockery::any(), // Canonicalize
+                true
+            )->once();
+        $this->mockAssert->shouldReceive('assertStringNotEqualsFile')
+            ->with(
+                'test 6',
+                'subject 6',
+                'message 6',
+                Mockery::any(),
+                true
+            )->once();
+
+        $this->assertNull(verify('subject 5')->withoutCase()->doesNotEqualFile('test 5'));
+        $this->assertNull(verify('message 6', 'subject 6')->withoutCase()->doesNotEqualFile('test 6'));
     }
 
     public function testXmlMethods()

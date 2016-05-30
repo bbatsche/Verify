@@ -621,7 +621,8 @@ class Verify extends VerifyBase
      */
     public function equalsFile($file)
     {
-        a::assertStringEqualsFile($file, $this->actual, $this->description);
+        // $canonicalize hardcoded to false
+        a::assertStringEqualsFile($file, $this->actual, $this->description, false, $this->ignoreCase);
     }
 
     /**
@@ -632,7 +633,8 @@ class Verify extends VerifyBase
      */
     public function doesNotEqualFile($file)
     {
-        a::assertStringNotEqualsFile($file, $this->actual, $this->description);
+        // $canonicalize hardcoded to false
+        a::assertStringNotEqualsFile($file, $this->actual, $this->description, false, $this->ignoreCase);
     }
 
     /**
