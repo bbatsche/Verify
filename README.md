@@ -23,6 +23,7 @@ Most of the original work was done by [@DavertMik](http://github.com/DavertMik) 
     - [Alternate Functions](#alternate-functions)
 - [Available Assertions](#available-assertions)
     - [File Assertions](#file-assertions)
+    - [Assertion Modifiers](#assertion-modifiers)
 - [Additional Information](#additional-information)
 
 ## Installation
@@ -191,6 +192,69 @@ verify_file('/path/to/test.json')->doesNotEqualJsonFile('/path/to/bad.json');
 
 verify_file('/path/to/test.xml')->equalsXmlFile('/path/to/other.xml');
 verify_file('/path/to/test.xml')->doesNotEqualXmlFile('/path/to/bad.xml');
+```
+
+### Assertion Modifiers
+
+The behavior of many assertions can be tweaked inline with the test. These modifiers can be used to control case sensitivity, account for floating point errors, or strictness when checking for object identity and datatypes. They follow the naming convention of `with*()` and `without*()`. The available modifiers are:
+
+```php
+// Account for floating point errors
+verify(0.1 + 0.2)->within(0.01)->equals(0.3);
+verify(0.1 + 0.2)->within(0.01)->doesNotEqual(0.4);
+
+// Control case sensitivity when comparing strings
+verify('A String')->withCase()->equals('A String');
+verify('A String')->withoutCase()->equals('a string');
+
+verify('A String')->withCase()->doesNotEqual('a string');
+verify('A String')->withoutCase()->doesNotEqual('another string');
+
+verify('A String')->withCase()->contains('String');
+verify('A String')->withoutCase()->contains('string');
+
+verify('A String')->withCase()->doesNotContain('string');
+verify('A String')->withoutCase()->doesNotContain('another');
+
+verify('A String')->withCase()->equalsFile('/some/file.txt');
+verify('a string')->withoutCase()->equalsFile('/some/file.txt');
+
+verify('a string')->withCase()->doesNotEqualFile('/some/file.txt');
+verify('A String')->withoutCase()->doesNotEqualFile('/some/other/file.txt');
+
+verify_file('/some/file.txt')->withCase()->equals('/some/other/file.txt');
+verify_file('/some/file.txt')->withoutCase()->equals('/some/other/file.txt');
+
+verify_file('/some/file.txt')->withCase()->doesNotEqual('/yet/another/file.txt');
+verify_file('/some/file.txt')->withoutCase()->doesNotEqual('/another/file.txt');
+
+// Whether to check element ordering when comparing two arrays
+verify([1, 2, 3])->withOrder()->equals([1, 2, 3]);
+verify([1, 2, 3])->withoutOrder()->equals([3, 1, 2]);
+
+verify([1, 2, 3])->withOrder()->doesNotEqual([3, 1, 2]);
+verify([1, 2, 3])->withoutOrder()->doesNotEqual([3, 1, 1]);
+
+// Whether to check for identity when comparing object values
+verify([$objectA])->withIdentity()->contains($objectA);
+verify([$objectA])->withoutIdentity()->contains($objectB);
+
+verify([$objectA])->withIdentity()->doesNotContain($objectB);
+verify([$objectA])->withoutIdentity()->doesNotContain($objectB);
+
+// Whether to include type when comparing values
+verify(['1', '2'])->withType()->contains('1');
+verify(['1', '2'])->withoutType()->contains(1);
+
+verify(['1', '2'])->withType()->doesNotContain('3');
+verify(['1', '2'])->withoutType()->doesNotContain(3);
+
+verify(['1', '2', '3'])->withType()->hasSubset(['1', '3']);
+verify(['1', '2', '3'])->withoutType()->hasSubset([1, 3]);
+
+// Whether to check element attributes when comparing XML documents
+verify($domDocument)->withAttributes()->equalsXmlStructure($validDocument);
+verify($domDocument)->withoutAttributes()->equalsXmlStructure($validDocument);
 ```
 
 ## Additional Information
