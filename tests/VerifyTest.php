@@ -1344,19 +1344,47 @@ class VerifyTest extends UnitTestBase
         $this->assertNull(verify('message 6', 'subject 6')->withoutCase()->doesNotEqualFile('test 6'));
     }
 
-    public function testXmlMethods()
+    public function testXmlStructure()
     {
-        $subject = new DOMDocument();
-        $target  = new DOMDocument();
+        $subject1 = new DOMDocument();
+        $target1  = new DOMDocument();
+
+        // Default: false
+        $this->mockAssert->shouldReceive('assertEqualXMLStructure')
+            ->with($target1, $subject1, false, Mockery::any())->once();
+        $this->mockAssert->shouldReceive('assertEqualXMLStructure')
+            ->with($target1, $subject1, false, 'message')->once();
+
+        $this->assertNull(verify($subject1)->equalsXmlStructure($target1));
+        $this->assertNull(verify('message', $subject1)->equalsXmlStructure($target1));
+
+        // Explicitly false
+        $subject2 = new DOMDocument();
+        $target2  = new DOMDocument();
 
         $this->mockAssert->shouldReceive('assertEqualXMLStructure')
-            ->with($target, $subject, false, Mockery::any())->once();
+            ->with($target2, $subject2, false, Mockery::any())->once();
         $this->mockAssert->shouldReceive('assertEqualXMLStructure')
-            ->with($target, $subject, false, 'message')->once();
+            ->with($target2, $subject2, false, 'message')->once();
 
-        $this->assertNull(verify($subject)->equalsXmlStructure($target));
-        $this->assertNull(verify('message', $subject)->equalsXmlStructure($target));
+        $this->assertNull(verify($subject2)->withoutAttributes()->equalsXmlStructure($target2));
+        $this->assertNull(verify('message', $subject2)->withoutAttributes()->equalsXmlStructure($target2));
 
+        // Explicitly false
+        $subject3 = new DOMDocument();
+        $target3  = new DOMDocument();
+
+        $this->mockAssert->shouldReceive('assertEqualXMLStructure')
+            ->with($target3, $subject3, true, Mockery::any())->once();
+        $this->mockAssert->shouldReceive('assertEqualXMLStructure')
+            ->with($target3, $subject3, true, 'message')->once();
+
+        $this->assertNull(verify($subject3)->withAttributes()->equalsXmlStructure($target3));
+        $this->assertNull(verify('message', $subject3)->withAttributes()->equalsXmlStructure($target3));
+    }
+
+    public function testXmlFilesString()
+    {
         $this->fireTwoValueTest('equalsXmlFile',       'assertXmlStringEqualsXmlFile');
         $this->fireTwoValueTest('doesNotEqualXmlFile', 'assertXmlStringNotEqualsXmlFile');
 

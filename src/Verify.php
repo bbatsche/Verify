@@ -18,6 +18,7 @@ class Verify extends VerifyBase
     protected $ignoreCase     = false;
     protected $objectIdentity = true;
     protected $dataType       = false;
+    protected $xmlAttributes  = false;
 
     public function within($delta)
     {
@@ -78,6 +79,20 @@ class Verify extends VerifyBase
     public function withoutType()
     {
         $this->dataType = false;
+
+        return $this;
+    }
+
+    public function withAttributes()
+    {
+        $this->xmlAttributes = true;
+
+        return $this;
+    }
+
+    public function withoutAttributes()
+    {
+        $this->xmlAttributes = false;
 
         return $this;
     }
@@ -684,14 +699,12 @@ class Verify extends VerifyBase
     /**
      * Assert SUT has the same XML structur as a given DOMElement
      *
-     * Note: does *not* check if element attributes are the same
-     *
      * @param \DOMElement $xml Structure SUT is expected to match
      * @return void
      */
     public function equalsXmlStructure($xml)
     {
-        a::assertEqualXMLStructure($xml, $this->actual, false, $this->description);
+        a::assertEqualXMLStructure($xml, $this->actual, $this->xmlAttributes, $this->description);
     }
 
     /**
