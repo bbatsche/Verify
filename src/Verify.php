@@ -12,10 +12,12 @@ use BeBat\Verify\Assert as a;
  */
 class Verify extends VerifyBase
 {
-    protected $floatDelta    = 0.0;
-    protected $maxDepth      = 10;
-    protected $presortValues = false;
-    protected $ignoreCase    = false;
+    protected $floatDelta     = 0.0;
+    protected $maxDepth       = 10;
+    protected $presortValues  = false;
+    protected $ignoreCase     = false;
+    protected $objectIdentity = true;
+    protected $dataType       = false;
 
     public function within($delta)
     {
@@ -48,6 +50,34 @@ class Verify extends VerifyBase
     public function withoutCase()
     {
         $this->ignoreCase = true;
+
+        return $this;
+    }
+
+    public function withIdentity()
+    {
+        $this->objectIdentity = true;
+
+        return $this;
+    }
+
+    public function withoutIdentity()
+    {
+        $this->objectIdentity = false;
+
+        return $this;
+    }
+
+    public function withType()
+    {
+        $this->dataType = true;
+
+        return $this;
+    }
+
+    public function withoutType()
+    {
+        $this->dataType = false;
 
         return $this;
     }
@@ -98,7 +128,14 @@ class Verify extends VerifyBase
      */
     public function contains($needle)
     {
-        a::assertContains($needle, $this->actual, $this->description, $this->ignoreCase);
+        a::assertContains(
+            $needle,
+            $this->actual,
+            $this->description,
+            $this->ignoreCase,
+            $this->objectIdentity,
+            $this->dataType
+        );
     }
 
     /**
@@ -109,7 +146,14 @@ class Verify extends VerifyBase
      */
     public function doesNotContain($needle)
     {
-        a::assertNotContains($needle, $this->actual, $this->description, $this->ignoreCase);
+        a::assertNotContains(
+            $needle,
+            $this->actual,
+            $this->description,
+            $this->ignoreCase,
+            $this->objectIdentity,
+            $this->dataType
+        );
     }
 
     /**

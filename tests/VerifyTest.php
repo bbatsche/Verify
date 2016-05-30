@@ -529,9 +529,23 @@ class VerifyTest extends UnitTestBase
     public function testContains()
     {
         $this->mockAssert->shouldReceive('assertContains')
-            ->with('test 1', 'subject 1', Mockery::any(), Mockery::any())->once();
+            ->with(
+                'test 1',
+                'subject 1',
+                Mockery::any(), // Message
+                Mockery::any(), // Ignore Case
+                Mockery::any(), // Object Identity
+                Mockery::any()  // Data Type
+            )->once();
         $this->mockAssert->shouldReceive('assertContains')
-            ->with('test 2', 'subject 2', 'message', Mockery::any())->once();
+            ->with(
+                'test 2',
+                'subject 2',
+                'message',
+                Mockery::any(),
+                Mockery::any(),
+                Mockery::any()
+            )->once();
 
         $this->assertNull(verify('subject 1')->contains('test 1'));
         $this->assertNull(verify('message', 'subject 2')->contains('test 2'));
@@ -540,9 +554,23 @@ class VerifyTest extends UnitTestBase
     public function testNotContain()
     {
         $this->mockAssert->shouldReceive('assertNotContains')
-            ->with('test 1', 'subject 1', Mockery::any(), Mockery::any())->once();
+            ->with(
+                'test 1',
+                'subject 1',
+                Mockery::any(), // Message
+                Mockery::any(), // Ignore Case
+                Mockery::any(), // Object Identity
+                Mockery::any()  // Data Type
+            )->once();
         $this->mockAssert->shouldReceive('assertNotContains')
-            ->with('test 2', 'subject 2', 'message', Mockery::any())->once();
+            ->with(
+                'test 2',
+                'subject 2',
+                'message',
+                Mockery::any(),
+                Mockery::any(),
+                Mockery::any()
+            )->once();
 
         $this->assertNull(verify('subject 1')->doesNotContain('test 1'));
         $this->assertNull(verify('message', 'subject 2')->doesNotContain('test 2'));
@@ -552,27 +580,69 @@ class VerifyTest extends UnitTestBase
     {
         // Default: false
         $this->mockAssert->shouldReceive('assertContains')
-            ->with('test 1', 'subject 1', Mockery::any(), false)->once();
+            ->with(
+                'test 1',
+                'subject 1',
+                Mockery::any(), // Message
+                false,
+                Mockery::any(), // Object Identity
+                Mockery::any()  // Data Type
+            )->once();
         $this->mockAssert->shouldReceive('assertContains')
-            ->with('test 2', 'subject 2', 'message 2', false)->once();
+            ->with(
+                'test 2',
+                'subject 2',
+                'message 2',
+                false,
+                Mockery::any(),
+                Mockery::any()
+            )->once();
 
         $this->assertNull(verify('subject 1')->contains('test 1'));
         $this->assertNull(verify('message 2', 'subject 2')->contains('test 2'));
 
         // Explicitly false
         $this->mockAssert->shouldReceive('assertContains')
-            ->with('test 3', 'subject 3', Mockery::any(), false)->once();
+            ->with(
+                'test 3',
+                'subject 3',
+                Mockery::any(),
+                false,
+                Mockery::any(),
+                Mockery::any()
+            )->once();
         $this->mockAssert->shouldReceive('assertContains')
-            ->with('test 4', 'subject 4', 'message 4', false)->once();
+            ->with(
+                'test 4',
+                'subject 4',
+                'message 4',
+                false,
+                Mockery::any(),
+                Mockery::any()
+            )->once();
 
         $this->assertNull(verify('subject 3')->withCase()->contains('test 3'));
         $this->assertNull(verify('message 4', 'subject 4')->withCase()->contains('test 4'));
 
         // Explicitly false
         $this->mockAssert->shouldReceive('assertContains')
-            ->with('test 5', 'subject 5', Mockery::any(), true)->once();
+            ->with(
+                'test 5',
+                'subject 5',
+                Mockery::any(),
+                true,
+                Mockery::any(),
+                Mockery::any()
+            )->once();
         $this->mockAssert->shouldReceive('assertContains')
-            ->with('test 6', 'subject 6', 'message 6', true)->once();
+            ->with(
+                'test 6',
+                'subject 6',
+                'message 6',
+                true,
+                Mockery::any(),
+                Mockery::any()
+            )->once();
 
         $this->assertNull(verify('subject 5')->withoutCase()->contains('test 5'));
         $this->assertNull(verify('message 6', 'subject 6')->withoutCase()->contains('test 6'));
@@ -582,30 +652,360 @@ class VerifyTest extends UnitTestBase
     {
         // Default: false
         $this->mockAssert->shouldReceive('assertNotContains')
-            ->with('test 1', 'subject 1', Mockery::any(), false)->once();
+            ->with(
+                'test 1',
+                'subject 1',
+                Mockery::any(), // Message
+                false,
+                Mockery::any(), // Object Identity
+                Mockery::any()  // Data Type
+            )->once();
         $this->mockAssert->shouldReceive('assertNotContains')
-            ->with('test 2', 'subject 2', 'message 2', false)->once();
+            ->with(
+                'test 2',
+                'subject 2',
+                'message 2',
+                false,
+                Mockery::any(),
+                Mockery::any()
+            )->once();
 
         $this->assertNull(verify('subject 1')->doesNotContain('test 1'));
         $this->assertNull(verify('message 2', 'subject 2')->doesNotContain('test 2'));
 
         // Explicitly false
         $this->mockAssert->shouldReceive('assertNotContains')
-            ->with('test 3', 'subject 3', Mockery::any(), false)->once();
+            ->with(
+                'test 3',
+                'subject 3',
+                Mockery::any(),
+                false,
+                Mockery::any(),
+                Mockery::any()
+            )->once();
         $this->mockAssert->shouldReceive('assertNotContains')
-            ->with('test 4', 'subject 4', 'message 4', false)->once();
+            ->with(
+                'test 4',
+                'subject 4',
+                'message 4',
+                false,
+                Mockery::any(),
+                Mockery::any()
+            )->once();
 
         $this->assertNull(verify('subject 3')->withCase()->doesNotContain('test 3'));
         $this->assertNull(verify('message 4', 'subject 4')->withCase()->doesNotContain('test 4'));
 
         // Explicitly false
         $this->mockAssert->shouldReceive('assertNotContains')
-            ->with('test 5', 'subject 5', Mockery::any(), true)->once();
+            ->with(
+                'test 5',
+                'subject 5',
+                Mockery::any(),
+                true,
+                Mockery::any(),
+                Mockery::any()
+            )->once();
         $this->mockAssert->shouldReceive('assertNotContains')
-            ->with('test 6', 'subject 6', 'message 6', true)->once();
+            ->with(
+                'test 6',
+                'subject 6',
+                'message 6',
+                true,
+                Mockery::any(),
+                Mockery::any()
+            )->once();
 
         $this->assertNull(verify('subject 5')->withoutCase()->doesNotContain('test 5'));
         $this->assertNull(verify('message 6', 'subject 6')->withoutCase()->doesNotContain('test 6'));
+    }
+
+    public function testObjectIdentityContains()
+    {
+        // Default: true
+        $this->mockAssert->shouldReceive('assertContains')
+            ->with(
+                'test 1',
+                'subject 1',
+                Mockery::any(), // Message
+                Mockery::any(), // Ignore Case
+                true,
+                Mockery::any()  // Data Type
+            )->once();
+        $this->mockAssert->shouldReceive('assertContains')
+            ->with(
+                'test 2',
+                'subject 2',
+                'message 2',
+                Mockery::any(),
+                true,
+                Mockery::any()
+            )->once();
+
+        $this->assertNull(verify('subject 1')->contains('test 1'));
+        $this->assertNull(verify('message 2', 'subject 2')->contains('test 2'));
+
+        // Explicitly false
+        $this->mockAssert->shouldReceive('assertContains')
+            ->with(
+                'test 3',
+                'subject 3',
+                Mockery::any(),
+                Mockery::any(),
+                false,
+                Mockery::any()
+            )->once();
+        $this->mockAssert->shouldReceive('assertContains')
+            ->with(
+                'test 4',
+                'subject 4',
+                'message 4',
+                Mockery::any(),
+                false,
+                Mockery::any()
+            )->once();
+
+        $this->assertNull(verify('subject 3')->withoutIdentity()->contains('test 3'));
+        $this->assertNull(verify('message 4', 'subject 4')->withoutIdentity()->contains('test 4'));
+
+        // Explicitly false
+        $this->mockAssert->shouldReceive('assertContains')
+            ->with(
+                'test 5',
+                'subject 5',
+                Mockery::any(),
+                Mockery::any(),
+                true,
+                Mockery::any()
+            )->once();
+        $this->mockAssert->shouldReceive('assertContains')
+            ->with(
+                'test 6',
+                'subject 6',
+                'message 6',
+                Mockery::any(),
+                true,
+                Mockery::any()
+            )->once();
+
+        $this->assertNull(verify('subject 5')->withIdentity()->contains('test 5'));
+        $this->assertNull(verify('message 6', 'subject 6')->withIdentity()->contains('test 6'));
+    }
+
+    public function testObjectIdentityNotContains()
+    {
+        // Default: true
+        $this->mockAssert->shouldReceive('assertNotContains')
+            ->with(
+                'test 1',
+                'subject 1',
+                Mockery::any(), // Message
+                Mockery::any(), // Ignore Case
+                true,
+                Mockery::any()  // Data Type
+            )->once();
+        $this->mockAssert->shouldReceive('assertNotContains')
+            ->with(
+                'test 2',
+                'subject 2',
+                'message 2',
+                Mockery::any(),
+                true,
+                Mockery::any()
+            )->once();
+
+        $this->assertNull(verify('subject 1')->doesNotContain('test 1'));
+        $this->assertNull(verify('message 2', 'subject 2')->doesNotContain('test 2'));
+
+        // Explicitly false
+        $this->mockAssert->shouldReceive('assertNotContains')
+            ->with(
+                'test 3',
+                'subject 3',
+                Mockery::any(),
+                Mockery::any(),
+                false,
+                Mockery::any()
+            )->once();
+        $this->mockAssert->shouldReceive('assertNotContains')
+            ->with(
+                'test 4',
+                'subject 4',
+                'message 4',
+                Mockery::any(),
+                false,
+                Mockery::any()
+            )->once();
+
+        $this->assertNull(verify('subject 3')->withoutIdentity()->doesNotContain('test 3'));
+        $this->assertNull(verify('message 4', 'subject 4')->withoutIdentity()->doesNotContain('test 4'));
+
+        // Explicitly false
+        $this->mockAssert->shouldReceive('assertNotContains')
+            ->with(
+                'test 5',
+                'subject 5',
+                Mockery::any(),
+                Mockery::any(),
+                true,
+                Mockery::any()
+            )->once();
+        $this->mockAssert->shouldReceive('assertNotContains')
+            ->with(
+                'test 6',
+                'subject 6',
+                'message 6',
+                Mockery::any(),
+                true,
+                Mockery::any()
+            )->once();
+
+        $this->assertNull(verify('subject 5')->withIdentity()->doesNotContain('test 5'));
+        $this->assertNull(verify('message 6', 'subject 6')->withIdentity()->doesNotContain('test 6'));
+    }
+
+    public function testDataTypeContains()
+    {
+        // Default: false
+        $this->mockAssert->shouldReceive('assertContains')
+            ->with(
+                'test 1',
+                'subject 1',
+                Mockery::any(), // Message
+                Mockery::any(), // Ignore Case
+                Mockery::any(), // Object Identity
+                false
+            )->once();
+        $this->mockAssert->shouldReceive('assertContains')
+            ->with(
+                'test 2',
+                'subject 2',
+                'message 2',
+                Mockery::any(),
+                Mockery::any(),
+                false
+            )->once();
+
+        $this->assertNull(verify('subject 1')->contains('test 1'));
+        $this->assertNull(verify('message 2', 'subject 2')->contains('test 2'));
+
+        // Explicitly false
+        $this->mockAssert->shouldReceive('assertContains')
+            ->with(
+                'test 3',
+                'subject 3',
+                Mockery::any(),
+                Mockery::any(),
+                Mockery::any(),
+                false
+            )->once();
+        $this->mockAssert->shouldReceive('assertContains')
+            ->with(
+                'test 4',
+                'subject 4',
+                'message 4',
+                Mockery::any(),
+                Mockery::any(),
+                false
+            )->once();
+
+        $this->assertNull(verify('subject 3')->withoutType()->contains('test 3'));
+        $this->assertNull(verify('message 4', 'subject 4')->withoutType()->contains('test 4'));
+
+        // Explicitly false
+        $this->mockAssert->shouldReceive('assertContains')
+            ->with(
+                'test 5',
+                'subject 5',
+                Mockery::any(),
+                Mockery::any(),
+                Mockery::any(),
+                true
+            )->once();
+        $this->mockAssert->shouldReceive('assertContains')
+            ->with(
+                'test 6',
+                'subject 6',
+                'message 6',
+                Mockery::any(),
+                Mockery::any(),
+                true
+            )->once();
+
+        $this->assertNull(verify('subject 5')->withType()->contains('test 5'));
+        $this->assertNull(verify('message 6', 'subject 6')->withType()->contains('test 6'));
+    }
+
+    public function testDataTypeNotContains()
+    {
+        // Default: false
+        $this->mockAssert->shouldReceive('assertNotContains')
+            ->with(
+                'test 1',
+                'subject 1',
+                Mockery::any(), // Message
+                Mockery::any(), // Ignore Case
+                Mockery::any(), // Object Identity
+                false
+            )->once();
+        $this->mockAssert->shouldReceive('assertNotContains')
+            ->with(
+                'test 2',
+                'subject 2',
+                'message 2',
+                Mockery::any(),
+                Mockery::any(),
+                false
+            )->once();
+
+        $this->assertNull(verify('subject 1')->doesNotContain('test 1'));
+        $this->assertNull(verify('message 2', 'subject 2')->doesNotContain('test 2'));
+
+        // Explicitly false
+        $this->mockAssert->shouldReceive('assertNotContains')
+            ->with(
+                'test 3',
+                'subject 3',
+                Mockery::any(),
+                Mockery::any(),
+                Mockery::any(),
+                false
+            )->once();
+        $this->mockAssert->shouldReceive('assertNotContains')
+            ->with(
+                'test 4',
+                'subject 4',
+                'message 4',
+                Mockery::any(),
+                Mockery::any(),
+                false
+            )->once();
+
+        $this->assertNull(verify('subject 3')->withoutType()->doesNotContain('test 3'));
+        $this->assertNull(verify('message 4', 'subject 4')->withoutType()->doesNotContain('test 4'));
+
+        // Explicitly false
+        $this->mockAssert->shouldReceive('assertNotContains')
+            ->with(
+                'test 5',
+                'subject 5',
+                Mockery::any(),
+                Mockery::any(),
+                Mockery::any(),
+                true
+            )->once();
+        $this->mockAssert->shouldReceive('assertNotContains')
+            ->with(
+                'test 6',
+                'subject 6',
+                'message 6',
+                Mockery::any(),
+                Mockery::any(),
+                true
+            )->once();
+
+        $this->assertNull(verify('subject 5')->withType()->doesNotContain('test 5'));
+        $this->assertNull(verify('message 6', 'subject 6')->withType()->doesNotContain('test 6'));
     }
 
     public function testRelativeInequality()
