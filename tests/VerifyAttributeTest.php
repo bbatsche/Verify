@@ -1082,10 +1082,42 @@ class VerifyAttributeTest extends UnitTestBase
         $this->assertNull(verify('message 6', 'subject 6')->attribute6->withoutCase()->doesNotEqual('test 6'));
     }
 
+    public function testEmpty()
+    {
+        $this->singleValueAttrTest('isEmpty',    'assertAttributeEmpty');
+        $this->singleValueAttrTest('isNotEmpty', 'assertAttributeNotEmpty');
+    }
+
+    public function testRelativeInequality()
+    {
+        $this->twoValueAttrTest('isGreaterThan',      'assertAttributeGreaterThan');
+        $this->twoValueAttrTest('isLessThan',         'assertAttributeLessThan');
+        $this->twoValueAttrTest('isGreaterOrEqualTo', 'assertAttributeGreaterThanOrEqual');
+        $this->twoValueAttrTest('isLessOrEqualTo',    'assertAttributeLessThanOrEqual');
+    }
+
+    public function testSame()
+    {
+        $this->twoValueAttrTest('sameAs',    'assertAttributeSame');
+        $this->twoValueAttrTest('notSameAs', 'assertAttributeNotSame');
+    }
+
+    public function testInstanceOf()
+    {
+        $this->twoValueAttrTest('isInstanceOf',    'assertAttributeInstanceOf');
+        $this->twoValueAttrTest('isNotInstanceOf', 'assertAttributeNotInstanceOf');
+    }
+
+    public function testInternalType()
+    {
+        $this->twoValueAttrTest('isInternalType',    'assertAttributeInternalType');
+        $this->twoValueAttrTest('isNotInternalType', 'assertAttributeNotInternalType');
+    }
+
     protected function singleValueAttrTest($verifyMethod, $assertMethod)
     {
-        $this->mockAssert->shouldReceive($assertMethod)->with('subject 1', 'attribute1', Mockery::any())->once();
-        $this->mockAssert->shouldReceive($assertMethod)->with('subject 2', 'attribute2', 'message')->once();
+        $this->mockAssert->shouldReceive($assertMethod)->with('attribute1', 'subject 1', Mockery::any())->once();
+        $this->mockAssert->shouldReceive($assertMethod)->with('attribute2', 'subject 2', 'message')->once();
 
         $this->assertNull(call_user_func(static::$verifyMethod, 'subject 1')->attribute1->$verifyMethod());
         $this->assertNull(call_user_func(static::$verifyMethod, 'message', 'subject 2')->attribute2->$verifyMethod());
