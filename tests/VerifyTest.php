@@ -2,6 +2,10 @@
 
 require_once 'UnitTestBase.php';
 
+use function BeBat\Verify\verify;
+use function BeBat\Verify\verify_that;
+use function BeBat\Verify\verify_not;
+
 class VerifyTest extends UnitTestBase
 {
     public static function setUpBeforeClass()
@@ -38,32 +42,13 @@ class VerifyTest extends UnitTestBase
         verify();
     }
 
-    public function testExpectFunctions()
-    {
-        $obj = expect('value');
-
-        $this->assertAttributeEquals('value', 'actual', $obj);
-        $this->assertAttributeEmpty('description', $obj);
-
-        $this->assertInstanceOf('BeBat\Verify\Verify', $obj);
-
-        $obj = expect('message', 'value');
-
-        $this->assertAttributeEquals('value', 'actual', $obj);
-        $this->assertAttributeEquals('message', 'description', $obj);
-
-        $this->assertInstanceOf('BeBat\Verify\Verify', $obj);
-    }
-
     public function testShortHandMethods()
     {
-        $this->mockAssert->shouldReceive('assertNotEmpty')->with('subject', Mockery::any())->twice();
-        $this->mockAssert->shouldReceive('assertEmpty')->with('subject', Mockery::any())->twice();
+        $this->mockAssert->shouldReceive('assertNotEmpty')->with('subject', Mockery::any())->once();
+        $this->mockAssert->shouldReceive('assertEmpty')->with('subject', Mockery::any())->once();
 
         $this->assertNull(verify_that('subject'));
-        $this->assertNull(expect_that('subject'));
         $this->assertNull(verify_not('subject'));
-        $this->assertNull(expect_not('subject'));
     }
 
     public function testEquals()

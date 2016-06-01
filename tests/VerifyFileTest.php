@@ -2,6 +2,8 @@
 
 require_once 'UnitTestBase.php';
 
+use function BeBat\Verify\verify_file;
+
 class VerifyFileTest extends UnitTestBase
 {
     public static function setUpBeforeClass()
@@ -19,23 +21,6 @@ class VerifyFileTest extends UnitTestBase
         $this->assertInstanceOf('BeBat\Verify\VerifyFile', $obj);
 
         $obj = verify_file('message', 'filename');
-
-        $this->assertAttributeEquals('filename', 'actual', $obj);
-        $this->assertAttributeEquals('message', 'description', $obj);
-
-        $this->assertInstanceOf('BeBat\Verify\VerifyFile', $obj);
-    }
-
-    public function testExpectFileFunction()
-    {
-        $obj = expect_file('filename');
-
-        $this->assertAttributeEquals('filename', 'actual', $obj);
-        $this->assertAttributeEmpty('description', $obj);
-
-        $this->assertInstanceOf('BeBat\Verify\VerifyFile', $obj);
-
-        $obj = expect_file('message', 'filename');
 
         $this->assertAttributeEquals('filename', 'actual', $obj);
         $this->assertAttributeEquals('message', 'description', $obj);

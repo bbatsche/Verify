@@ -2,13 +2,10 @@
 
 require_once 'UnitTestBase.php';
 
+use function BeBat\Verify\verify;
+
 class VerifyAttributeTest extends UnitTestBase
 {
-    public static function setUpBeforeClass()
-    {
-        static::$verifyMethod = 'verify';
-    }
-
     public function testAttributeFunctions()
     {
         $obj1 = verify('value');
@@ -1119,8 +1116,8 @@ class VerifyAttributeTest extends UnitTestBase
         $this->mockAssert->shouldReceive($assertMethod)->with('attribute1', 'subject 1', Mockery::any())->once();
         $this->mockAssert->shouldReceive($assertMethod)->with('attribute2', 'subject 2', 'message')->once();
 
-        $this->assertNull(call_user_func(static::$verifyMethod, 'subject 1')->attribute1->$verifyMethod());
-        $this->assertNull(call_user_func(static::$verifyMethod, 'message', 'subject 2')->attribute2->$verifyMethod());
+        $this->assertNull(verify('subject 1')->attribute1->$verifyMethod());
+        $this->assertNull(verify('message', 'subject 2')->attribute2->$verifyMethod());
     }
 
     protected function twoValueAttrTest($verifyMethod, $assertMethod)
@@ -1128,7 +1125,7 @@ class VerifyAttributeTest extends UnitTestBase
         $this->mockAssert->shouldReceive($assertMethod)->with('test 1', 'attribute1', 'subject 1', Mockery::any())->once();
         $this->mockAssert->shouldReceive($assertMethod)->with('test 2', 'attribute2', 'subject 2', 'message')->once();
 
-        $this->assertNull(call_user_func(static::$verifyMethod, 'subject 1')->attribute1->$verifyMethod('test 1'));
-        $this->assertNull(call_user_func(static::$verifyMethod, 'message', 'subject 2')->attribute2->$verifyMethod('test 2'));
+        $this->assertNull(verify('subject 1')->attribute1->$verifyMethod('test 1'));
+        $this->assertNull(verify('message', 'subject 2')->attribute2->$verifyMethod('test 2'));
     }
 }
