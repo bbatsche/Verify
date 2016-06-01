@@ -17,6 +17,10 @@
             "homepage": "http://github.com/bbatsche"
         }
     ],
+    "support": {
+        "issues": "https://waffle.io/bbatsche/verify",
+        "docs": "http://bbatsche.github.io/Verify/"
+    },
     "require": {
         "phpunit/phpunit": "~4.0",
         "php": ">=5.4.0"
