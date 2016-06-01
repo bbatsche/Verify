@@ -23,6 +23,7 @@ Most of the original work was done by [@DavertMik](http://github.com/DavertMik) 
     - [Alternate Functions](#alternate-functions)
 - [Available Assertions](#available-assertions)
     - [File Assertions](#file-assertions)
+    - [Attribute Assertions](#attribute-assertions)
     - [Assertion Modifiers](#assertion-modifiers)
 - [Additional Information](#additional-information)
 
@@ -176,6 +177,52 @@ verify($xmlString)->doesNotEqualXmlString('<bad><xml /></bad>');
 verify($xmlString)->doesNotEqualXmlFile('/path/to/bad.xml');
 ```
 
+### Attribute Assertions
+
+Verify (and PHPUnit) has the ability to test the value of protected and private object properties (or "attributes"). While this is typically considered a violation of best unit testing practice, there are times when inspecting a protected value can be the simplest way of checking your code. The attribute you wish to check can be tacked on after calling `verify()`, just like if you were accessing it as a public value. For example, if you had an object called `$user` with a private `first_name` property that should be equal to `'Alice'`, you can assert that with the following code:
+
+```php
+verify($user)->first_name->equals('Alice');
+```
+
+The following subset of assertions support checking attribute values:
+
+```php
+verify($obj)->attribute_name->equals('Some Value');
+verify($obj)->attribute_name->doesNotEqual('some other value');
+
+verify($obj)->attribute_name->contains('Val');
+verify($obj)->attribute_name->doesNotContain('unwanted value');
+
+verify($obj)->array_attribute->hasCount(5);
+verify($obj)->array_attribute->doesNotHaveCount(0);
+
+verify($obj)->attribute_name->isEmpty();
+verify($obj)->attribute_name->isNotEmpty();
+
+verify($obj)->numeric_attribute->isGreaterThan(0);
+verify($obj)->numeric_attribute->isGreaterOrEqualTo(1);
+verify($obj)->numeric_attribute->isLessThan(10);
+verify($obj)->numeric_attribute->isLessOrEqualTo(9.99);
+
+verify($obj)->attribute_name->isInstanceOf('GoodClass');
+verify($obj)->attribute_name->isNotInstanceOf('InvalidClass');
+verify($obj)->attribute_name->isInternalType('string');
+verify($obj)->attribute_name->isNotInternaltype('int');
+
+verify($obj)->object_attriute->sameAs($validObject);
+verify($obj)->object_attriute->notSameAs($invalidObject);
+
+verify($obj)->array_attribute->containsOnly('bool');
+verify($obj)->array_attribute->doesNotContainOnly('InvalidClassName');
+```
+
+If your attribute/property name conflicts with an existing `Verify` property, you can set it explicitly with the `attribute()` method:
+
+```php
+verify($obj)->attribute('isNot')->equals(false);
+```
+
 ### File Assertions
 
 If the subject under test is actually a file, you must use the `verify_file()` (or `expect_file()`) methods to access filesystem assertions.
@@ -255,6 +302,12 @@ verify(['1', '2', '3'])->withoutType()->hasSubset([1, 3]);
 // Whether to check element attributes when comparing XML documents
 verify($domDocument)->withAttributes()->equalsXmlStructure($validDocument);
 verify($domDocument)->withoutAttributes()->equalsXmlStructure($validDocument);
+```
+
+Assertion modifiers can be combined with each other, or with attribute assertions:
+
+```php
+verify($obj)->string_attribute->withoutCase()->equals('some value');
 ```
 
 ## Additional Information
