@@ -13,6 +13,13 @@ use BeBat\Verify\Assert as a;
 class Verify extends VerifyBase
 {
     /**
+     * Name of object attribute to evaluate (rather than the object itsefl)
+     *
+     * @var null|string
+     */
+    protected $attributeName;
+
+     /**
      * Acceptable range when checking for floating point equality
      *
      * @var float
@@ -49,6 +56,30 @@ class Verify extends VerifyBase
      * @var bool
      */
     protected $xmlAttributes = false;
+
+    /**
+     * Sets the attribute name to check
+     *
+     * @param string $attr Name of attribute
+     * @return self
+     */
+    public function __get($attr)
+    {
+        return $this->attribute($attr);
+    }
+
+    /**
+     * Sets the attribute name to check
+     *
+     * @param string $attr Name of attribute
+     * @return self
+     */
+    public function attribute($attr)
+    {
+        $this->attributeName = $attr;
+
+        return $this;
+    }
 
     /**
      * Specify an acceptable range when checking a floating point SUT's equality
@@ -167,15 +198,28 @@ class Verify extends VerifyBase
      */
     public function equals($expected)
     {
-        a::assertEquals(
-            $expected,
-            $this->actual,
-            $this->description,
-            $this->floatDelta,
-            $this->maxDepth,
-            $this->ignoreOrder,
-            $this->ignoreCase
-        );
+        if (isset($this->attributeName)) {
+            a::assertAttributeEquals(
+                $expected,
+                $this->attributeName,
+                $this->actual,
+                $this->description,
+                $this->floatDelta,
+                $this->maxDepth,
+                $this->ignoreOrder,
+                $this->ignoreCase
+            );
+        } else {
+            a::assertEquals(
+                $expected,
+                $this->actual,
+                $this->description,
+                $this->floatDelta,
+                $this->maxDepth,
+                $this->ignoreOrder,
+                $this->ignoreCase
+            );
+        }
     }
 
     /**
@@ -186,15 +230,28 @@ class Verify extends VerifyBase
      */
     public function doesNotEqual($expected)
     {
-        a::assertNotEquals(
-            $expected,
-            $this->actual,
-            $this->description,
-            $this->floatDelta,
-            $this->maxDepth,
-            $this->ignoreOrder,
-            $this->ignoreCase
-        );
+        if (isset($this->attributeName)) {
+            a::assertAttributeNotEquals(
+                $expected,
+                $this->attributeName,
+                $this->actual,
+                $this->description,
+                $this->floatDelta,
+                $this->maxDepth,
+                $this->ignoreOrder,
+                $this->ignoreCase
+            );
+        } else {
+            a::assertNotEquals(
+                $expected,
+                $this->actual,
+                $this->description,
+                $this->floatDelta,
+                $this->maxDepth,
+                $this->ignoreOrder,
+                $this->ignoreCase
+            );
+        }
     }
 
     /**
@@ -205,14 +262,26 @@ class Verify extends VerifyBase
      */
     public function contains($needle)
     {
-        a::assertContains(
-            $needle,
-            $this->actual,
-            $this->description,
-            $this->ignoreCase,
-            $this->objectIdentity,
-            $this->dataType
-        );
+        if (isset($this->attributeName)) {
+            a::assertAttributeContains(
+                $needle,
+                $this->attributeName,
+                $this->actual,
+                $this->description,
+                $this->ignoreCase,
+                $this->objectIdentity,
+                $this->dataType
+            );
+        } else {
+            a::assertContains(
+                $needle,
+                $this->actual,
+                $this->description,
+                $this->ignoreCase,
+                $this->objectIdentity,
+                $this->dataType
+            );
+        }
     }
 
     /**
@@ -223,14 +292,26 @@ class Verify extends VerifyBase
      */
     public function doesNotContain($needle)
     {
-        a::assertNotContains(
-            $needle,
-            $this->actual,
-            $this->description,
-            $this->ignoreCase,
-            $this->objectIdentity,
-            $this->dataType
-        );
+        if (isset($this->attributeName)) {
+            a::assertAttributeNotContains(
+                $needle,
+                $this->attributeName,
+                $this->actual,
+                $this->description,
+                $this->ignoreCase,
+                $this->objectIdentity,
+                $this->dataType
+            );
+        } else {
+            a::assertNotContains(
+                $needle,
+                $this->actual,
+                $this->description,
+                $this->ignoreCase,
+                $this->objectIdentity,
+                $this->dataType
+            );
+        }
     }
 
     /**
@@ -252,7 +333,11 @@ class Verify extends VerifyBase
      */
     public function isGreaterThan($expected)
     {
-        a::assertGreaterThan($expected, $this->actual, $this->description);
+        if (isset($this->attributeName)) {
+            a::assertAttributeGreaterThan($expected, $this->attributeName, $this->actual, $this->description);
+        } else {
+            a::assertGreaterThan($expected, $this->actual, $this->description);
+        }
     }
 
     /**
@@ -263,7 +348,11 @@ class Verify extends VerifyBase
      */
     public function isLessThan($expected)
     {
-        a::assertLessThan($expected, $this->actual, $this->description);
+        if (isset($this->attributeName)) {
+            a::assertAttributeLessThan($expected, $this->attributeName, $this->actual, $this->description);
+        } else {
+            a::assertLessThan($expected, $this->actual, $this->description);
+        }
     }
 
     /**
@@ -274,7 +363,11 @@ class Verify extends VerifyBase
      */
     public function isGreaterOrEqualTo($expected)
     {
-        a::assertGreaterThanOrEqual($expected, $this->actual, $this->description);
+        if (isset($this->attributeName)) {
+            a::assertAttributeGreaterThanOrEqual($expected, $this->attributeName, $this->actual, $this->description);
+        } else {
+            a::assertGreaterThanOrEqual($expected, $this->actual, $this->description);
+        }
     }
 
     /**
@@ -285,7 +378,11 @@ class Verify extends VerifyBase
      */
     public function isLessOrEqualTo($expected)
     {
-        a::assertLessThanOrEqual($expected, $this->actual, $this->description);
+        if (isset($this->attributeName)) {
+            a::assertAttributeLessThanOrEqual($expected, $this->attributeName, $this->actual, $this->description);
+        } else {
+            a::assertLessThanOrEqual($expected, $this->actual, $this->description);
+        }
     }
 
     /**
@@ -355,7 +452,11 @@ class Verify extends VerifyBase
      */
     public function isEmpty()
     {
-        a::assertEmpty($this->actual, $this->description);
+        if (isset($this->attributeName)) {
+            a::assertAttributeEmpty($this->attributeName, $this->actual, $this->description);
+        } else {
+            a::assertEmpty($this->actual, $this->description);
+        }
     }
 
     /**
@@ -365,7 +466,11 @@ class Verify extends VerifyBase
      */
     public function isNotEmpty()
     {
-        a::assertNotEmpty($this->actual, $this->description);
+        if (isset($this->attributeName)) {
+            a::assertAttributeNotEmpty($this->attributeName, $this->actual, $this->description);
+        } else {
+            a::assertNotEmpty($this->actual, $this->description);
+        }
     }
 
     /**
@@ -398,7 +503,11 @@ class Verify extends VerifyBase
      */
     public function isInstanceOf($class)
     {
-        a::assertInstanceOf($class, $this->actual, $this->description);
+        if (isset($this->attributeName)) {
+            a::assertAttributeInstanceOf($class, $this->attributeName, $this->actual, $this->description);
+        } else {
+            a::assertInstanceOf($class, $this->actual, $this->description);
+        }
     }
 
     /**
@@ -409,7 +518,11 @@ class Verify extends VerifyBase
      */
     public function isNotInstanceOf($class)
     {
-        a::assertNotInstanceOf($class, $this->actual, $this->description);
+        if (isset($this->attributeName)) {
+            a::assertAttributeNotInstanceOf($class, $this->attributeName, $this->actual, $this->description);
+        } else {
+            a::assertNotInstanceOf($class, $this->actual, $this->description);
+        }
     }
 
     /**
@@ -420,7 +533,11 @@ class Verify extends VerifyBase
      */
     public function isInternalType($type)
     {
-        a::assertInternalType($type, $this->actual, $this->description);
+        if (isset($this->attributeName)) {
+            a::assertAttributeInternalType($type, $this->attributeName, $this->actual, $this->description);
+        } else {
+            a::assertInternalType($type, $this->actual, $this->description);
+        }
     }
 
     /**
@@ -431,7 +548,11 @@ class Verify extends VerifyBase
      */
     public function isNotInternalType($type)
     {
-        a::assertNotInternalType($type, $this->actual, $this->description);
+        if (isset($this->attributeName)) {
+            a::assertAttributeNotInternalType($type, $this->attributeName, $this->actual, $this->description);
+        } else {
+            a::assertNotInternalType($type, $this->actual, $this->description);
+        }
     }
 
     /**
@@ -494,7 +615,11 @@ class Verify extends VerifyBase
      */
     public function containsOnly($type)
     {
-        a::assertContainsOnly($type, $this->actual, null, $this->description);
+        if (isset($this->attributeName)) {
+            a::assertAttributeContainsOnly($type, $this->attributeName, $this->actual, null, $this->description);
+        } else {
+            a::assertContainsOnly($type, $this->actual, null, $this->description);
+        }
     }
 
     /**
@@ -508,7 +633,11 @@ class Verify extends VerifyBase
      */
     public function doesNotContainOnly($type)
     {
-        a::assertNotContainsOnly($type, $this->actual, null, $this->description);
+        if (isset($this->attributeName)) {
+            a::assertAttributeNotContainsOnly($type, $this->attributeName, $this->actual, null, $this->description);
+        } else {
+            a::assertNotContainsOnly($type, $this->actual, null, $this->description);
+        }
     }
 
     /**
@@ -519,7 +648,11 @@ class Verify extends VerifyBase
      */
     public function hasCount($count)
     {
-        a::assertCount($count, $this->actual, $this->description);
+        if (isset($this->attributeName)) {
+            a::assertAttributeCount($count, $this->attributeName, $this->actual, $this->description);
+        } else {
+            a::assertCount($count, $this->actual, $this->description);
+        }
     }
 
     /**
@@ -530,7 +663,11 @@ class Verify extends VerifyBase
      */
     public function doesNotHaveCount($count)
     {
-        a::assertNotCount($count, $this->actual, $this->description);
+        if (isset($this->attributeName)) {
+            a::assertAttributeNotCount($count, $this->attributeName, $this->actual, $this->description);
+        } else {
+            a::assertNotCount($count, $this->actual, $this->description);
+        }
     }
 
     /**
@@ -687,7 +824,11 @@ class Verify extends VerifyBase
      */
     public function sameAs($expected)
     {
-        a::assertSame($expected, $this->actual, $this->description);
+        if (isset($this->attributeName)) {
+            a::assertAttributeSame($expected, $this->attributeName, $this->actual, $this->description);
+        } else {
+            a::assertSame($expected, $this->actual, $this->description);
+        }
     }
 
     /**
@@ -698,7 +839,11 @@ class Verify extends VerifyBase
      */
     public function notSameAs($expected)
     {
-        a::assertNotSame($expected, $this->actual, $this->description);
+        if (isset($this->attributeName)) {
+            a::assertAttributeNotSame($expected, $this->attributeName, $this->actual, $this->description);
+        } else {
+            a::assertNotSame($expected, $this->actual, $this->description);
+        }
     }
 
     /**
