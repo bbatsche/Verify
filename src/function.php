@@ -14,7 +14,7 @@ if (!function_exists('verify')) {
      *
      * @throws \BadMethodCallException When called with 0 arguments, or more than two arguments
      *
-     * @return void
+     * @return \BeBat\Verify\Verify
      */
     function verify()
     {
@@ -56,8 +56,6 @@ if (!function_exists('expect')) {
      * Alternate function for verify()
      *
      * @see verify()
-     *
-     * @return void
      */
     function expect()
     {
@@ -68,8 +66,6 @@ if (!function_exists('expect')) {
      * Alternate function for verify_that()
      *
      * @see verify_that()
-     *
-     * @return void
      */
     function expect_that($truth)
     {
@@ -80,8 +76,6 @@ if (!function_exists('expect')) {
      * ALternate function for verify_not()
      *
      * @see verify_not()
-     *
-     * @return void
      */
     function expect_not($fallacy)
     {
@@ -101,7 +95,7 @@ if (!function_exists('verify_file')) {
      *
      * @throws \BadMethodCallException When called with 0 arguments, or more than two arguments
      *
-     * @return void
+     * @return \BeBat\Verify\VerifyFile
      */
     function verify_file()
     {
@@ -121,8 +115,6 @@ if (!function_exists('expect_file')) {
      * Alternate function for verify_file()
      *
      * @see verify_file()
-     *
-     * @return void
      */
     function expect_file()
     {
