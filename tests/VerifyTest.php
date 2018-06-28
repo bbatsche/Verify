@@ -32,13 +32,13 @@ class VerifyTest extends UnitTestBase
 
     public function testVerifyTooManyArgs()
     {
-        $this->setExpectedException('BadMethodCallException');
+        $this->expectException('BadMethodCallException');
         verify('arg1', 'arg2', 'arg3');
     }
 
     public function testVerifyTooFewArgs()
     {
-        $this->setExpectedException('BadMethodCallException');
+        $this->expectException('BadMethodCallException');
         verify();
     }
 

@@ -30,13 +30,13 @@ class VerifyFileTest extends UnitTestBase
 
     public function testVerifyFileTooManyArgs()
     {
-        $this->setExpectedException('BadMethodCallException');
+        $this->expectException('BadMethodCallException');
         verify_file('arg1', 'arg2', 'arg3');
     }
 
     public function testVerifyFileTooFewArgs()
     {
-        $this->setExpectedException('BadMethodCallException');
+        $this->expectException('BadMethodCallException');
         verify_file();
     }
 

@@ -1,6 +1,6 @@
 <?php
 
-abstract class UnitTestBase extends PHPUnit_Framework_TestCase
+abstract class UnitTestBase extends PHPUnit\Framework\TestCase
 {
     protected $mockAssert;
     protected static $verifyMethod;

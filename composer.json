@@ -22,15 +22,15 @@
         "docs": "http://bbatsche.github.io/Verify/"
     },
     "require": {
-        "phpunit/phpunit": "~5.0",
-        "php": ">=5.6.0"
+        "phpunit/phpunit": ">=6.0",
+        "php": ">=7.0"
     },
     "require-dev": {
-        "mockery/mockery": "~0.9",
-        "apigen/apigen": "~4.1"
+        "mockery/mockery": "^1.0",
+        "apigen/apigen": "^4.1"
     },
     "replace": {
-        "codeception/verify": "0.*"
+        "codeception/verify": "*"
     },
     "suggest": {
         "codeception/specify": "Highly readable test code blocks for PHPUnit and Codeception"
