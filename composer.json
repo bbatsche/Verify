@@ -22,15 +22,15 @@
         "docs": "http://bbatsche.github.io/Verify/"
     },
     "require": {
-        "phpunit/phpunit": "~4.0",
-        "php": ">=5.4.0"
+        "php": ">=7.0",
+        "phpunit/phpunit": ">=6.0"
     },
     "require-dev": {
-        "mockery/mockery": "~0.9",
-        "apigen/apigen": "~4.1"
+        "friendsofphp/php-cs-fixer": "^2.12",
+        "mockery/mockery": "^1.0"
     },
     "replace": {
-        "codeception/verify": "0.*"
+        "codeception/verify": "*"
     },
     "suggest": {
         "codeception/specify": "Highly readable test code blocks for PHPUnit and Codeception"
@@ -41,9 +41,20 @@
             "BeBat\\Verify\\": "src"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "BeBat\\Verify\\Test\\": "test"
+        }
+    },
+    "scripts": {
+        "cs-check": "php-cs-fixer fix -v --allow-risky=yes --ansi --dry-run --diff",
+        "cs-check-file": "php-cs-fixer fix -v --allow-risky=yes --ansi --dry-run --diff --path-mode=intersection",
+        "cs-fix": "php-cs-fixer fix -v --allow-risky=yes --ansi",
+        "test": "phpunit --colors=always"
+    },
     "extra": {
         "branch-alias": {
-            "dev-master": "1.1-dev"
+            "dev-master": "2.0-dev"
         }
     }
 }

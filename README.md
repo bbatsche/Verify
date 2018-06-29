@@ -13,7 +13,7 @@ With BDD assertions influenced by Chai, Jasmine, and RSpec your assertions would
 [![License](https://img.shields.io/packagist/l/bebat/verify.svg?style=plastic)](https://packagist.org/packages/bebat/verify)
 [![Build Status](https://img.shields.io/travis/bbatsche/Verify.svg?style=plastic)](https://travis-ci.org/bbatsche/Verify)
 
-Most of the original work was done by [@DavertMik](http://github.com/DavertMik) and [@Ragazzo](http://github.com/Ragazzo) in the [Codeception/Verify](http://github.com/Codeception/Verify) repo. This fork was created when it became apparent the original library was missing some key features and was all but abandoned.
+Most of the original work was done by [@DavertMik](http://github.com/DavertMik) and [@Ragazzo](http://github.com/Ragazzo) in the [Codeception/Verify](http://github.com/Codeception/Verify) repo. This fork was created to address some issues and then expand the API & feature set.
 
 ## Contents
 
@@ -32,14 +32,27 @@ Most of the original work was done by [@DavertMik](http://github.com/DavertMik) 
 To install the current version of Verify from [Packagist](https://packagist.org/packages/bebat/verify), run the following in your project directory:
 
 ```bash
-composer require --dev bebat/verify:~1.0
+composer require --dev bebat/verify:~2.0@alpha
 ```
 
-Verify will be added to your `composer.json` under `require-dev` and installed in your `vendor` directory. You can then start using it in your unit tests.
+Verify will be added to your `composer.json` under `require-dev` and installed in your `vendor` directory. Verify takes advantage of PHP 5.6's ability to namespace functions, so to have it in your unit tests you should add `use function` statements to the top of your files:
+
+```php
+<?php
+
+use function BeBat\Verify\verify;
+use function BeBat\Verify\verify_file;
+use function BeBat\Verify\verify_that;
+use function BeBat\Verify\verify_not;
+
+// ...
+```
+
+You can then start using it in your unit tests.
 
 ## Basic Usage
 
-To use Verify in your unit tests, call the `verify()` along with your expectation, like the following:
+To use Verify in your unit tests, call the `verify()` function along with your expectation, like the following:
 
 ```php
 $testValue = true;
@@ -65,7 +78,16 @@ verify_not($user->isBanned());
 
 ### Alternate Functions
 
-To better match TDD/BDD style, Verify also comes with `expect()` and `expect_*()` functions that act as aliases of the `verify()` function.
+To better match TDD/BDD style, you may wish to give Verify's functions a different name like `expect()`. This can be done through the use of PHP 5.6's namespaced function aliases like so:
+
+```php
+use function BeBat\Verify\verify as expect;
+use function BeBat\Verify\verify_file as expect_file;
+use function BeBat\Verify\verify_that as expect_that;
+use function BeBat\Verify\verify_not as expect_not;
+```
+
+Now, in your unit test code, you can write:
 
 ```php
 expect($testValue)->equals('some other value');
@@ -225,7 +247,7 @@ verify($obj)->attribute('isNot')->equals(false);
 
 ### File Assertions
 
-If the subject under test is actually a file, you must use the `verify_file()` (or `expect_file()`) methods to access filesystem assertions.
+If the subject under test is actually a file, you must use the `verify_file()` methods to access filesystem assertions.
 
 ```php
 verify_file('/path/to/test.txt')->exists();
@@ -309,7 +331,3 @@ Assertion modifiers can be combined with each other, or with attribute assertion
 ```php
 verify($obj)->string_attribute->withoutCase()->equals('some value');
 ```
-
-## Additional Information
-
-Full API documentation can be found on [GitHub Pages](http://bbatsche.github.io/Verify/). Any issues or questions can be submitted to [Waffle.io](https://waffle.io/bbatsche/Verify).
