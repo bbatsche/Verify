@@ -22,7 +22,7 @@
         "docs": "http://bbatsche.github.io/Verify/"
     },
     "require": {
-        "phpunit/phpunit": "~4.0",
+        "phpunit/phpunit": ">=4.0, <6.0",
         "php": ">=5.4.0"
     },
     "require-dev": {
