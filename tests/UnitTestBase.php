@@ -3,11 +3,12 @@
 abstract class UnitTestBase extends PHPUnit_Framework_TestCase
 {
     protected $mockAssert;
+
     protected static $verifyMethod;
 
     protected function setUp()
     {
-        $this->mockAssert = Mockery::mock('alias:BeBat\Verify\Assert');
+        $this->mockAssert = Mockery::mock('alias:BeBat\\Verify\\Assert');
     }
 
     protected function tearDown()

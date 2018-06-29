@@ -1,32 +1,20 @@
-<?php namespace BeBat\Verify;
+<?php
+
+namespace BeBat\Verify;
 
 use BeBat\Verify\Assert as a;
 
 /**
- * Verify Files
+ * Verify Files.
  *
  * Collection of assertions specific to filesystem objects.
- *
- * @package BeBat\Verify
  */
 class VerifyFile extends VerifyBase
 {
     /**
-     * Assert contents of SUT are equal to another given file's contents
-     *
-     * @param string $expected Name of file SUT is expected to be equal to
-     * @return void
-     */
-    public function equals($expected)
-    {
-        a::assertFileEquals($expected, $this->actual, $this->description, $this->ignoreOrder, $this->ignoreCase);
-    }
-
-    /**
-     * Assert contents of SUT are not the same as another given file
+     * Assert contents of SUT are not the same as another given file.
      *
      * @param string $expected Name of file SUT is expected to differ from
-     * @return void
      */
     public function doesNotEqual($expected)
     {
@@ -34,41 +22,9 @@ class VerifyFile extends VerifyBase
     }
 
     /**
-     * Assert SUT exists in the filesystem
-     *
-     * @return void
-     */
-    public function exists()
-    {
-        a::assertFileExists($this->actual, $this->description);
-    }
-
-    /**
-     * Assert SUT does not exist in the filesystem
-     *
-     * @return void
-     */
-    public function doesNotExist()
-    {
-        a::assertFileNotExists($this->actual, $this->description);
-    }
-
-    /**
-     * Assert SUT's contents as JSON value are equal to the JSON contents of a given file
-     *
-     * @param string $file JSON file SUT is expected to be the same as
-     * @return void
-     */
-    public function equalsJsonFile($file)
-    {
-        a::assertJsonFileEqualsJsonFile($file, $this->actual, $this->description);
-    }
-
-    /**
-     * Assert SUT's contents as a JSON value are not the same as the JSON contents of a given file
+     * Assert SUT's contents as a JSON value are not the same as the JSON contents of a given file.
      *
      * @param string $file JSON file SUT is expected to differ from
-     * @return void
      */
     public function doesNotEqualJsonFile($file)
     {
@@ -76,10 +32,47 @@ class VerifyFile extends VerifyBase
     }
 
     /**
-     * Assert SUT's contents as XML are the same as the XML in a given file
+     * Assert SUT's contents as XML are not the same as the XML in a given file.
+     *
+     * @param string $file XML file SUT is expected to differ from
+     */
+    public function doesNotEqualXmlFile($file)
+    {
+        a::assertXmlFileNotEqualsXmlFile($file, $this->actual, $this->description);
+    }
+
+    /**
+     * Assert SUT does not exist in the filesystem.
+     */
+    public function doesNotExist()
+    {
+        a::assertFileNotExists($this->actual, $this->description);
+    }
+
+    /**
+     * Assert contents of SUT are equal to another given file's contents.
+     *
+     * @param string $expected Name of file SUT is expected to be equal to
+     */
+    public function equals($expected)
+    {
+        a::assertFileEquals($expected, $this->actual, $this->description, $this->ignoreOrder, $this->ignoreCase);
+    }
+
+    /**
+     * Assert SUT's contents as JSON value are equal to the JSON contents of a given file.
+     *
+     * @param string $file JSON file SUT is expected to be the same as
+     */
+    public function equalsJsonFile($file)
+    {
+        a::assertJsonFileEqualsJsonFile($file, $this->actual, $this->description);
+    }
+
+    /**
+     * Assert SUT's contents as XML are the same as the XML in a given file.
      *
      * @param string $file XML file SUT is expected to be the same as
-     * @return void
      */
     public function equalsXmlFile($file)
     {
@@ -87,13 +80,10 @@ class VerifyFile extends VerifyBase
     }
 
     /**
-     * Assert SUT's contents as XML are not the same as the XML in a given file
-     *
-     * @param string $file XML file SUT is expected to differ from
-     * @return void
+     * Assert SUT exists in the filesystem.
      */
-    public function doesNotEqualXmlFile($file)
+    public function exists()
     {
-        a::assertXmlFileNotEqualsXmlFile($file, $this->actual, $this->description);
+        a::assertFileExists($this->actual, $this->description);
     }
 }

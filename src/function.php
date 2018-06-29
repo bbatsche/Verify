@@ -5,7 +5,7 @@ use BeBat\Verify\VerifyFile;
 
 if (!function_exists('verify')) {
     /**
-     * Interface into Verify library and main set of assertions
+     * Interface into Verify library and main set of assertions.
      *
      * @param string|mixed $description When called with a single parameter, will be used as the
      *                                  Subject Under Test (SUT). When called with two parameters,
@@ -18,7 +18,7 @@ if (!function_exists('verify')) {
      */
     function verify()
     {
-        switch(func_num_args()) {
+        switch (func_num_args()) {
             case 1:
                 return new Verify(func_get_arg(0));
             case 2:
@@ -29,10 +29,9 @@ if (!function_exists('verify')) {
     }
 
     /**
-     * Assert a value is not empty or "true"
+     * Assert a value is not empty or "true".
      *
      * @param mixed $truth SUT expected to be not empty
-     * @return void
      */
     function verify_that($truth)
     {
@@ -40,10 +39,9 @@ if (!function_exists('verify')) {
     }
 
     /**
-     * Assert a value is empty or "false"
+     * Assert a value is empty or "false".
      *
      * @param mixed $fallacy SUT expected to be empty
-     * @return void
      */
     function verify_not($fallacy)
     {
@@ -53,7 +51,7 @@ if (!function_exists('verify')) {
 
 if (!function_exists('expect')) {
     /**
-     * Alternate function for verify()
+     * Alternate function for verify().
      *
      * @see verify()
      */
@@ -63,9 +61,11 @@ if (!function_exists('expect')) {
     }
 
     /**
-     * Alternate function for verify_that()
+     * Alternate function for verify_that().
      *
      * @see verify_that()
+     *
+     * @param mixed $truth
      */
     function expect_that($truth)
     {
@@ -73,20 +73,21 @@ if (!function_exists('expect')) {
     }
 
     /**
-     * ALternate function for verify_not()
+     * ALternate function for verify_not().
      *
      * @see verify_not()
+     *
+     * @param mixed $fallacy
      */
     function expect_not($fallacy)
     {
         expect($fallacy)->isEmpty();
     }
-
 }
 
 if (!function_exists('verify_file')) {
     /**
-     * Interface into Verify with assertions specific to file system objects
+     * Interface into Verify with assertions specific to file system objects.
      *
      * @param string $description When called with a single parameter, will be used as the Subject
      *                            Under Test (SUT) file name. When called with two parameters,
@@ -99,7 +100,7 @@ if (!function_exists('verify_file')) {
      */
     function verify_file()
     {
-        switch(func_num_args()) {
+        switch (func_num_args()) {
             case 1:
                 return new VerifyFile(func_get_arg(0));
             case 2:
@@ -112,7 +113,7 @@ if (!function_exists('verify_file')) {
 
 if (!function_exists('expect_file')) {
     /**
-     * Alternate function for verify_file()
+     * Alternate function for verify_file().
      *
      * @see verify_file()
      */
