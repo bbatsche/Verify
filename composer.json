@@ -27,7 +27,8 @@
     },
     "require-dev": {
         "mockery/mockery": "^1.0",
-        "apigen/apigen": "^4.1"
+        "apigen/apigen": "^4.1",
+        "squizlabs/php_codesniffer": "^3.3"
     },
     "replace": {
         "codeception/verify": "*"

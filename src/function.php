@@ -1,10 +1,11 @@
-<?php namespace BeBat\Verify;
+<?php
 
-use BeBat\Verify\Verify;
-use BeBat\Verify\VerifyFile;
+declare(strict_types=1);
+
+namespace BeBat\Verify;
 
 /**
- * Interface into Verify library and main set of assertions
+ * Interface into Verify library and main set of assertions.
  *
  * @param string|mixed $description When called with a single parameter, will be used as the
  *                                  Subject Under Test (SUT). When called with two parameters,
@@ -17,21 +18,20 @@ use BeBat\Verify\VerifyFile;
  */
 function verify()
 {
-    switch(func_num_args()) {
+    switch (\func_num_args()) {
         case 1:
-            return new Verify(func_get_arg(0));
+            return new Verify(\func_get_arg(0));
         case 2:
-            return new Verify(func_get_arg(1), func_get_arg(0));
+            return new Verify(\func_get_arg(1), \func_get_arg(0));
         default:
             throw new \BadMethodCallException('verify() must be called with exactly 1 or 2 arguments.');
     }
 }
 
 /**
- * Assert a value is not empty or "true"
+ * Assert a value is not empty or "true".
  *
  * @param mixed $truth SUT expected to be not empty
- * @return void
  */
 function verify_that($truth)
 {
@@ -39,10 +39,9 @@ function verify_that($truth)
 }
 
 /**
- * Assert a value is empty or "false"
+ * Assert a value is empty or "false".
  *
  * @param mixed $fallacy SUT expected to be empty
- * @return void
  */
 function verify_not($fallacy)
 {
@@ -50,7 +49,7 @@ function verify_not($fallacy)
 }
 
 /**
- * Interface into Verify with assertions specific to file system objects
+ * Interface into Verify with assertions specific to file system objects.
  *
  * @param string $description When called with a single parameter, will be used as the Subject
  *                            Under Test (SUT) file name. When called with two parameters,
@@ -63,11 +62,11 @@ function verify_not($fallacy)
  */
 function verify_file()
 {
-    switch(func_num_args()) {
+    switch (\func_num_args()) {
         case 1:
-            return new VerifyFile(func_get_arg(0));
+            return new VerifyFile(\func_get_arg(0));
         case 2:
-            return new VerifyFile(func_get_arg(1), func_get_arg(0));
+            return new VerifyFile(\func_get_arg(1), \func_get_arg(0));
         default:
             throw new \BadMethodCallException('verify_file() must be called with exactly 1 or 2 arguments.');
     }

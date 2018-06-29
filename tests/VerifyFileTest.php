@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 require_once 'UnitTestBase.php';
 
 use function BeBat\Verify\verify_file;
@@ -11,35 +13,6 @@ class VerifyFileTest extends UnitTestBase
         static::$verifyMethod = 'verify_file';
     }
 
-    public function testVerifyFileFunction()
-    {
-        $obj = verify_file('filename');
-
-        $this->assertAttributeEquals('filename', 'actual', $obj);
-        $this->assertAttributeEmpty('description', $obj);
-
-        $this->assertInstanceOf('BeBat\Verify\VerifyFile', $obj);
-
-        $obj = verify_file('message', 'filename');
-
-        $this->assertAttributeEquals('filename', 'actual', $obj);
-        $this->assertAttributeEquals('message', 'description', $obj);
-
-        $this->assertInstanceOf('BeBat\Verify\VerifyFile', $obj);
-    }
-
-    public function testVerifyFileTooManyArgs()
-    {
-        $this->expectException('BadMethodCallException');
-        verify_file('arg1', 'arg2', 'arg3');
-    }
-
-    public function testVerifyFileTooFewArgs()
-    {
-        $this->expectException('BadMethodCallException');
-        verify_file();
-    }
-
     public function testEquals()
     {
         $this->mockAssert->shouldReceive('assertFileEquals')
@@ -49,6 +22,12 @@ class VerifyFileTest extends UnitTestBase
 
         $this->assertNull(verify_file('subject 1')->equals('test 1'));
         $this->assertNull(verify_file('message', 'subject 2')->equals('test 2'));
+    }
+
+    public function testExists()
+    {
+        $this->fireSingleValueTest('exists', 'assertFileExists');
+        $this->fireSingleValueTest('doesNotExist', 'assertFileNotExists');
     }
 
     public function testIgnoreCaseEquals()
@@ -81,17 +60,6 @@ class VerifyFileTest extends UnitTestBase
         $this->assertNull(verify_file('message 6', 'subject 6')->withoutCase()->equals('test 6'));
     }
 
-    public function testNotEquals()
-    {
-        $this->mockAssert->shouldReceive('assertFileNotEquals')
-            ->with('test 1', 'subject 1', Mockery::any(), Mockery::any(), Mockery::any())->once();
-        $this->mockAssert->shouldReceive('assertFileNotEquals')
-            ->with('test 2', 'subject 2', 'message', Mockery::any(), Mockery::any())->once();
-
-        $this->assertNull(verify_file('subject 1')->doesNotEqual('test 1'));
-        $this->assertNull(verify_file('message', 'subject 2')->doesNotEqual('test 2'));
-    }
-
     public function testIgnoreCaseNotEquals()
     {
         // Default: false
@@ -122,21 +90,55 @@ class VerifyFileTest extends UnitTestBase
         $this->assertNull(verify_file('message 6', 'subject 6')->withoutCase()->doesNotEqual('test 6'));
     }
 
-    public function testExists()
-    {
-        $this->fireSingleValueTest('exists',       'assertFileExists');
-        $this->fireSingleValueTest('doesNotExist', 'assertFileNotExists');
-    }
-
     public function testJsonFile()
     {
-        $this->fireTwoValueTest('equalsJsonFile',       'assertJsonFileEqualsJsonFile');
+        $this->fireTwoValueTest('equalsJsonFile', 'assertJsonFileEqualsJsonFile');
         $this->fireTwoValueTest('doesNotEqualJsonFile', 'assertJsonFileNotEqualsJsonFile');
+    }
+
+    public function testNotEquals()
+    {
+        $this->mockAssert->shouldReceive('assertFileNotEquals')
+            ->with('test 1', 'subject 1', Mockery::any(), Mockery::any(), Mockery::any())->once();
+        $this->mockAssert->shouldReceive('assertFileNotEquals')
+            ->with('test 2', 'subject 2', 'message', Mockery::any(), Mockery::any())->once();
+
+        $this->assertNull(verify_file('subject 1')->doesNotEqual('test 1'));
+        $this->assertNull(verify_file('message', 'subject 2')->doesNotEqual('test 2'));
+    }
+
+    public function testVerifyFileFunction()
+    {
+        $obj = verify_file('filename');
+
+        $this->assertAttributeSame('filename', 'actual', $obj);
+        $this->assertAttributeEmpty('description', $obj);
+
+        $this->assertInstanceOf('BeBat\\Verify\\VerifyFile', $obj);
+
+        $obj = verify_file('message', 'filename');
+
+        $this->assertAttributeSame('filename', 'actual', $obj);
+        $this->assertAttributeSame('message', 'description', $obj);
+
+        $this->assertInstanceOf('BeBat\\Verify\\VerifyFile', $obj);
+    }
+
+    public function testVerifyFileTooFewArgs()
+    {
+        $this->expectException('BadMethodCallException');
+        verify_file();
+    }
+
+    public function testVerifyFileTooManyArgs()
+    {
+        $this->expectException('BadMethodCallException');
+        verify_file('arg1', 'arg2', 'arg3');
     }
 
     public function testXmlFile()
     {
-        $this->fireTwoValueTest('equalsXmlFile',       'assertXmlFileEqualsXmlFile');
+        $this->fireTwoValueTest('equalsXmlFile', 'assertXmlFileEqualsXmlFile');
         $this->fireTwoValueTest('doesNotEqualXmlFile', 'assertXmlFileNotEqualsXmlFile');
     }
 }

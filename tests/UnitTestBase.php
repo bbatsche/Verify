@@ -1,13 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 abstract class UnitTestBase extends PHPUnit\Framework\TestCase
 {
     protected $mockAssert;
+
     protected static $verifyMethod;
 
     protected function setUp()
     {
-        $this->mockAssert = Mockery::mock('alias:BeBat\Verify\Assert');
+        $this->mockAssert = Mockery::mock('alias:BeBat\\Verify\\Assert');
     }
 
     protected function tearDown()
@@ -22,8 +25,8 @@ abstract class UnitTestBase extends PHPUnit\Framework\TestCase
         $this->mockAssert->shouldReceive($assertMethod)->with('subject 1', Mockery::any())->once();
         $this->mockAssert->shouldReceive($assertMethod)->with('subject 2', 'message')->once();
 
-        $this->assertNull(call_user_func($verifyFunction, 'subject 1')->$verifyMethod());
-        $this->assertNull(call_user_func($verifyFunction, 'message', 'subject 2')->$verifyMethod());
+        $this->assertNull(\call_user_func($verifyFunction, 'subject 1')->{$verifyMethod}());
+        $this->assertNull(\call_user_func($verifyFunction, 'message', 'subject 2')->{$verifyMethod}());
     }
 
     protected function fireTwoValueTest($verifyMethod, $assertMethod)
@@ -33,7 +36,7 @@ abstract class UnitTestBase extends PHPUnit\Framework\TestCase
         $this->mockAssert->shouldReceive($assertMethod)->with('test 1', 'subject 1', Mockery::any())->once();
         $this->mockAssert->shouldReceive($assertMethod)->with('test 2', 'subject 2', 'message')->once();
 
-        $this->assertNull(call_user_func($verifyFunction, 'subject 1')->$verifyMethod('test 1'));
-        $this->assertNull(call_user_func($verifyFunction, 'message', 'subject 2')->$verifyMethod('test 2'));
+        $this->assertNull(\call_user_func($verifyFunction, 'subject 1')->{$verifyMethod}('test 1'));
+        $this->assertNull(\call_user_func($verifyFunction, 'message', 'subject 2')->{$verifyMethod}('test 2'));
     }
 }
