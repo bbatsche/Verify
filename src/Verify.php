@@ -79,7 +79,7 @@ class Verify extends VerifyBase
      *
      * @return self
      */
-    public function attribute($attr)
+    public function attribute(string $attr): self
     {
         $this->attributeName = $attr;
 
@@ -120,7 +120,7 @@ class Verify extends VerifyBase
      *
      * @param string $type Class name or internal PHP type expected to be in SUT
      */
-    public function containsOnly($type)
+    public function containsOnly(string $type)
     {
         if (isset($this->attributeName)) {
             a::assertAttributeContainsOnly($type, $this->attributeName, $this->actual, null, $this->description);
@@ -166,7 +166,7 @@ class Verify extends VerifyBase
      *
      * @param string $type Class name or internal PHP type expected to not be the exclusive type in SUT
      */
-    public function doesNotContainOnly($type)
+    public function doesNotContainOnly(string $type)
     {
         if (isset($this->attributeName)) {
             a::assertAttributeNotContainsOnly($type, $this->attributeName, $this->actual, null, $this->description);
@@ -180,7 +180,7 @@ class Verify extends VerifyBase
      *
      * @param string $suffix Value SUT is expected to not end with
      */
-    public function doesNotEndWith($suffix)
+    public function doesNotEndWith(string $suffix)
     {
         a::assertStringEndsNotWith($suffix, $this->actual, $this->description);
     }
@@ -221,7 +221,7 @@ class Verify extends VerifyBase
      *
      * @param string $file Name of file SUT is expected to differ from
      */
-    public function doesNotEqualFile($file)
+    public function doesNotEqualFile(string $file)
     {
         // $canonicalize hardcoded to false
         a::assertStringNotEqualsFile($file, $this->actual, $this->description, false, $this->ignoreCase);
@@ -232,7 +232,7 @@ class Verify extends VerifyBase
      *
      * @param string $file Name of file with JSON SUT is epxected to be different from
      */
-    public function doesNotEqualJsonFile($file)
+    public function doesNotEqualJsonFile(string $file)
     {
         a::assertJsonStringNotEqualsJsonFile($file, $this->actual, $this->description);
     }
@@ -242,7 +242,7 @@ class Verify extends VerifyBase
      *
      * @param string $string JSON value SUT is expected to be different from
      */
-    public function doesNotEqualJsonString($string)
+    public function doesNotEqualJsonString(string $string)
     {
         a::assertJsonStringNotEqualsJsonString($string, $this->actual, $this->description);
     }
@@ -252,7 +252,7 @@ class Verify extends VerifyBase
      *
      * @param string $file Name of XML file SUT is expected to differ from
      */
-    public function doesNotEqualXmlFile($file)
+    public function doesNotEqualXmlFile(string $file)
     {
         a::assertXmlStringNotEqualsXmlFile($file, $this->actual, $this->description);
     }
@@ -262,7 +262,7 @@ class Verify extends VerifyBase
      *
      * @param string $xmlString XML data SUT is expected to differ from
      */
-    public function doesNotEqualXmlString($xmlString)
+    public function doesNotEqualXmlString(string $xmlString)
     {
         a::assertXmlStringNotEqualsXmlString($xmlString, $this->actual, $this->description);
     }
@@ -272,7 +272,7 @@ class Verify extends VerifyBase
      *
      * @param string $attribute Name of attribute expected to be abscent from SUT
      */
-    public function doesNotHaveAttribute($attribute)
+    public function doesNotHaveAttribute(string $attribute)
     {
         if (\is_string($this->actual)) {
             a::assertClassNotHasAttribute($attribute, $this->actual, $this->description);
@@ -286,7 +286,7 @@ class Verify extends VerifyBase
      *
      * @param int $count Number of elements SUT is not expected to contain
      */
-    public function doesNotHaveCount($count)
+    public function doesNotHaveCount(int $count)
     {
         if (isset($this->attributeName)) {
             a::assertAttributeNotCount($count, $this->attributeName, $this->actual, $this->description);
@@ -310,7 +310,7 @@ class Verify extends VerifyBase
      *
      * @param string $attribute Name of static attribute expected to be abscent from SUT
      */
-    public function doesNotHaveStaticAttribute($attribute)
+    public function doesNotHaveStaticAttribute(string $attribute)
     {
         a::assertClassNotHasStaticAttribute($attribute, $this->actual, $this->description);
     }
@@ -322,7 +322,7 @@ class Verify extends VerifyBase
      *
      * @see https://phpunit.de/manual/current/en/appendixes.assertions.html#appendixes.assertions.assertStringMatchesFormat
      */
-    public function doesNotMatchFormat($format)
+    public function doesNotMatchFormat(string $format)
     {
         a::assertStringNotMatchesFormat($format, $this->actual, $this->description);
     }
@@ -334,7 +334,7 @@ class Verify extends VerifyBase
      *
      * @see https://phpunit.de/manual/current/en/appendixes.assertions.html#appendixes.assertions.assertStringMatchesFormat
      */
-    public function doesNotMatchFormatFile($formatFile)
+    public function doesNotMatchFormatFile(string $formatFile)
     {
         a::assertStringNotMatchesFormatFile($formatFile, $this->actual, $this->description);
     }
@@ -344,7 +344,7 @@ class Verify extends VerifyBase
      *
      * @param string $expression Regular expression SUT is exted to not match
      */
-    public function doesNotMatchRegExp($expression)
+    public function doesNotMatchRegExp(string $expression)
     {
         a::assertNotRegExp($expression, $this->actual, $this->description);
     }
@@ -354,7 +354,7 @@ class Verify extends VerifyBase
      *
      * @param string $prefix Value SUT is expected to not start with
      */
-    public function doesNotStartWith($prefix)
+    public function doesNotStartWith(string $prefix)
     {
         a::assertStringStartsNotWith($prefix, $this->actual, $this->description);
     }
@@ -364,7 +364,7 @@ class Verify extends VerifyBase
      *
      * @param string $suffix Value SUT is expected to end with
      */
-    public function endsWith($suffix)
+    public function endsWith(string $suffix)
     {
         a::assertStringEndsWith($suffix, $this->actual, $this->description);
     }
@@ -405,7 +405,7 @@ class Verify extends VerifyBase
      *
      * @param string $file Name of file SUT is expected to match
      */
-    public function equalsFile($file)
+    public function equalsFile(string $file)
     {
         // $canonicalize hardcoded to false
         a::assertStringEqualsFile($file, $this->actual, $this->description, false, $this->ignoreCase);
@@ -416,7 +416,7 @@ class Verify extends VerifyBase
      *
      * @param string $file Name of file with JSON expected to match SUT
      */
-    public function equalsJsonFile($file)
+    public function equalsJsonFile(string $file)
     {
         a::assertJsonStringEqualsJsonFile($file, $this->actual, $this->description);
     }
@@ -426,7 +426,7 @@ class Verify extends VerifyBase
      *
      * @param string $string JSON value SUT is expected to be equal to
      */
-    public function equalsJsonString($string)
+    public function equalsJsonString(string $string)
     {
         a::assertJsonStringEqualsJsonString($string, $this->actual, $this->description);
     }
@@ -436,7 +436,7 @@ class Verify extends VerifyBase
      *
      * @param string $file Name of XML file SUT is expected to match
      */
-    public function equalsXmlFile($file)
+    public function equalsXmlFile(string $file)
     {
         a::assertXmlStringEqualsXmlFile($file, $this->actual, $this->description);
     }
@@ -446,7 +446,7 @@ class Verify extends VerifyBase
      *
      * @param string $xmlString XML data SUT is expected to equal
      */
-    public function equalsXmlString($xmlString)
+    public function equalsXmlString(string $xmlString)
     {
         a::assertXmlStringEqualsXmlString($xmlString, $this->actual, $this->description);
     }
@@ -456,7 +456,7 @@ class Verify extends VerifyBase
      *
      * @param \DOMElement $xml Structure SUT is expected to match
      */
-    public function equalsXmlStructure($xml)
+    public function equalsXmlStructure(\DOMElement $xml)
     {
         a::assertEqualXMLStructure($xml, $this->actual, $this->xmlAttributes, $this->description);
     }
@@ -466,7 +466,7 @@ class Verify extends VerifyBase
      *
      * @param string $attribute Name of attribute expected to be in SUT
      */
-    public function hasAttribute($attribute)
+    public function hasAttribute(string $attribute)
     {
         if (\is_string($this->actual)) {
             a::assertClassHasAttribute($attribute, $this->actual, $this->description);
@@ -480,7 +480,7 @@ class Verify extends VerifyBase
      *
      * @param int $count Expected number of elements to be in SUT
      */
-    public function hasCount($count)
+    public function hasCount(int $count)
     {
         if (isset($this->attributeName)) {
             a::assertAttributeCount($count, $this->attributeName, $this->actual, $this->description);
@@ -504,7 +504,7 @@ class Verify extends VerifyBase
      *
      * @param string $attribute Name of attribute expected to be in SUT
      */
-    public function hasStaticAttribute($attribute)
+    public function hasStaticAttribute(string $attribute)
     {
         a::assertClassHasStaticAttribute($attribute, $this->actual, $this->description);
     }
@@ -572,7 +572,7 @@ class Verify extends VerifyBase
      *
      * @param string $class Name of class SUT is expected to be an instance of
      */
-    public function isInstanceOf($class)
+    public function isInstanceOf(string $class)
     {
         if (isset($this->attributeName)) {
             a::assertAttributeInstanceOf($class, $this->attributeName, $this->actual, $this->description);
@@ -586,7 +586,7 @@ class Verify extends VerifyBase
      *
      * @param string $type Data type SUT is expected to be
      */
-    public function isInternalType($type)
+    public function isInternalType(string $type)
     {
         if (isset($this->attributeName)) {
             a::assertAttributeInternalType($type, $this->attributeName, $this->actual, $this->description);
@@ -656,7 +656,7 @@ class Verify extends VerifyBase
      *
      * @param string $class Name of class SUT is expect to not be
      */
-    public function isNotInstanceOf($class)
+    public function isNotInstanceOf(string $class)
     {
         if (isset($this->attributeName)) {
             a::assertAttributeNotInstanceOf($class, $this->attributeName, $this->actual, $this->description);
@@ -670,7 +670,7 @@ class Verify extends VerifyBase
      *
      * @param string $type Data type SUT is expected to not be
      */
-    public function isNotInternalType($type)
+    public function isNotInternalType(string $type)
     {
         if (isset($this->attributeName)) {
             a::assertAttributeNotInternalType($type, $this->attributeName, $this->actual, $this->description);
@@ -718,7 +718,7 @@ class Verify extends VerifyBase
      *
      * @see https://phpunit.de/manual/current/en/appendixes.assertions.html#appendixes.assertions.assertStringMatchesFormat
      */
-    public function matchesFormat($format)
+    public function matchesFormat(string $format)
     {
         a::assertStringMatchesFormat($format, $this->actual, $this->description);
     }
@@ -730,7 +730,7 @@ class Verify extends VerifyBase
      *
      * @see https://phpunit.de/manual/current/en/appendixes.assertions.html#appendixes.assertions.assertStringMatchesFormat
      */
-    public function matchesFormatFile($formatFile)
+    public function matchesFormatFile(string $formatFile)
     {
         a::assertStringMatchesFormatFile($formatFile, $this->actual, $this->description);
     }
@@ -740,7 +740,7 @@ class Verify extends VerifyBase
      *
      * @param string $expression Regular expression SUT is expected to match
      */
-    public function matchesRegExp($expression)
+    public function matchesRegExp(string $expression)
     {
         a::assertRegExp($expression, $this->actual, $this->description);
     }
@@ -748,7 +748,7 @@ class Verify extends VerifyBase
     /**
      * Assert SUT does not have the same value and type as a given value.
      *
-     * @param string $expected Value SUT is expected to differ from
+     * @param mixed $expected Value SUT is expected to differ from
      */
     public function notSameAs($expected)
     {
@@ -798,7 +798,7 @@ class Verify extends VerifyBase
      *
      * @param string $prefix Value SUT is expected to start with
      */
-    public function startsWith($prefix)
+    public function startsWith(string $prefix)
     {
         a::assertStringStartsWith($prefix, $this->actual, $this->description);
     }
@@ -808,7 +808,7 @@ class Verify extends VerifyBase
      *
      * @return self
      */
-    public function withAttributes()
+    public function withAttributes(): self
     {
         $this->xmlAttributes = true;
 
@@ -820,7 +820,7 @@ class Verify extends VerifyBase
      *
      * @return self
      */
-    public function withIdentity()
+    public function withIdentity(): self
     {
         $this->objectIdentity = true;
 
@@ -834,7 +834,7 @@ class Verify extends VerifyBase
      *
      * @return self
      */
-    public function within($delta)
+    public function within(float $delta): self
     {
         $this->floatDelta = $delta;
 
@@ -846,7 +846,7 @@ class Verify extends VerifyBase
      *
      * @return self
      */
-    public function withOrder()
+    public function withOrder(): self
     {
         $this->ignoreOrder = false;
 
@@ -858,7 +858,7 @@ class Verify extends VerifyBase
      *
      * @return self
      */
-    public function withoutAttributes()
+    public function withoutAttributes(): self
     {
         $this->xmlAttributes = false;
 
@@ -870,7 +870,7 @@ class Verify extends VerifyBase
      *
      * @return self
      */
-    public function withoutIdentity()
+    public function withoutIdentity(): self
     {
         $this->objectIdentity = false;
 
@@ -882,7 +882,7 @@ class Verify extends VerifyBase
      *
      * @return self
      */
-    public function withoutOrder()
+    public function withoutOrder(): self
     {
         $this->ignoreOrder = true;
 
@@ -894,7 +894,7 @@ class Verify extends VerifyBase
      *
      * @return self
      */
-    public function withoutType()
+    public function withoutType(): self
     {
         $this->dataType = false;
 
@@ -906,7 +906,7 @@ class Verify extends VerifyBase
      *
      * @return self
      */
-    public function withType()
+    public function withType(): self
     {
         $this->dataType = true;
 

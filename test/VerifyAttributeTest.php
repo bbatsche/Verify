@@ -75,8 +75,21 @@ class VerifyAttributeTest extends UnitTestBase
 
     public function testCount()
     {
-        $this->twoValueAttrTest('hasCount', 'assertAttributeCount');
-        $this->twoValueAttrTest('doesNotHaveCount', 'assertAttributeNotCount');
+        $this->mockAssert->shouldReceive('assertAttributeCount')
+            ->with(1, 'attribute1', 'subject 1', Mockery::any())->once();
+        $this->mockAssert->shouldReceive('assertAttributeCount')
+            ->with(2, 'attribute2', 'subject 2', 'message')->once();
+
+        $this->assertNull(verify('subject 1')->attribute1->hasCount(1));
+        $this->assertNull(verify('message', 'subject 2')->attribute2->hasCount(2));
+
+        $this->mockAssert->shouldReceive('assertAttributeNotCount')
+            ->with(3, 'attribute3', 'subject 3', Mockery::any())->once();
+        $this->mockAssert->shouldReceive('assertAttributeNotCount')
+            ->with(4, 'attribute4', 'subject 4', 'message')->once();
+
+        $this->assertNull(verify('subject 3')->attribute3->doesNotHaveCount(3));
+        $this->assertNull(verify('message', 'subject 4')->attribute4->doesNotHaveCount(4));
     }
 
     public function testDataTypeContains()

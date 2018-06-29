@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BeBat\Verify\Test;
 
 use DOMDOcument;
+use DOMElement;
 use Mockery;
 use function BeBat\Verify\verify;
 use function BeBat\Verify\verify_not;
@@ -73,13 +74,19 @@ class VerifyTest extends UnitTestBase
         $this->assertNull(verify('message', $obj)->doesNotContainOnly('TypeD'));
     }
 
-    public function testCountAndSize()
+    public function testCount()
     {
-        $this->fireTwoValueTest('hasCount', 'assertCount');
-        $this->fireTwoValueTest('doesNotHaveCount', 'assertNotCount');
+        $this->mockAssert->shouldReceive('assertCount')->with(1, 'subject 1', Mockery::any())->once();
+        $this->mockAssert->shouldReceive('assertCount')->with(2, 'subject 2', 'message')->once();
 
-        $this->fireTwoValueTest('sameSizeAs', 'assertSameSize');
-        $this->fireTwoValueTest('notSameSizeAs', 'assertNotSameSize');
+        $this->assertNull(verify('subject 1')->hasCount(1));
+        $this->assertNull(verify('message', 'subject 2')->hasCount(2));
+
+        $this->mockAssert->shouldReceive('assertNotCount')->with(3, 'subject 3', Mockery::any())->once();
+        $this->mockAssert->shouldReceive('assertNotCount')->with(4, 'subject 4', 'message')->once();
+
+        $this->assertNull(verify('subject 3')->doesNotHaveCount(3));
+        $this->assertNull(verify('message', 'subject 4')->doesNotHaveCount(4));
     }
 
     public function testDataTypeArraySubset()
@@ -1336,6 +1343,12 @@ class VerifyTest extends UnitTestBase
         $this->assertNull(verify_not('subject'));
     }
 
+    public function testSize()
+    {
+        $this->fireTwoValueTest('sameSizeAs', 'assertSameSize');
+        $this->fireTwoValueTest('notSameSizeAs', 'assertNotSameSize');
+    }
+
     public function testStartsEndsWith()
     {
         $this->fireTwoValueTest('startsWith', 'assertStringStartsWith');
@@ -1398,7 +1411,7 @@ class VerifyTest extends UnitTestBase
     public function testXmlStructure()
     {
         $subject1 = new DOMDocument();
-        $target1  = new DOMDocument();
+        $target1  = new DOMElement('target1');
 
         // Default: false
         $this->mockAssert->shouldReceive('assertEqualXMLStructure')
@@ -1411,7 +1424,7 @@ class VerifyTest extends UnitTestBase
 
         // Explicitly false
         $subject2 = new DOMDocument();
-        $target2  = new DOMDocument();
+        $target2  = new DOMElement('target2');
 
         $this->mockAssert->shouldReceive('assertEqualXMLStructure')
             ->with($target2, $subject2, false, Mockery::any())->once();
@@ -1423,7 +1436,7 @@ class VerifyTest extends UnitTestBase
 
         // Explicitly false
         $subject3 = new DOMDocument();
-        $target3  = new DOMDocument();
+        $target3  = new DOMElement('target3');
 
         $this->mockAssert->shouldReceive('assertEqualXMLStructure')
             ->with($target3, $subject3, true, Mockery::any())->once();
