@@ -13,7 +13,7 @@ With BDD assertions influenced by Chai, Jasmine, and RSpec your assertions would
 [![License](https://img.shields.io/packagist/l/bebat/verify.svg?style=plastic)](https://packagist.org/packages/bebat/verify)
 [![Build Status](https://img.shields.io/travis/bbatsche/Verify.svg?style=plastic)](https://travis-ci.org/bbatsche/Verify)
 
-Most of the original work was done by [@DavertMik](http://github.com/DavertMik) and [@Ragazzo](http://github.com/Ragazzo) in the [Codeception/Verify](http://github.com/Codeception/Verify) repo. This fork was created when it became apparent the original library was missing some key features and was all but abandoned.
+Most of the original work was done by [@DavertMik](http://github.com/DavertMik) and [@Ragazzo](http://github.com/Ragazzo) in the [Codeception/Verify](http://github.com/Codeception/Verify) repo. This fork was created to address some issues and then expand the API & feature set.
 
 ## Contents
 
@@ -331,7 +331,3 @@ Assertion modifiers can be combined with each other, or with attribute assertion
 ```php
 verify($obj)->string_attribute->withoutCase()->equals('some value');
 ```
-
-## Additional Information
-
-Full API documentation can be found on [GitHub Pages](http://bbatsche.github.io/Verify/). Any issues or questions can be submitted to [Waffle.io](https://waffle.io/bbatsche/Verify).
