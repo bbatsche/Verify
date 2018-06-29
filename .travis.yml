@@ -17,4 +17,5 @@ install:
   - travis_retry composer install --dev --no-interaction --prefer-dist
 
 script:
-  - ./vendor/bin/phpunit
+  - composer cs-check
+  - composer test
