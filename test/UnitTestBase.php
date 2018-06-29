@@ -1,6 +1,10 @@
 <?php
 
-abstract class UnitTestBase extends PHPUnit_Framework_TestCase
+namespace BeBat\Verify\Test;
+
+use Mockery;
+
+abstract class UnitTestBase extends \PHPUnit_Framework_TestCase
 {
     protected $mockAssert;
 

@@ -1,6 +1,8 @@
 <?php
 
-require_once 'UnitTestBase.php';
+namespace BeBat\Verify\Test;
+
+use Mockery;
 
 class VerifyFileTest extends UnitTestBase
 {

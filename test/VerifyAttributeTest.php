@@ -1,6 +1,8 @@
 <?php
 
-require_once 'UnitTestBase.php';
+namespace BeBat\Verify\Test;
+
+use Mockery;
 
 class VerifyAttributeTest extends UnitTestBase
 {
@@ -55,7 +57,7 @@ class VerifyAttributeTest extends UnitTestBase
 
     public function testContainsOnly()
     {
-        $obj = new stdClass();
+        $obj = new \stdClass();
 
         $this->mockAssert->shouldReceive('assertAttributeContainsOnly')
             ->with('TypeA', 'attribute1', $obj, null, Mockery::any())->once();

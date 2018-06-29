@@ -8,7 +8,7 @@
 >
     <testsuites>
         <testsuite name="Verify">
-            <directory>tests</directory>
+            <directory>test</directory>
         </testsuite>
     </testsuites>
 </phpunit>
