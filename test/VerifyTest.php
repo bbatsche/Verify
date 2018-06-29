@@ -2,8 +2,10 @@
 
 declare(strict_types=1);
 
-require_once 'UnitTestBase.php';
+namespace BeBat\Verify\Test;
 
+use DOMDOcument;
+use Mockery;
 use function BeBat\Verify\verify;
 use function BeBat\Verify\verify_not;
 use function BeBat\Verify\verify_that;
@@ -53,7 +55,7 @@ class VerifyTest extends UnitTestBase
 
     public function testContainsOnly()
     {
-        $obj = new stdClass();
+        $obj = new \stdClass();
 
         $this->mockAssert->shouldReceive('assertContainsOnly')
             ->with('TypeA', $obj, null, Mockery::any())->once();
@@ -412,7 +414,7 @@ class VerifyTest extends UnitTestBase
 
     public function testHasAttribute()
     {
-        $obj = new stdClass();
+        $obj = new \stdClass();
 
         $this->mockAssert->shouldReceive('assertClassHasAttribute')
             ->with('attribute1', 'ClassA', Mockery::any())->once();

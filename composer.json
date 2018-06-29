@@ -42,6 +42,11 @@
             "BeBat\\Verify\\": "src"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "BeBat\\Verify\\Test\\": "test"
+        }
+    },
     "extra": {
         "branch-alias": {
             "dev-master": "2.0-dev"

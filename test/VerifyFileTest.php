@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-require_once 'UnitTestBase.php';
+namespace BeBat\Verify\Test;
 
+use Mockery;
 use function BeBat\Verify\verify_file;
 
 class VerifyFileTest extends UnitTestBase
