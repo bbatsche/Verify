@@ -8,12 +8,21 @@ php:
   - 7.1
   - 7.2
 
+env:
+  - PHPUNIT_VERSION=4.0
+  - PHPUNIT_VERSION=5.0
+
+matrix:
+  exclude:
+    - php: 5.4
+      env: PHPUNIT_VERSION=5.0
+    - php: 5.5
+      env: PHPUNIT_VERSION=5.0
+
 sudo: false
 
-before_install:
-  - travis_retry composer self-update
-
 install:
+  - composer require phpunit/phpunit:^$PHPUNIT_VERSION --update-no-dev --no-interaction --prefer-dist --no-progress --no-suggest --update-with-all-dependencies
   - travis_retry composer install --dev --no-interaction --prefer-dist
 
 script:

@@ -26,8 +26,7 @@
         "php": ">=5.4.0"
     },
     "require-dev": {
-        "mockery/mockery": "~0.9",
-        "apigen/apigen": "~4.1"
+        "mockery/mockery": "~0.9"
     },
     "replace": {
         "codeception/verify": "0.*"
