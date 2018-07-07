@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 namespace BeBat\Verify\Test;
 
-use BeBat\Verify\MissingConditionException;
 use BeBat\Verify\Verify;
 use DOMElement;
 use Mockery;
 
 class VerifyTest extends UnitTestBase
 {
+    protected $defaultActualValue = 'actual value';
+
     public function setUp()
     {
-        $this->subject = new Verify('actual value', 'some message');
+        $this->subject = new Verify($this->defaultActualValue, 'some message');
 
         parent::setUp();
     }
@@ -23,7 +24,7 @@ class VerifyTest extends UnitTestBase
      *
      * @return array
      */
-    public function allVerifyMethods(): array
+    public function allMethods(): array
     {
         return [
             ['true'],
@@ -1027,66 +1028,6 @@ class VerifyTest extends UnitTestBase
     }
 
     /**
-     * Test MissingConditionException is thrown for all methods.
-     *
-     * @param string $verifyMethod
-     * @param mixed  $value
-     *
-     * @dataProvider allVerifyMethods
-     */
-    public function testMissingConditionException(string $verifyMethod, $value = 'dummy value')
-    {
-        $this->expectException(MissingConditionException::class);
-
-        $this->subject->{$verifyMethod}($value);
-    }
-
-    /**
-     * Test verify methods that don't take any value.
-     *
-     * @param bool   $modifierCondition
-     * @param string $verifyMethod
-     * @param string $assertMethod
-     *
-     * @dataProvider noParamMethods
-     */
-    public function testNoParamMethods(bool $modifierCondition, string $verifyMethod, string $assertMethod)
-    {
-        $this->setModifierCondition($modifierCondition);
-
-        $this->mockAssert->shouldReceive($assertMethod)
-            ->with('actual value', 'some message')
-            ->once();
-
-        $this->assertSame($this->subject, $this->subject->{$verifyMethod}());
-    }
-
-    /**
-     * Test verify methods that take in a single value for comparison.
-     *
-     * @param bool   $modifierCondition
-     * @param string $verifyMethod
-     * @param string $assertMethod
-     * @param mixed  $expectedValue
-     *
-     * @dataProvider singleParamMethods
-     */
-    public function testSingleParamMethods(
-        bool $modifierCondition,
-        string $verifyMethod,
-        string $assertMethod,
-        $expectedValue = 'some value'
-    ) {
-        $this->setModifierCondition($modifierCondition);
-
-        $this->mockAssert->shouldReceive($assertMethod)
-            ->with($expectedValue, 'actual value', 'some message')
-            ->once();
-
-        $this->assertSame($this->subject, $this->subject->{$verifyMethod}($expectedValue));
-    }
-
-    /**
      * Test Verify::subset().
      */
     public function testSubset()
@@ -1134,13 +1075,5 @@ class VerifyTest extends UnitTestBase
         $this->expectExceptionMessage($methodName . ' does not support negative condition.');
 
         $this->subject->{$methodName}($value);
-    }
-
-    protected function setModifierCondition(bool $value)
-    {
-        $reflection       = new \ReflectionObject($this->subject);
-        $modifierProperty = $reflection->getProperty('modifierCondition');
-        $modifierProperty->setAccessible(true);
-        $modifierProperty->setValue($this->subject, $value);
     }
 }

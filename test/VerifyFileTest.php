@@ -4,142 +4,116 @@ declare(strict_types=1);
 
 namespace BeBat\Verify\Test;
 
+use BeBat\Verify\VerifyFile;
 use Mockery;
-use function BeBat\Verify\verify_file;
 
 class VerifyFileTest extends UnitTestBase
 {
-    public static function setUpBeforeClass()
+    protected $defaultActualValue = 'file under test';
+
+    public function setUp()
     {
-        static::$verifyMethod = 'verify_file';
+        $this->subject = new VerifyFile($this->defaultActualValue, 'some message');
+
+        parent::setUp();
     }
 
-    public function testEquals()
+    /**
+     * All VerifyFile methods.
+     *
+     * @return array
+     */
+    public function allMethods(): array
     {
-        $this->mockAssert->shouldReceive('assertFileEquals')
-            ->with('test 1', 'subject 1', Mockery::any(), Mockery::any(), Mockery::any())->once();
-        $this->mockAssert->shouldReceive('assertFileEquals')
-            ->with('test 2', 'subject 2', 'message', Mockery::any(), Mockery::any())->once();
-
-        $this->assertNull(verify_file('subject 1')->equals('test 1'));
-        $this->assertNull(verify_file('message', 'subject 2')->equals('test 2'));
+        return [
+            ['equalTo'],
+            ['equalToJsonFile'],
+            ['equalToXmlFile'],
+            ['exist'],
+            ['readable'],
+            ['writable'],
+        ];
     }
 
-    public function testExists()
+    /**
+     * PHPUnit assertions used by VerifyFile::equalTo().
+     *
+     * @return array
+     */
+    public function equalToMethods(): array
     {
-        $this->fireSingleValueTest('exists', 'assertFileExists');
-        $this->fireSingleValueTest('doesNotExist', 'assertFileNotExists');
+        return [
+            [true,  'assertFileEquals'],
+            [false, 'assertFileNotEquals'],
+        ];
     }
 
-    public function testIgnoreCaseEquals()
+    /**
+     * All VerifyFile methods and their PHPUnit assertions that do not take a value for comparison.
+     *
+     * @return array
+     */
+    public function noParamMethods(): array
     {
-        // Default: false
-        $this->mockAssert->shouldReceive('assertFileEquals')
-            ->with('test 1', 'subject 1', Mockery::any(), Mockery::any(), false)->once();
-        $this->mockAssert->shouldReceive('assertFileEquals')
-            ->with('test 2', 'subject 2', 'message 2', Mockery::any(), false)->once();
-
-        $this->assertNull(verify_file('subject 1')->equals('test 1'));
-        $this->assertNull(verify_file('message 2', 'subject 2')->equals('test 2'));
-
-        // Explicitly false
-        $this->mockAssert->shouldReceive('assertFileEquals')
-            ->with('test 3', 'subject 3', Mockery::any(), Mockery::any(), false)->once();
-        $this->mockAssert->shouldReceive('assertFileEquals')
-            ->with('test 4', 'subject 4', 'message 4', Mockery::any(), false)->once();
-
-        $this->assertNull(verify_file('subject 3')->withCase()->equals('test 3'));
-        $this->assertNull(verify_file('message 4', 'subject 4')->withCase()->equals('test 4'));
-
-        // Explicitly false
-        $this->mockAssert->shouldReceive('assertFileEquals')
-            ->with('test 5', 'subject 5', Mockery::any(), Mockery::any(), true)->once();
-        $this->mockAssert->shouldReceive('assertFileEquals')
-            ->with('test 6', 'subject 6', 'message 6', Mockery::any(), true)->once();
-
-        $this->assertNull(verify_file('subject 5')->withoutCase()->equals('test 5'));
-        $this->assertNull(verify_file('message 6', 'subject 6')->withoutCase()->equals('test 6'));
+        return [
+            [true,  'exist',    'assertFileExists'],
+            [true,  'readable', 'assertFileIsReadable'],
+            [true,  'writable', 'assertFileIsWritable'],
+            [false, 'exist',    'assertFileNotExists'],
+            [false, 'readable', 'assertFileNotIsReadable'],
+            [false, 'writable', 'assertFileNotIsWritable'],
+        ];
     }
 
-    public function testIgnoreCaseNotEquals()
+    /**
+     * All VerifyFile methods and their PHPUnit assertions that take in a single parameter.
+     *
+     * @return array
+     */
+    public function singleParamMethods(): array
     {
-        // Default: false
-        $this->mockAssert->shouldReceive('assertFileNotEquals')
-            ->with('test 1', 'subject 1', Mockery::any(), Mockery::any(), false)->once();
-        $this->mockAssert->shouldReceive('assertFileNotEquals')
-            ->with('test 2', 'subject 2', 'message 2', Mockery::any(), false)->once();
-
-        $this->assertNull(verify_file('subject 1')->doesNotEqual('test 1'));
-        $this->assertNull(verify_file('message 2', 'subject 2')->doesNotEqual('test 2'));
-
-        // Explicitly false
-        $this->mockAssert->shouldReceive('assertFileNotEquals')
-            ->with('test 3', 'subject 3', Mockery::any(), Mockery::any(), false)->once();
-        $this->mockAssert->shouldReceive('assertFileNotEquals')
-            ->with('test 4', 'subject 4', 'message 4', Mockery::any(), false)->once();
-
-        $this->assertNull(verify_file('subject 3')->withCase()->doesNotEqual('test 3'));
-        $this->assertNull(verify_file('message 4', 'subject 4')->withCase()->doesNotEqual('test 4'));
-
-        // Explicitly false
-        $this->mockAssert->shouldReceive('assertFileNotEquals')
-            ->with('test 5', 'subject 5', Mockery::any(), Mockery::any(), true)->once();
-        $this->mockAssert->shouldReceive('assertFileNotEquals')
-            ->with('test 6', 'subject 6', 'message 6', Mockery::any(), true)->once();
-
-        $this->assertNull(verify_file('subject 5')->withoutCase()->doesNotEqual('test 5'));
-        $this->assertNull(verify_file('message 6', 'subject 6')->withoutCase()->doesNotEqual('test 6'));
+        return [
+            [true,  'equalToJsonFile', 'assertJsonFileEqualsJsonFile'],
+            [true,  'equalToXmlFile',  'assertXmlFileEqualsXmlFile'],
+            [false, 'equalToJsonFile', 'assertJsonFileNotEqualsJsonFile'],
+            [false, 'equalToXmlFile',  'assertXmlFileNotEqualsXmlFile'],
+        ];
     }
 
-    public function testJsonFile()
+    /**
+     * Test VerifyFile::equalTo().
+     *
+     * @param bool   $modifierConition
+     * @param string $assertMethod
+     *
+     * @dataProvider equalToMethods
+     */
+    public function testEqualTo(bool $modifierConition, string $assertMethod)
     {
-        $this->fireTwoValueTest('equalsJsonFile', 'assertJsonFileEqualsJsonFile');
-        $this->fireTwoValueTest('doesNotEqualJsonFile', 'assertJsonFileNotEqualsJsonFile');
-    }
+        $this->setModifierCondition($modifierConition);
 
-    public function testNotEquals()
-    {
-        $this->mockAssert->shouldReceive('assertFileNotEquals')
-            ->with('test 1', 'subject 1', Mockery::any(), Mockery::any(), Mockery::any())->once();
-        $this->mockAssert->shouldReceive('assertFileNotEquals')
-            ->with('test 2', 'subject 2', 'message', Mockery::any(), Mockery::any())->once();
+        $this->mockAssert->shouldReceive($assertMethod)
+            ->with('file name', $this->defaultActualValue, 'some message', false, Mockery::any())
+            ->once();
 
-        $this->assertNull(verify_file('subject 1')->doesNotEqual('test 1'));
-        $this->assertNull(verify_file('message', 'subject 2')->doesNotEqual('test 2'));
-    }
+        $this->assertSame($this->subject, $this->subject->equalTo('file name'));
 
-    public function testVerifyFileFunction()
-    {
-        $obj = verify_file('filename');
+        $this->subject = new VerifyFile('subject file with case', 'message with case');
+        $this->setModifierCondition($modifierConition);
 
-        $this->assertAttributeSame('filename', 'actual', $obj);
-        $this->assertAttributeEmpty('description', $obj);
+        $this->mockAssert->shouldReceive($assertMethod)
+            ->with('expected file with case', 'subject file with case', 'message with case', false, false)
+            ->once();
 
-        $this->assertInstanceOf('BeBat\\Verify\\VerifyFile', $obj);
+        $this->assertSame($this->subject, $this->subject->withCase()->equalTo('expected file with case'));
 
-        $obj = verify_file('message', 'filename');
+        $this->subject = new VerifyFile('subject file w/o case', 'message w/o case');
+        $this->setModifierCondition($modifierConition);
 
-        $this->assertAttributeSame('filename', 'actual', $obj);
-        $this->assertAttributeSame('message', 'description', $obj);
+        $this->mockAssert->shouldReceive($assertMethod)
+            ->with('expected file w/o case', 'subject file w/o case', 'message w/o case', false, true)
+            ->once();
 
-        $this->assertInstanceOf('BeBat\\Verify\\VerifyFile', $obj);
-    }
-
-    public function testVerifyFileTooFewArgs()
-    {
-        $this->expectException('BadMethodCallException');
-        verify_file();
-    }
-
-    public function testVerifyFileTooManyArgs()
-    {
-        $this->expectException('BadMethodCallException');
-        verify_file('arg1', 'arg2', 'arg3');
-    }
-
-    public function testXmlFile()
-    {
-        $this->fireTwoValueTest('equalsXmlFile', 'assertXmlFileEqualsXmlFile');
-        $this->fireTwoValueTest('doesNotEqualXmlFile', 'assertXmlFileNotEqualsXmlFile');
+        $this->assertSame($this->subject, $this->subject->withoutCase()->equalTo('expected file w/o case'));
     }
 }
