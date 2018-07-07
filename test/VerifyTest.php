@@ -4,1446 +4,1143 @@ declare(strict_types=1);
 
 namespace BeBat\Verify\Test;
 
-use DOMDOcument;
+use BeBat\Verify\MissingConditionException;
+use BeBat\Verify\Verify;
 use DOMElement;
 use Mockery;
-use function BeBat\Verify\verify;
-use function BeBat\Verify\verify_not;
-use function BeBat\Verify\verify_that;
 
 class VerifyTest extends UnitTestBase
 {
-    public static function setUpBeforeClass()
+    public function setUp()
     {
-        static::$verifyMethod = 'verify';
+        $this->subject = new Verify('actual value', 'some message');
+
+        parent::setUp();
     }
 
-    public function testArraySubset()
+    /**
+     * All possible verify methods.
+     *
+     * @return array
+     */
+    public function allVerifyMethods(): array
     {
-        $this->mockAssert->shouldReceive('assertArraySubset')
-            ->with('test 1', 'subject 1', Mockery::any(), Mockery::any())->once();
-        $this->mockAssert->shouldReceive('assertArraySubset')
-            ->with('test 2', 'subject 2', Mockery::any(), 'message')->once();
-
-        $this->assertNull(verify('subject 1')->hasSubset('test 1'));
-        $this->assertNull(verify('message', 'subject 2')->hasSubset('test 2'));
+        return [
+            ['true'],
+            ['false'],
+            ['null'],
+            ['empty'],
+            ['json'],
+            ['count', 30],
+            ['key'],
+            ['startWith'],
+            ['endWith'],
+            ['contain'],
+            ['containOnly'],
+            ['matchRegExp'],
+            ['matchFormat'],
+            ['matchFormatFile'],
+            ['equalToJsonString'],
+            ['equalToJsonFile'],
+            ['equalToXmlString'],
+            ['equalToXmlFile'],
+            ['equalToXmlStructure', new DOMElement('foo')],
+            ['greaterThan'],
+            ['greaterOrEqualTo'],
+            ['lessThan'],
+            ['lessOrEqualTo'],
+            ['finite'],
+            ['infinite'],
+            ['nan'],
+            ['equalTo'],
+            ['equalToFile'],
+            ['sameAs'],
+            ['sameSizeAs'],
+            ['subset'],
+            ['instanceOf'],
+            ['internalType'],
+            ['attribute'],
+            ['staticAttribute'],
+        ];
     }
 
-    public function testContains()
+    /**
+     * Sample data for testing attribute() method.
+     *
+     * @return array
+     */
+    public function attributeAssertMethods(): array
     {
-        $this->mockAssert->shouldReceive('assertContains')
-            ->with(
-                'test 1',
-                'subject 1',
-                Mockery::any(), // Message
-                Mockery::any(), // Ignore Case
-                Mockery::any(), // Object Identity
-                Mockery::any()  // Data Type
-            )->once();
-        $this->mockAssert->shouldReceive('assertContains')
-            ->with(
-                'test 2',
-                'subject 2',
-                'message',
-                Mockery::any(),
-                Mockery::any(),
-                Mockery::any()
-            )->once();
-
-        $this->assertNull(verify('subject 1')->contains('test 1'));
-        $this->assertNull(verify('message', 'subject 2')->contains('test 2'));
+        return [
+            [true,  'SomeClass',     'assertClassHasAttribute'],
+            [true,  new \stdClass(), 'assertObjectHasAttribute'],
+            [false, 'SomeClass',     'assertClassNotHasAttribute'],
+            [false, new \stdClass(), 'assertObjectNotHasAttribute'],
+        ];
     }
 
-    public function testContainsOnly()
+    /**
+     * Assert methods used by contain() for attributes.
+     *
+     * @return array
+     */
+    public function attributeContainAssertMethods(): array
     {
-        $obj = new \stdClass();
-
-        $this->mockAssert->shouldReceive('assertContainsOnly')
-            ->with('TypeA', $obj, null, Mockery::any())->once();
-        $this->mockAssert->shouldReceive('assertContainsOnly')
-            ->with('TypeB', $obj, null, 'message')->once();
-        $this->mockAssert->shouldReceive('assertNotContainsOnly')
-            ->with('TypeC', $obj, null, Mockery::any())->once();
-        $this->mockAssert->shouldReceive('assertNotContainsOnly')
-            ->with('TypeD', $obj, null, 'message')->once();
-
-        $this->assertNull(verify($obj)->containsOnly('TypeA'));
-        $this->assertNull(verify('message', $obj)->containsOnly('TypeB'));
-
-        $this->assertNull(verify($obj)->doesNotContainOnly('TypeC'));
-        $this->assertNull(verify('message', $obj)->doesNotContainOnly('TypeD'));
+        return [
+            [true,  'assertAttributeContains'],
+            [false, 'assertAttributeNotContains'],
+        ];
     }
 
-    public function testCount()
+    /**
+     * Assert methods used by containOnly() for attributes.
+     *
+     * @return array
+     */
+    public function attributeContainOnlyAssertMethods(): array
     {
-        $this->mockAssert->shouldReceive('assertCount')->with(1, 'subject 1', Mockery::any())->once();
-        $this->mockAssert->shouldReceive('assertCount')->with(2, 'subject 2', 'message')->once();
-
-        $this->assertNull(verify('subject 1')->hasCount(1));
-        $this->assertNull(verify('message', 'subject 2')->hasCount(2));
-
-        $this->mockAssert->shouldReceive('assertNotCount')->with(3, 'subject 3', Mockery::any())->once();
-        $this->mockAssert->shouldReceive('assertNotCount')->with(4, 'subject 4', 'message')->once();
-
-        $this->assertNull(verify('subject 3')->doesNotHaveCount(3));
-        $this->assertNull(verify('message', 'subject 4')->doesNotHaveCount(4));
+        return [
+            [true,  'assertAttributeContainsOnly'],
+            [false, 'assertAttributeNotContainsOnly'],
+        ];
     }
 
-    public function testDataTypeArraySubset()
+    /**
+     * Assert methods used by equalTo() for attributes.
+     *
+     * @return array
+     */
+    public function attributeEqualToAssertMethods(): array
     {
-        // Default: false
-        $this->mockAssert->shouldReceive('assertArraySubset')
-            ->with('test 1', 'subject 1', false, Mockery::any())->once();
-        $this->mockAssert->shouldReceive('assertArraySubset')
-            ->with('test 2', 'subject 2', false, 'message 2')->once();
-
-        $this->assertNull(verify('subject 1')->hasSubset('test 1'));
-        $this->assertNull(verify('message 2', 'subject 2')->hasSubset('test 2'));
-
-        // Explicitly false
-        $this->mockAssert->shouldReceive('assertArraySubset')
-            ->with('test 3', 'subject 3', false, Mockery::any())->once();
-        $this->mockAssert->shouldReceive('assertArraySubset')
-            ->with('test 4', 'subject 4', false, 'message 4')->once();
-
-        $this->assertNull(verify('subject 3')->withoutType()->hasSubset('test 3'));
-        $this->assertNull(verify('message 4', 'subject 4')->withoutType()->hasSubset('test 4'));
-
-        // Explicitly true
-        $this->mockAssert->shouldReceive('assertArraySubset')
-            ->with('test 5', 'subject 5', true, Mockery::any())->once();
-        $this->mockAssert->shouldReceive('assertArraySubset')
-            ->with('test 6', 'subject 6', true, 'message 6')->once();
-
-        $this->assertNull(verify('subject 5')->withType()->hasSubset('test 5'));
-        $this->assertNull(verify('message 6', 'subject 6')->withType()->hasSubset('test 6'));
+        return [
+            [true,  'assertAttributeEquals'],
+            [false, 'assertAttributeNotEquals'],
+        ];
     }
 
-    public function testDataTypeContains()
+    /**
+     * Verify methods and their PHPUnit assertions for object attributes.
+     *
+     * @return array
+     */
+    public function attributeMethods(): array
     {
-        // Default: false
-        $this->mockAssert->shouldReceive('assertContains')
-            ->with(
-                'test 1',
-                'subject 1',
-                Mockery::any(), // Message
-                Mockery::any(), // Ignore Case
-                Mockery::any(), // Object Identity
-                false
-            )->once();
-        $this->mockAssert->shouldReceive('assertContains')
-            ->with(
-                'test 2',
-                'subject 2',
-                'message 2',
-                Mockery::any(),
-                Mockery::any(),
-                false
-            )->once();
-
-        $this->assertNull(verify('subject 1')->contains('test 1'));
-        $this->assertNull(verify('message 2', 'subject 2')->contains('test 2'));
-
-        // Explicitly false
-        $this->mockAssert->shouldReceive('assertContains')
-            ->with(
-                'test 3',
-                'subject 3',
-                Mockery::any(),
-                Mockery::any(),
-                Mockery::any(),
-                false
-            )->once();
-        $this->mockAssert->shouldReceive('assertContains')
-            ->with(
-                'test 4',
-                'subject 4',
-                'message 4',
-                Mockery::any(),
-                Mockery::any(),
-                false
-            )->once();
-
-        $this->assertNull(verify('subject 3')->withoutType()->contains('test 3'));
-        $this->assertNull(verify('message 4', 'subject 4')->withoutType()->contains('test 4'));
-
-        // Explicitly false
-        $this->mockAssert->shouldReceive('assertContains')
-            ->with(
-                'test 5',
-                'subject 5',
-                Mockery::any(),
-                Mockery::any(),
-                Mockery::any(),
-                true
-            )->once();
-        $this->mockAssert->shouldReceive('assertContains')
-            ->with(
-                'test 6',
-                'subject 6',
-                'message 6',
-                Mockery::any(),
-                Mockery::any(),
-                true
-            )->once();
-
-        $this->assertNull(verify('subject 5')->withType()->contains('test 5'));
-        $this->assertNull(verify('message 6', 'subject 6')->withType()->contains('test 6'));
+        return [
+            [true,  'count',            'assertAttributeCount', 40],
+            [true,  'greaterThan',      'assertAttributeGreaterThan'],
+            [true,  'greaterOrEqualto', 'assertAttributeGreaterThanOrEqual'],
+            [true,  'lessThan',         'assertAttributeLessThan'],
+            [true,  'lessOrEqualto',    'assertAttributeLessThanOrEqual'],
+            [true,  'instanceOf',       'assertAttributeInstanceOf'],
+            [true,  'internalType',     'assertAttributeInternalType'],
+            [true,  'sameAs',           'assertAttributeSame'],
+            [false, 'count',            'assertAttributeNotCount', 50],
+            [false, 'greaterThan',      'assertAttributeLessThanOrEqual'],
+            [false, 'greaterOrEqualto', 'assertAttributeLessThan'],
+            [false, 'lessThan',         'assertAttributeGreaterThanOrEqual'],
+            [false, 'lessOrEqualto',    'assertAttributeGreaterThan'],
+            [false, 'instanceOf',       'assertAttributeNotInstanceOf'],
+            [false, 'internalType',     'assertAttributeNotInternalType'],
+            [false, 'sameAs',           'assertAttributeNotSame'],
+        ];
     }
 
-    public function testDataTypeNotContains()
+    /**
+     * Assert methods used by contain().
+     *
+     * @return array
+     */
+    public function containAssertMethods(): array
     {
-        // Default: false
-        $this->mockAssert->shouldReceive('assertNotContains')
-            ->with(
-                'test 1',
-                'subject 1',
-                Mockery::any(), // Message
-                Mockery::any(), // Ignore Case
-                Mockery::any(), // Object Identity
-                false
-            )->once();
-        $this->mockAssert->shouldReceive('assertNotContains')
-            ->with(
-                'test 2',
-                'subject 2',
-                'message 2',
-                Mockery::any(),
-                Mockery::any(),
-                false
-            )->once();
-
-        $this->assertNull(verify('subject 1')->doesNotContain('test 1'));
-        $this->assertNull(verify('message 2', 'subject 2')->doesNotContain('test 2'));
-
-        // Explicitly false
-        $this->mockAssert->shouldReceive('assertNotContains')
-            ->with(
-                'test 3',
-                'subject 3',
-                Mockery::any(),
-                Mockery::any(),
-                Mockery::any(),
-                false
-            )->once();
-        $this->mockAssert->shouldReceive('assertNotContains')
-            ->with(
-                'test 4',
-                'subject 4',
-                'message 4',
-                Mockery::any(),
-                Mockery::any(),
-                false
-            )->once();
-
-        $this->assertNull(verify('subject 3')->withoutType()->doesNotContain('test 3'));
-        $this->assertNull(verify('message 4', 'subject 4')->withoutType()->doesNotContain('test 4'));
-
-        // Explicitly false
-        $this->mockAssert->shouldReceive('assertNotContains')
-            ->with(
-                'test 5',
-                'subject 5',
-                Mockery::any(),
-                Mockery::any(),
-                Mockery::any(),
-                true
-            )->once();
-        $this->mockAssert->shouldReceive('assertNotContains')
-            ->with(
-                'test 6',
-                'subject 6',
-                'message 6',
-                Mockery::any(),
-                Mockery::any(),
-                true
-            )->once();
-
-        $this->assertNull(verify('subject 5')->withType()->doesNotContain('test 5'));
-        $this->assertNull(verify('message 6', 'subject 6')->withType()->doesNotContain('test 6'));
+        return [
+            [true,  'assertContains'],
+            [false, 'assertNotContains'],
+        ];
     }
 
-    public function testEquals()
+    /**
+     * Assert methods used by containOnly().
+     *
+     * @return array
+     */
+    public function containOnlyAssertMethods(): array
     {
-        $this->mockAssert->shouldReceive('assertEquals')
-            ->with(
-                'test 1',
-                'subject 1',
-                Mockery::any(), // Message
-                Mockery::any(), // Delta
-                Mockery::any(), // Max Depth
-                Mockery::any(), // Canonicalize
-                Mockery::any()  // Ignore Case
-            )->once();
-        $this->mockAssert->shouldReceive('assertEquals')
-            ->with(
-                'test 2',
-                'subject 2',
-                'message',
-                Mockery::any(),
-                Mockery::any(),
-                Mockery::any(),
-                Mockery::any()
-            )->once();
-
-        $this->assertNull(verify('subject 1')->equals('test 1'));
-        $this->assertNull(verify('message', 'subject 2')->equals('test 2'));
+        return [
+            [true,  'assertContainsOnly'],
+            [false, 'assertNotContainsOnly'],
+        ];
     }
 
-    public function testEqualsFile()
+    /**
+     * Assert methods used by equalTo().
+     *
+     * @return array
+     */
+    public function equalToAssertMethods(): array
     {
-        $this->mockAssert->shouldReceive('assertStringEqualsFile')
-            ->with(
-                'test 1',
-                'subject 1',
-                Mockery::any(), // Message
-                Mockery::any(), // Canonicalize
-                Mockery::any()  // Ignore Case
-            )->once();
-        $this->mockAssert->shouldReceive('assertStringEqualsFile')
-            ->with(
-                'test 2',
-                'subject 2',
-                'message',
-                Mockery::any(),
-                Mockery::any()
-            )->once();
-
-        $this->assertNull(verify('subject 1')->equalsFile('test 1'));
-        $this->assertNull(verify('message', 'subject 2')->equalsFile('test 2'));
+        return [
+            [true,  'assertEquals'],
+            [false, 'assertNotEquals'],
+        ];
     }
 
-    public function testFloatingPointEquals()
+    /**
+     * Assert methods used by equalToFile().
+     *
+     * @return array
+     */
+    public function equalToFileAssertMethods(): array
     {
-        // Default: 0.0
-        $this->mockAssert->shouldReceive('assertEquals')
-            ->with(
-                'test 1',
-                'subject 1',
-                Mockery::any(), // Message
-                0.0,
-                Mockery::any(), // Max Depth
-                Mockery::any(), // Canonicalize
-                Mockery::any()  // Ignore Case
-            )->once();
-        $this->mockAssert->shouldReceive('assertEquals')
-            ->with(
-                'test 2',
-                'subject 2',
-                'message 2',
-                0.0,
-                Mockery::any(),
-                Mockery::any(),
-                Mockery::any()
-            )->once();
-
-        $this->assertNull(verify('subject 1')->equals('test 1'));
-        $this->assertNull(verify('message 2', 'subject 2')->equals('test 2'));
-
-        // Specified value: 1.0
-        $this->mockAssert->shouldReceive('assertEquals')
-            ->with(
-                'test 3',
-                'subject 3',
-                Mockery::any(),
-                1.0,
-                Mockery::any(),
-                Mockery::any(),
-                Mockery::any()
-            )->once();
-        $this->mockAssert->shouldReceive('assertEquals')
-            ->with(
-                'test 4',
-                'subject 4',
-                'message 4',
-                1.0,
-                Mockery::any(),
-                Mockery::any(),
-                Mockery::any()
-            )->once();
-
-        $this->assertNull(verify('subject 3')->within(1.0)->equals('test 3'));
-        $this->assertNull(verify('message 4', 'subject 4')->within(1.0)->equals('test 4'));
+        return [
+            [true,  'assertStringEqualsFile'],
+            [false, 'assertStringNotEqualsFile'],
+        ];
     }
 
-    public function testFloatingPointNotEquals()
+    /**
+     * Verify methods that cannot be used with a negative condition.
+     *
+     * @return array
+     */
+    public function methodsWithoutNegativeCondition(): array
     {
-        // Default: 0.0
-        $this->mockAssert->shouldReceive('assertNotEquals')
-            ->with(
-                'test 1',
-                'subject 1',
-                Mockery::any(), // Message
-                0.0,
-                Mockery::any(), // Max Depth
-                Mockery::any(), // Canonicalize
-                Mockery::any()  // Ignore Case
-            )->once();
-        $this->mockAssert->shouldReceive('assertNotEquals')
-            ->with(
-                'test 2',
-                'subject 2',
-                'message 2',
-                0.0,
-                Mockery::any(),
-                Mockery::any(),
-                Mockery::any()
-            )->once();
-
-        $this->assertNull(verify('subject 1')->doesNotEqual('test 1'));
-        $this->assertNull(verify('message 2', 'subject 2')->doesNotEqual('test 2'));
-
-        // Specified value: 1.0
-        $this->mockAssert->shouldReceive('assertNotEquals')
-            ->with(
-                'test 3',
-                'subject 3',
-                Mockery::any(),
-                1.0,
-                Mockery::any(),
-                Mockery::any(),
-                Mockery::any()
-            )->once();
-        $this->mockAssert->shouldReceive('assertNotEquals')
-            ->with(
-                'test 4',
-                'subject 4',
-                'message 4',
-                1.0,
-                Mockery::any(),
-                Mockery::any(),
-                Mockery::any()
-            )->once();
-
-        $this->assertNull(verify('subject 3')->within(1.0)->doesNotEqual('test 3'));
-        $this->assertNull(verify('message 4', 'subject 4')->within(1.0)->doesNotEqual('test 4'));
+        return [
+            ['equalToXmlStructure', new DOMElement('foo')],
+            ['json'],
+            ['subset'],
+            ['nan'],
+        ];
     }
 
-    public function testHasAttribute()
+    /**
+     * Verify methods and their PHPUnit assertions that don't take any comparison value.
+     *
+     * @return array
+     */
+    public function noParamMethods(): array
     {
-        $obj = new \stdClass();
-
-        $this->mockAssert->shouldReceive('assertClassHasAttribute')
-            ->with('attribute1', 'ClassA', Mockery::any())->once();
-        $this->mockAssert->shouldReceive('assertClassHasAttribute')
-            ->with('attribute2', 'ClassB', 'message')->once();
-
-        $this->mockAssert->shouldReceive('assertObjectHasAttribute')
-            ->with('attribute3', $obj, Mockery::any())->once();
-        $this->mockAssert->shouldReceive('assertObjectHasAttribute')
-            ->with('attribute4', $obj, 'message')->once();
-
-        $this->mockAssert->shouldReceive('assertClassNotHasAttribute')
-            ->with('attribute5', 'ClassC', Mockery::any())->once();
-        $this->mockAssert->shouldReceive('assertClassNotHasAttribute')
-            ->with('attribute6', 'ClassD', 'message')->once();
-
-        $this->mockAssert->shouldReceive('assertObjectNotHasAttribute')
-            ->with('attribute7', $obj, Mockery::any())->once();
-        $this->mockAssert->shouldReceive('assertObjectNotHasAttribute')
-            ->with('attribute8', $obj, 'message')->once();
-
-        $this->mockAssert->shouldReceive('assertClassHasStaticAttribute')
-            ->with('attribute9', 'ClassE', Mockery::any())->once();
-        $this->mockAssert->shouldReceive('assertClassHasStaticAttribute')
-            ->with('attributeA', 'ClassF', 'message')->once();
-
-        $this->mockAssert->shouldReceive('assertClassNotHasStaticAttribute')
-            ->with('attributeB', 'ClassG', Mockery::any())->once();
-        $this->mockAssert->shouldReceive('assertClassNotHasStaticAttribute')
-            ->with('attributeC', 'ClassH', 'message')->once();
-
-        $this->assertNull(verify('ClassA')->hasAttribute('attribute1'));
-        $this->assertNull(verify('message', 'ClassB')->hasAttribute('attribute2'));
-
-        $this->assertNull(verify($obj)->hasAttribute('attribute3'));
-        $this->assertNull(verify('message', $obj)->hasAttribute('attribute4'));
-
-        $this->assertNull(verify('ClassC')->doesNotHaveAttribute('attribute5'));
-        $this->assertNull(verify('message', 'ClassD')->doesNotHaveAttribute('attribute6'));
-
-        $this->assertNull(verify($obj)->doesNotHaveAttribute('attribute7'));
-        $this->assertNull(verify('message', $obj)->doesNotHaveAttribute('attribute8'));
-
-        $this->assertNull(verify('ClassE')->hasStaticAttribute('attribute9'));
-        $this->assertNull(verify('message', 'ClassF')->hasStaticAttribute('attributeA'));
-
-        $this->assertNull(verify('ClassG')->doesNotHaveStaticAttribute('attributeB'));
-        $this->assertNull(verify('message', 'ClassH')->doesNotHaveStaticAttribute('attributeC'));
+        return [
+            [true,  'true',     'assertTrue'],
+            [true,  'false',    'assertFalse'],
+            [true,  'null',     'assertNull'],
+            [true,  'empty',    'assertEmpty'],
+            [true,  'finite',   'assertFinite'],
+            [true,  'infinite', 'assertInfinite'],
+            [true,  'nan',      'assertNan'],
+            [true,  'json',     'assertJson'],
+            [false, 'true',     'assertNotTrue'],
+            [false, 'false',    'assertNotFalse'],
+            [false, 'null',     'assertNotNull'],
+            [false, 'empty',    'assertNotEmpty'],
+            [false, 'finite',   'assertInfinite'],
+            [false, 'infinite', 'assertFinite'],
+        ];
     }
 
-    public function testHasKey()
+    /**
+     * Verify methods and their PHPUNit assertions that take a comparison value.
+     *
+     * @return array
+     */
+    public function singleParamMethods(): array
     {
-        $this->fireTwoValueTest('hasKey', 'assertArrayHasKey');
-        $this->fireTwoValueTest('doesNotHaveKey', 'assertArrayNotHasKey');
+        return [
+            [true,  'count',             'assertCount', 10],
+            [true,  'key',               'assertArrayHasKey'],
+            [true,  'startWith',         'assertStringStartsWith'],
+            [true,  'endWith',           'assertStringEndsWith'],
+            [true,  'matchRegExp',       'assertRegExp'],
+            [true,  'matchFormat',       'assertStringMatchesFormat'],
+            [true,  'matchFormatFile',   'assertStringMatchesFormatFile'],
+            [true,  'equalToJsonString', 'assertJsonStringEqualsJsonString'],
+            [true,  'equalToJsonFile',   'assertJsonStringEqualsJsonFile'],
+            [true,  'equalToXmlString',  'assertXmlStringEqualsXmlString'],
+            [true,  'equalToXmlFile',    'assertXmlStringEqualsXmlFile'],
+            [true,  'greaterThan',       'assertGreaterThan'],
+            [true,  'greaterOrEqualTo',  'assertGreaterThanOrEqual'],
+            [true,  'lessThan',          'assertLessThan'],
+            [true,  'lessOrEqualTo',     'assertLessThanOrEqual'],
+            [true,  'instanceOf',        'assertInstanceOf'],
+            [true,  'internalType',      'assertInternalType'],
+            [true,  'sameAs',            'assertSame'],
+            [true,  'sameSizeAs',        'assertSameSize'],
+            [true,  'staticAttribute',   'assertClassHasStaticAttribute'],
+            [false, 'count',             'assertNotCount', 20],
+            [false, 'key',               'assertArrayNotHasKey'],
+            [false, 'startWith',         'assertStringStartsNotWith'],
+            [false, 'endWith',           'assertStringEndsNotWith'],
+            [false, 'matchRegExp',       'assertNotRegExp'],
+            [false, 'matchFormat',       'assertStringNotMatchesFormat'],
+            [false, 'matchFormatFile',   'assertStringNotMatchesFormatFile'],
+            [false, 'equalToJsonString', 'assertJsonStringNotEqualsJsonString'],
+            [false, 'equalToJsonFile',   'assertJsonStringNotEqualsJsonFile'],
+            [false, 'equalToXmlString',  'assertXmlStringNotEqualsXmlString'],
+            [false, 'equalToXmlFile',    'assertXmlStringNotEqualsXmlFile'],
+            [false, 'greaterThan',       'assertLessThanOrEqual'],
+            [false, 'greaterOrEqualTo',  'assertLessThan'],
+            [false, 'lessThan',          'assertGreaterThanOrEqual'],
+            [false, 'lessOrEqualTo',     'assertGreaterThan'],
+            [false, 'instanceOf',        'assertNotInstanceOf'],
+            [false, 'internalType',      'assertNotInternalType'],
+            [false, 'sameAs',            'assertNotSame'],
+            [false, 'sameSizeAs',        'assertNotSameSize'],
+            [false, 'staticAttribute',   'assertClassNotHasStaticAttribute'],
+        ];
     }
 
-    public function testIgnoreCaseContains()
+    /**
+     * Test Verify::contain() with & without case sensitivity for attributes.
+     *
+     * @param bool   $modifierCondition
+     * @param string $assertMethod
+     *
+     * @dataProvider attributeContainAssertMethods
+     */
+    public function testAttribueContainCaseSensitive(bool $modifierCondition, string $assertMethod)
     {
-        // Default: false
-        $this->mockAssert->shouldReceive('assertContains')
+        $this->subject = new Verify('value with case', 'message with case');
+        $this->setModifierCondition($modifierCondition);
+        $this->subject->attributeNamed('attribute_with_case');
+
+        $this->mockAssert->shouldReceive($assertMethod)
             ->with(
-                'test 1',
-                'subject 1',
-                Mockery::any(), // Message
-                false,
-                Mockery::any(), // Object Identity
-                Mockery::any()  // Data Type
-            )->once();
-        $this->mockAssert->shouldReceive('assertContains')
-            ->with(
-                'test 2',
-                'subject 2',
-                'message 2',
+                'needle with case',
+                'attribute_with_case',
+                'value with case',
+                'message with case',
                 false,
                 Mockery::any(),
                 Mockery::any()
             )->once();
 
-        $this->assertNull(verify('subject 1')->contains('test 1'));
-        $this->assertNull(verify('message 2', 'subject 2')->contains('test 2'));
+        $this->assertSame($this->subject, $this->subject->withCase()->contain('needle with case'));
 
-        // Explicitly false
-        $this->mockAssert->shouldReceive('assertContains')
-            ->with(
-                'test 3',
-                'subject 3',
-                Mockery::any(),
-                false,
-                Mockery::any(),
-                Mockery::any()
-            )->once();
-        $this->mockAssert->shouldReceive('assertContains')
-            ->with(
-                'test 4',
-                'subject 4',
-                'message 4',
-                false,
-                Mockery::any(),
-                Mockery::any()
-            )->once();
+        $this->subject = new Verify('value w/o case', 'message w/o case');
+        $this->setModifierCondition($modifierCondition);
+        $this->subject->attributeNamed('attribute_without_case');
 
-        $this->assertNull(verify('subject 3')->withCase()->contains('test 3'));
-        $this->assertNull(verify('message 4', 'subject 4')->withCase()->contains('test 4'));
-
-        // Explicitly false
-        $this->mockAssert->shouldReceive('assertContains')
+        $this->mockAssert->shouldReceive($assertMethod)
             ->with(
-                'test 5',
-                'subject 5',
-                Mockery::any(),
-                true,
-                Mockery::any(),
-                Mockery::any()
-            )->once();
-        $this->mockAssert->shouldReceive('assertContains')
-            ->with(
-                'test 6',
-                'subject 6',
-                'message 6',
+                'needle w/o case',
+                'attribute_without_case',
+                'value w/o case',
+                'message w/o case',
                 true,
                 Mockery::any(),
                 Mockery::any()
             )->once();
 
-        $this->assertNull(verify('subject 5')->withoutCase()->contains('test 5'));
-        $this->assertNull(verify('message 6', 'subject 6')->withoutCase()->contains('test 6'));
+        $this->assertSame($this->subject, $this->subject->withoutCase()->contain('needle w/o case'));
     }
 
-    public function testIgnoreCaseEquals()
+    /**
+     * Test Verify::contain() with & without data type for attributes.
+     *
+     * @param bool   $modifierCondition
+     * @param string $assertMethod
+     *
+     * @dataProvider attributeContainAssertMethods
+     */
+    public function testAttribueContainDataType(bool $modifierCondition, string $assertMethod)
     {
-        // Default: false
-        $this->mockAssert->shouldReceive('assertEquals')
-            ->with(
-                'test 1',
-                'subject 1',
-                Mockery::any(), // Message
-                Mockery::any(), // Delta
-                Mockery::any(), // Max Depth
-                Mockery::any(), // Canonicalize
-                false
-            )->once();
-        $this->mockAssert->shouldReceive('assertEquals')
-            ->with(
-                'test 2',
-                'subject 2',
-                'message 2',
-                Mockery::any(),
-                Mockery::any(),
-                Mockery::any(),
-                false
-            )->once();
+        $this->subject = new Verify('value with type', 'message with type');
+        $this->setModifierCondition($modifierCondition);
+        $this->subject->attributeNamed('attribute_with_type');
 
-        $this->assertNull(verify('subject 1')->equals('test 1'));
-        $this->assertNull(verify('message 2', 'subject 2')->equals('test 2'));
-
-        // Explicitly false
-        $this->mockAssert->shouldReceive('assertEquals')
+        $this->mockAssert->shouldReceive($assertMethod)
             ->with(
-                'test 3',
-                'subject 3',
-                Mockery::any(),
-                Mockery::any(),
-                Mockery::any(),
-                Mockery::any(),
-                false
-            )->once();
-        $this->mockAssert->shouldReceive('assertEquals')
-            ->with(
-                'test 4',
-                'subject 4',
-                'message 4',
-                Mockery::any(),
-                Mockery::any(),
-                Mockery::any(),
-                false
-            )->once();
-
-        $this->assertNull(verify('subject 3')->withCase()->equals('test 3'));
-        $this->assertNull(verify('message 4', 'subject 4')->withCase()->equals('test 4'));
-
-        // Explicitly true
-        $this->mockAssert->shouldReceive('assertEquals')
-            ->with(
-                'test 5',
-                'subject 5',
-                Mockery::any(),
-                Mockery::any(),
+                'needle with type',
+                'attribute_with_type',
+                'value with type',
+                'message with type',
                 Mockery::any(),
                 Mockery::any(),
                 true
             )->once();
-        $this->mockAssert->shouldReceive('assertEquals')
+
+        $this->assertSame($this->subject, $this->subject->withType()->contain('needle with type'));
+
+        $this->subject = new Verify('value w/o type', 'message w/o type');
+        $this->setModifierCondition($modifierCondition);
+        $this->subject->attributeNamed('attribute_without_type');
+
+        $this->mockAssert->shouldReceive($assertMethod)
             ->with(
-                'test 6',
-                'subject 6',
-                'message 6',
+                'needle w/o type',
+                'attribute_without_type',
+                'value w/o type',
+                'message w/o type',
+                Mockery::any(),
+                Mockery::any(),
+                false
+            )->once();
+
+        $this->assertSame($this->subject, $this->subject->withoutType()->contain('needle w/o type'));
+    }
+
+    /**
+     * Test Verify::contain() with & without object identity for attributes.
+     *
+     * @param bool   $modifierCondition
+     * @param string $assertMethod
+     *
+     * @dataProvider attributeContainAssertMethods
+     */
+    public function testAttribueContainObjectIdentity(bool $modifierCondition, string $assertMethod)
+    {
+        $this->subject = new Verify('value with identity', 'message with identity');
+        $this->setModifierCondition($modifierCondition);
+        $this->subject->attributeNamed('attribute_with_identity');
+
+        $this->mockAssert->shouldReceive($assertMethod)
+            ->with(
+                'needle with identity',
+                'attribute_with_identity',
+                'value with identity',
+                'message with identity',
+                Mockery::any(),
+                true,
+                Mockery::any()
+            )->once();
+
+        $this->assertSame($this->subject, $this->subject->withIdentity()->contain('needle with identity'));
+
+        $this->subject = new Verify('value w/o identity', 'message w/o identity');
+        $this->setModifierCondition($modifierCondition);
+        $this->subject->attributeNamed('attribute_without_identity');
+
+        $this->mockAssert->shouldReceive($assertMethod)
+            ->with(
+                'needle w/o identity',
+                'attribute_without_identity',
+                'value w/o identity',
+                'message w/o identity',
+                Mockery::any(),
+                false,
+                Mockery::any()
+            )->once();
+
+        $this->assertSame($this->subject, $this->subject->withoutIdentity()->contain('needle w/o identity'));
+    }
+
+    /**
+     * Test Verify::attribute().
+     *
+     * @param bool          $modifierCondition
+     * @param string|object $actualValue
+     * @param string        $assertMethod
+     *
+     * @dataProvider attributeAssertMethods
+     */
+    public function testAttribute(bool $modifierCondition, $actualValue, string $assertMethod)
+    {
+        $this->subject = new Verify($actualValue, 'some message');
+
+        $this->setModifierCondition($modifierCondition);
+
+        $this->mockAssert->shouldReceive($assertMethod)
+            ->with('attribute_name', $actualValue, 'some message')
+            ->once();
+
+        $this->assertSame($this->subject, $this->subject->attribute('attribute_name'));
+    }
+
+    /**
+     * Test negative assertions for object attributes.
+     *
+     * @param bool   $modifierCondition
+     * @param string $verifyMethod
+     * @param string $assertMethod
+     * @param mixed  $expectedValue
+     *
+     * @dataProvider attributeMethods
+     */
+    public function testAttributeAssertions(
+        bool $modifierCondition,
+        string $verifyMethod,
+        string $assertMethod,
+        $expectedValue = 'some value'
+    ) {
+        $this->setModifierCondition($modifierCondition);
+
+        $this->subject->attributeNamed('my_attribute');
+
+        $this->mockAssert->shouldReceive($assertMethod)
+            ->with($expectedValue, 'my_attribute', 'actual value', 'some message')
+            ->once();
+
+        $this->assertSame($this->subject, $this->subject->{$verifyMethod}($expectedValue));
+    }
+
+    /**
+     * Test Verify::contain() basic case for attributes.
+     *
+     * @param bool   $modifierCondition
+     * @param string $assertMethod
+     *
+     * @dataProvider attributeContainAssertMethods
+     */
+    public function testAttributeContain(bool $modifierCondition, string $assertMethod)
+    {
+        $this->setModifierCondition($modifierCondition);
+        $this->subject->attributeNamed('attribute_name');
+
+        $this->mockAssert->shouldReceive($assertMethod)
+            ->with('needle', 'attribute_name', 'actual value', 'some message', Mockery::any(), Mockery::any(), Mockery::any())
+            ->once();
+
+        $this->assertSame($this->subject, $this->subject->contain('needle'));
+    }
+
+    /**
+     * Test Verify::containOnly() for object attributes.
+     *
+     * @param bool   $modifierCondition
+     * @param string $assertMethod
+     *
+     * @dataProvider attributeContainOnlyAssertMethods
+     */
+    public function testAttributeContainOnly(bool $modifierCondition, string $assertMethod)
+    {
+        $this->setModifierCondition($modifierCondition);
+        $this->subject->attributeNamed('attribute_name');
+
+        $this->mockAssert->shouldReceive($assertMethod)
+            ->with('data type', 'attribute_name', 'actual value', null, 'some message')
+            ->once();
+
+        $this->assertSame($this->subject, $this->subject->containOnly('data type'));
+    }
+
+    /**
+     * Test Verify::equalTo() for attributes.
+     *
+     * @param bool   $modifierCondition
+     * @param string $assertMethod
+     *
+     * @dataProvider attributeEqualToAssertMethods
+     */
+    public function testAttributeEqualTo(bool $modifierCondition, string $assertMethod)
+    {
+        $this->setModifierCondition($modifierCondition);
+        $this->subject->attributeNamed('my_attribute');
+
+        $this->mockAssert->shouldReceive($assertMethod)
+            ->with(
+                'expected value',
+                'my_attribute',
+                'actual value',
+                'some message',
+                Mockery::any(),
+                Mockery::any(),
+                Mockery::any(),
+                Mockery::any()
+            )->once();
+
+        $this->assertSame($this->subject, $this->subject->equalTo('expected value'));
+    }
+
+    /**
+     * Test Verify::equalTo() for attributes with or without case sensitivity.
+     *
+     * @param bool   $modifierCondition
+     * @param string $assertMethod
+     *
+     * @dataProvider attributeEqualToAssertMethods
+     */
+    public function testAttributeEqualToCaseSensitive(bool $modifierCondition, string $assertMethod)
+    {
+        $this->subject = new Verify('actual with case', 'message with case');
+        $this->setModifierCondition($modifierCondition);
+        $this->subject->attributeNamed('case_sensitive_attribute');
+
+        $this->mockAssert->shouldReceive($assertMethod)
+            ->with(
+                'expected with case',
+                'case_sensitive_attribute',
+                'actual with case',
+                'message with case',
+                Mockery::any(),
+                Mockery::any(),
+                Mockery::any(),
+                false
+            )->once();
+
+        $this->assertSame($this->subject, $this->subject->withCase()->equalTo('expected with case'));
+
+        $this->subject = new Verify('actual w/o case', 'message w/o case');
+        $this->setModifierCondition($modifierCondition);
+        $this->subject->attributeNamed('uncase_sensitive_attribute');
+
+        $this->mockAssert->shouldReceive($assertMethod)
+            ->with(
+                'expected w/o case',
+                'uncase_sensitive_attribute',
+                'actual w/o case',
+                'message w/o case',
                 Mockery::any(),
                 Mockery::any(),
                 Mockery::any(),
                 true
             )->once();
 
-        $this->assertNull(verify('subject 5')->withoutCase()->equals('test 5'));
-        $this->assertNull(verify('message 6', 'subject 6')->withoutCase()->equals('test 6'));
+        $this->assertSame($this->subject, $this->subject->withoutCase()->equalTo('expected w/o case'));
     }
 
-    public function testIgnoreCaseEqualsFile()
+    /**
+     * Test Verify::equalTo() for attributes with some float delta.
+     *
+     * @param bool   $modifierCondition
+     * @param string $assertMethod
+     *
+     * @dataProvider attributeEqualToAssertMethods
+     */
+    public function testAttributeEqualToFloatDelta(bool $modifierCondition, string $assertMethod)
     {
-        // Default: false
-        $this->mockAssert->shouldReceive('assertStringEqualsFile')
+        $this->setModifierCondition($modifierCondition);
+        $this->subject->attributeNamed('my_attribute');
+
+        $this->mockAssert->shouldReceive($assertMethod)
             ->with(
-                'test 1',
-                'subject 1',
-                Mockery::any(), // Message
-                Mockery::any(), // Canonicalize
-                false
-            )->once();
-        $this->mockAssert->shouldReceive('assertStringEqualsFile')
-            ->with(
-                'test 2',
-                'subject 2',
-                'message 2',
+                'expected value',
+                'my_attribute',
+                'actual value',
+                'some message',
+                1.62,
                 Mockery::any(),
-                false
-            )->once();
-
-        $this->assertNull(verify('subject 1')->equalsFile('test 1'));
-        $this->assertNull(verify('message 2', 'subject 2')->equalsFile('test 2'));
-
-        // Explicitly false
-        $this->mockAssert->shouldReceive('assertStringEqualsFile')
-            ->with(
-                'test 3',
-                'subject 3',
-                Mockery::any(), // Message
-                Mockery::any(), // Canonicalize
-                false
-            )->once();
-        $this->mockAssert->shouldReceive('assertStringEqualsFile')
-            ->with(
-                'test 4',
-                'subject 4',
-                'message 4',
                 Mockery::any(),
-                false
+                Mockery::any()
             )->once();
 
-        $this->assertNull(verify('subject 3')->withCase()->equalsFile('test 3'));
-        $this->assertNull(verify('message 4', 'subject 4')->withCase()->equalsFile('test 4'));
-
-        // Explicitly true
-        $this->mockAssert->shouldReceive('assertStringEqualsFile')
-            ->with(
-                'test 5',
-                'subject 5',
-                Mockery::any(), // Message
-                Mockery::any(), // Canonicalize
-                true
-            )->once();
-        $this->mockAssert->shouldReceive('assertStringEqualsFile')
-            ->with(
-                'test 6',
-                'subject 6',
-                'message 6',
-                Mockery::any(),
-                true
-            )->once();
-
-        $this->assertNull(verify('subject 5')->withoutCase()->equalsFile('test 5'));
-        $this->assertNull(verify('message 6', 'subject 6')->withoutCase()->equalsFile('test 6'));
+        $this->assertSame($this->subject, $this->subject->within(1.62)->equalTo('expected value'));
     }
 
-    public function testIgnoreCaseNotContain()
+    /**
+     * Test Verify::equalTo() for attributes with or without order.
+     *
+     * @param bool   $modifierCondition
+     * @param string $assertMethod
+     *
+     * @dataProvider attributeEqualToAssertMethods
+     */
+    public function testAttributeEqualToOrder(bool $modifierCondition, string $assertMethod)
     {
-        // Default: false
-        $this->mockAssert->shouldReceive('assertNotContains')
+        $this->subject = new Verify('actual with order', 'message with order');
+        $this->setModifierCondition($modifierCondition);
+        $this->subject->attributeNamed('ordered_attribute');
+
+        $this->mockAssert->shouldReceive($assertMethod)
             ->with(
-                'test 1',
-                'subject 1',
-                Mockery::any(), // Message
-                false,
-                Mockery::any(), // Object Identity
-                Mockery::any()  // Data Type
-            )->once();
-        $this->mockAssert->shouldReceive('assertNotContains')
-            ->with(
-                'test 2',
-                'subject 2',
-                'message 2',
-                false,
+                'expected with order',
+                'ordered_attribute',
+                'actual with order',
+                'message with order',
                 Mockery::any(),
+                Mockery::any(),
+                false,
                 Mockery::any()
             )->once();
 
-        $this->assertNull(verify('subject 1')->doesNotContain('test 1'));
-        $this->assertNull(verify('message 2', 'subject 2')->doesNotContain('test 2'));
+        $this->assertSame($this->subject, $this->subject->withOrder()->equalTo('expected with order'));
 
-        // Explicitly false
-        $this->mockAssert->shouldReceive('assertNotContains')
-            ->with(
-                'test 3',
-                'subject 3',
-                Mockery::any(),
-                false,
-                Mockery::any(),
-                Mockery::any()
-            )->once();
-        $this->mockAssert->shouldReceive('assertNotContains')
-            ->with(
-                'test 4',
-                'subject 4',
-                'message 4',
-                false,
-                Mockery::any(),
-                Mockery::any()
-            )->once();
+        $this->subject = new Verify('actual w/o order', 'message w/o order');
+        $this->setModifierCondition($modifierCondition);
+        $this->subject->attributeNamed('unordered_attribute');
 
-        $this->assertNull(verify('subject 3')->withCase()->doesNotContain('test 3'));
-        $this->assertNull(verify('message 4', 'subject 4')->withCase()->doesNotContain('test 4'));
-
-        // Explicitly false
-        $this->mockAssert->shouldReceive('assertNotContains')
+        $this->mockAssert->shouldReceive($assertMethod)
             ->with(
-                'test 5',
-                'subject 5',
+                'expected w/o order',
+                'unordered_attribute',
+                'actual w/o order',
+                'message w/o order',
+                Mockery::any(),
                 Mockery::any(),
                 true,
-                Mockery::any(),
-                Mockery::any()
-            )->once();
-        $this->mockAssert->shouldReceive('assertNotContains')
-            ->with(
-                'test 6',
-                'subject 6',
-                'message 6',
-                true,
-                Mockery::any(),
                 Mockery::any()
             )->once();
 
-        $this->assertNull(verify('subject 5')->withoutCase()->doesNotContain('test 5'));
-        $this->assertNull(verify('message 6', 'subject 6')->withoutCase()->doesNotContain('test 6'));
+        $this->assertSame($this->subject, $this->subject->withoutOrder()->equalTo('expected w/o order'));
     }
 
-    public function testIgnoreCaseNotEquals()
+    /**
+     * Test Verify::contain() basic case.
+     *
+     * @param bool   $modifierCondition
+     * @param string $assertMethod
+     *
+     * @dataProvider containAssertMethods
+     */
+    public function testContain(bool $modifierCondition, string $assertMethod)
     {
-        // Default: false
-        $this->mockAssert->shouldReceive('assertNotEquals')
-            ->with(
-                'test 1',
-                'subject 1',
-                Mockery::any(), // Message
-                Mockery::any(), // Delta
-                Mockery::any(), // Max Depth
-                Mockery::any(), // Canonicalize
-                false
-            )->once();
-        $this->mockAssert->shouldReceive('assertNotEquals')
-            ->with(
-                'test 2',
-                'subject 2',
-                'message 2',
-                Mockery::any(),
-                Mockery::any(),
-                Mockery::any(),
-                false
-            )->once();
+        $this->setModifierCondition($modifierCondition);
 
-        $this->assertNull(verify('subject 1')->doesNotEqual('test 1'));
-        $this->assertNull(verify('message 2', 'subject 2')->doesNotEqual('test 2'));
+        $this->mockAssert->shouldReceive($assertMethod)
+            ->with('needle', 'actual value', 'some message', Mockery::any(), Mockery::any(), Mockery::any())
+            ->once();
 
-        // Explicitly false
-        $this->mockAssert->shouldReceive('assertNotEquals')
-            ->with(
-                'test 3',
-                'subject 3',
-                Mockery::any(),
-                Mockery::any(),
-                Mockery::any(),
-                Mockery::any(),
-                false
-            )->once();
-        $this->mockAssert->shouldReceive('assertNotEquals')
-            ->with(
-                'test 4',
-                'subject 4',
-                'message 4',
-                Mockery::any(),
-                Mockery::any(),
-                Mockery::any(),
-                false
-            )->once();
-
-        $this->assertNull(verify('subject 3')->withCase()->doesNotEqual('test 3'));
-        $this->assertNull(verify('message 4', 'subject 4')->withCase()->doesNotEqual('test 4'));
-
-        // Explicitly true
-        $this->mockAssert->shouldReceive('assertNotEquals')
-            ->with(
-                'test 5',
-                'subject 5',
-                Mockery::any(),
-                Mockery::any(),
-                Mockery::any(),
-                Mockery::any(),
-                true
-            )->once();
-        $this->mockAssert->shouldReceive('assertNotEquals')
-            ->with(
-                'test 6',
-                'subject 6',
-                'message 6',
-                Mockery::any(),
-                Mockery::any(),
-                Mockery::any(),
-                true
-            )->once();
-
-        $this->assertNull(verify('subject 5')->withoutCase()->doesNotEqual('test 5'));
-        $this->assertNull(verify('message 6', 'subject 6')->withoutCase()->doesNotEqual('test 6'));
+        $this->assertSame($this->subject, $this->subject->contain('needle'));
     }
 
-    public function testIgnoreCaseNotEqualsFile()
+    /**
+     * Test Verify::contain() with & without case sensitivity.
+     *
+     * @param bool   $modifierCondition
+     * @param string $assertMethod
+     *
+     * @dataProvider containAssertMethods
+     */
+    public function testContainCaseSensitive(bool $modifierCondition, string $assertMethod)
     {
-        // Default: false
-        $this->mockAssert->shouldReceive('assertStringNotEqualsFile')
+        $this->subject = new Verify('value with case', 'message with case');
+        $this->setModifierCondition($modifierCondition);
+
+        $this->mockAssert->shouldReceive($assertMethod)
+            ->with('needle with case', 'value with case', 'message with case', false, Mockery::any(), Mockery::any())
+            ->once();
+
+        $this->assertSame($this->subject, $this->subject->withCase()->contain('needle with case'));
+
+        $this->subject = new Verify('value w/o case', 'message w/o case');
+        $this->setModifierCondition($modifierCondition);
+
+        $this->mockAssert->shouldReceive($assertMethod)
+            ->with('needle w/o case', 'value w/o case', 'message w/o case', true, Mockery::any(), Mockery::any())
+            ->once();
+
+        $this->assertSame($this->subject, $this->subject->withoutCase()->contain('needle w/o case'));
+    }
+
+    /**
+     * Test Verify::contain() with & without data type.
+     *
+     * @param bool   $modifierCondition
+     * @param string $assertMethod
+     *
+     * @dataProvider containAssertMethods
+     */
+    public function testContainDataType(bool $modifierCondition, string $assertMethod)
+    {
+        $this->subject = new Verify('value with type', 'message with type');
+        $this->setModifierCondition($modifierCondition);
+
+        $this->mockAssert->shouldReceive($assertMethod)
+            ->with('needle with type', 'value with type', 'message with type', Mockery::any(), Mockery::any(), true)
+            ->once();
+
+        $this->assertSame($this->subject, $this->subject->withType()->contain('needle with type'));
+
+        $this->subject = new Verify('value w/o type', 'message w/o type');
+        $this->setModifierCondition($modifierCondition);
+
+        $this->mockAssert->shouldReceive($assertMethod)
+            ->with('needle w/o type', 'value w/o type', 'message w/o type', Mockery::any(), Mockery::any(), false)
+            ->once();
+
+        $this->assertSame($this->subject, $this->subject->withoutType()->contain('needle w/o type'));
+    }
+
+    /**
+     * Test Verify::contain() with & without object identity.
+     *
+     * @param bool   $modifierCondition
+     * @param string $assertMethod
+     *
+     * @dataProvider containAssertMethods
+     */
+    public function testContainObjectIdentity(bool $modifierCondition, string $assertMethod)
+    {
+        $this->subject = new Verify('value with identity', 'message with identity');
+        $this->setModifierCondition($modifierCondition);
+
+        $this->mockAssert->shouldReceive($assertMethod)
+            ->with('needle with identity', 'value with identity', 'message with identity', Mockery::any(), true, Mockery::any())
+            ->once();
+
+        $this->assertSame($this->subject, $this->subject->withIdentity()->contain('needle with identity'));
+
+        $this->subject = new Verify('value w/o identity', 'message w/o identity');
+        $this->setModifierCondition($modifierCondition);
+
+        $this->mockAssert->shouldReceive($assertMethod)
+            ->with('needle w/o identity', 'value w/o identity', 'message w/o identity', Mockery::any(), false, Mockery::any())
+            ->once();
+
+        $this->assertSame($this->subject, $this->subject->withoutIdentity()->contain('needle w/o identity'));
+    }
+
+    /**
+     * Test Verify::containOnly().
+     *
+     * @param bool   $modifierCondition
+     * @param string $assertMethod
+     *
+     * @dataProvider containOnlyAssertMethods
+     */
+    public function testContainOnly(bool $modifierCondition, string $assertMethod)
+    {
+        $this->setModifierCondition($modifierCondition);
+
+        $this->mockAssert->shouldReceive($assertMethod)
+            ->with('data type', 'actual value', null, 'some message')
+            ->once();
+
+        $this->assertSame($this->subject, $this->subject->containOnly('data type'));
+    }
+
+    /**
+     * Test Verify::equalTo().
+     *
+     * @param bool   $modifierCondition
+     * @param string $assertMethod
+     *
+     * @dataProvider equalToAssertMethods
+     */
+    public function testEqualTo(bool $modifierCondition, string $assertMethod)
+    {
+        $this->setModifierCondition($modifierCondition);
+
+        $this->mockAssert->shouldReceive($assertMethod)
             ->with(
-                'test 1',
-                'subject 1',
-                Mockery::any(), // Message
-                Mockery::any(), // Canonicalize
-                false
+                'expected value',
+                'actual value',
+                'some message',
+                Mockery::any(),
+                Mockery::any(),
+                Mockery::any(),
+                Mockery::any()
             )->once();
-        $this->mockAssert->shouldReceive('assertStringNotEqualsFile')
+
+        $this->assertSame($this->subject, $this->subject->equalTo('expected value'));
+    }
+
+    /**
+     * Test Verify::equalTo() with or without case sensitivity.
+     *
+     * @param bool   $modifierCondition
+     * @param string $assertMethod
+     *
+     * @dataProvider equalToAssertMethods
+     */
+    public function testEqualToCaseSensitive(bool $modifierCondition, string $assertMethod)
+    {
+        $this->subject = new Verify('actual with case', 'message with case');
+        $this->setModifierCondition($modifierCondition);
+
+        $this->mockAssert->shouldReceive($assertMethod)
             ->with(
-                'test 2',
-                'subject 2',
-                'message 2',
+                'expected with case',
+                'actual with case',
+                'message with case',
+                Mockery::any(),
+                Mockery::any(),
                 Mockery::any(),
                 false
             )->once();
 
-        $this->assertNull(verify('subject 1')->doesNotEqualFile('test 1'));
-        $this->assertNull(verify('message 2', 'subject 2')->doesNotEqualFile('test 2'));
+        $this->assertSame($this->subject, $this->subject->withCase()->equalTo('expected with case'));
 
-        // Explicitly false
-        $this->mockAssert->shouldReceive('assertStringNotEqualsFile')
+        $this->subject = new Verify('actual w/o case', 'message w/o case');
+        $this->setModifierCondition($modifierCondition);
+
+        $this->mockAssert->shouldReceive($assertMethod)
             ->with(
-                'test 3',
-                'subject 3',
-                Mockery::any(), // Message
-                Mockery::any(), // Canonicalize
-                false
-            )->once();
-        $this->mockAssert->shouldReceive('assertStringNotEqualsFile')
-            ->with(
-                'test 4',
-                'subject 4',
-                'message 4',
+                'expected w/o case',
+                'actual w/o case',
+                'message w/o case',
                 Mockery::any(),
-                false
-            )->once();
-
-        $this->assertNull(verify('subject 3')->withCase()->doesNotEqualFile('test 3'));
-        $this->assertNull(verify('message 4', 'subject 4')->withCase()->doesNotEqualFile('test 4'));
-
-        // Explicitly true
-        $this->mockAssert->shouldReceive('assertStringNotEqualsFile')
-            ->with(
-                'test 5',
-                'subject 5',
-                Mockery::any(), // Message
-                Mockery::any(), // Canonicalize
-                true
-            )->once();
-        $this->mockAssert->shouldReceive('assertStringNotEqualsFile')
-            ->with(
-                'test 6',
-                'subject 6',
-                'message 6',
+                Mockery::any(),
                 Mockery::any(),
                 true
             )->once();
 
-        $this->assertNull(verify('subject 5')->withoutCase()->doesNotEqualFile('test 5'));
-        $this->assertNull(verify('message 6', 'subject 6')->withoutCase()->doesNotEqualFile('test 6'));
+        $this->assertSame($this->subject, $this->subject->withoutCase()->equalTo('expected w/o case'));
     }
 
-    public function testIgnoreOrderEquals()
+    /**
+     * Test Verify::equalToFile().
+     *
+     * @param bool   $modifierCondition
+     * @param string $assertMethod
+     *
+     * @dataProvider equalToFileAssertMethods
+     */
+    public function testEqualToFile(bool $modifierCondition, string $assertMethod)
     {
-        // Default: false
-        $this->mockAssert->shouldReceive('assertEquals')
+        $this->setModifierCondition($modifierCondition);
+
+        $this->mockAssert->shouldReceive($assertMethod)
             ->with(
-                'test 1',
-                'subject 1',
-                Mockery::any(), // Message
-                Mockery::any(), // Delta
-                Mockery::any(), // Max Depth
-                false,
-                Mockery::any()  // Ignore Case
-            )->once();
-        $this->mockAssert->shouldReceive('assertEquals')
-            ->with(
-                'test 2',
-                'subject 2',
-                'message 2',
+                'file name',
+                'actual value',
+                'some message',
                 Mockery::any(),
-                Mockery::any(),
-                false,
                 Mockery::any()
             )->once();
 
-        $this->assertNull(verify('subject 1')->equals('test 1'));
-        $this->assertNull(verify('message 2', 'subject 2')->equals('test 2'));
-
-        // Explicitly false
-        $this->mockAssert->shouldReceive('assertEquals')
-            ->with(
-                'test 3',
-                'subject 3',
-                Mockery::any(),
-                Mockery::any(),
-                Mockery::any(),
-                false,
-                Mockery::any()
-            )->once();
-        $this->mockAssert->shouldReceive('assertEquals')
-            ->with(
-                'test 4',
-                'subject 4',
-                'message 4',
-                Mockery::any(),
-                Mockery::any(),
-                false,
-                Mockery::any()
-            )->once();
-
-        $this->assertNull(verify('subject 3')->withOrder()->equals('test 3'));
-        $this->assertNull(verify('message 4', 'subject 4')->withOrder()->equals('test 4'));
-
-        // Explicitly true
-        $this->mockAssert->shouldReceive('assertEquals')
-            ->with(
-                'test 5',
-                'subject 5',
-                Mockery::any(),
-                Mockery::any(),
-                Mockery::any(),
-                true,
-                Mockery::any()
-            )->once();
-        $this->mockAssert->shouldReceive('assertEquals')
-            ->with(
-                'test 6',
-                'subject 6',
-                'message 6',
-                Mockery::any(),
-                Mockery::any(),
-                true,
-                Mockery::any()
-            )->once();
-
-        $this->assertNull(verify('subject 5')->withoutOrder()->equals('test 5'));
-        $this->assertNull(verify('message 6', 'subject 6')->withoutOrder()->equals('test 6'));
+        $this->assertSame($this->subject, $this->subject->equalToFile('file name'));
     }
 
-    public function testIgnoreOrderNotEquals()
+    /**
+     * Test Verify::equalToFile() with or without case sensitivity.
+     *
+     * @param bool   $modifierCondition
+     * @param string $assertMethod
+     *
+     * @dataProvider equalToFileAssertMethods
+     */
+    public function testEqualToFileCaseSensitive(bool $modifierCondition, string $assertMethod)
     {
-        // Default: false
-        $this->mockAssert->shouldReceive('assertNotEquals')
+        $this->subject = new Verify('actual with case', 'message with case');
+        $this->setModifierCondition($modifierCondition);
+
+        $this->mockAssert->shouldReceive($assertMethod)
             ->with(
-                'test 1',
-                'subject 1',
-                Mockery::any(), // Message
-                Mockery::any(), // Delta
-                Mockery::any(), // Max Depth
-                false,
-                Mockery::any()  // Ignore Case
+                'file with case',
+                'actual with case',
+                'message with case',
+                Mockery::any(),
+                false
             )->once();
-        $this->mockAssert->shouldReceive('assertNotEquals')
+
+        $this->assertSame($this->subject, $this->subject->withCase()->equalToFile('file with case'));
+
+        $this->subject = new Verify('actual w/o case', 'message w/o case');
+        $this->setModifierCondition($modifierCondition);
+
+        $this->mockAssert->shouldReceive($assertMethod)
             ->with(
-                'test 2',
-                'subject 2',
-                'message 2',
+                'file w/o case',
+                'actual w/o case',
+                'message w/o case',
+                Mockery::any(),
+                true
+            )->once();
+
+        $this->assertSame($this->subject, $this->subject->withoutCase()->equalToFile('file w/o case'));
+    }
+
+    /**
+     * Test Verify::equalTo() with some float delta.
+     *
+     * @param bool   $modifierCondition
+     * @param string $assertMethod
+     *
+     * @dataProvider equalToAssertMethods
+     */
+    public function testEqualToFloatDelta(bool $modifierCondition, string $assertMethod)
+    {
+        $this->setModifierCondition($modifierCondition);
+
+        $this->mockAssert->shouldReceive($assertMethod)
+            ->with(
+                'expected value',
+                'actual value',
+                'some message',
+                6.28,
                 Mockery::any(),
                 Mockery::any(),
-                false,
                 Mockery::any()
             )->once();
 
-        $this->assertNull(verify('subject 1')->doesNotEqual('test 1'));
-        $this->assertNull(verify('message 2', 'subject 2')->doesNotEqual('test 2'));
+        $this->assertSame($this->subject, $this->subject->within(6.28)->equalTo('expected value'));
+    }
 
-        // Explicitly false
-        $this->mockAssert->shouldReceive('assertNotEquals')
+    /**
+     * Test Verify::equalTo() with or without order.
+     *
+     * @param bool   $modifierCondition
+     * @param string $assertMethod
+     *
+     * @dataProvider equalToAssertMethods
+     */
+    public function testEqualToOrder(bool $modifierCondition, string $assertMethod)
+    {
+        $this->subject = new Verify('actual with order', 'message with order');
+        $this->setModifierCondition($modifierCondition);
+
+        $this->mockAssert->shouldReceive($assertMethod)
             ->with(
-                'test 3',
-                'subject 3',
-                Mockery::any(),
-                Mockery::any(),
-                Mockery::any(),
-                false,
-                Mockery::any()
-            )->once();
-        $this->mockAssert->shouldReceive('assertNotEquals')
-            ->with(
-                'test 4',
-                'subject 4',
-                'message 4',
+                'expected with order',
+                'actual with order',
+                'message with order',
                 Mockery::any(),
                 Mockery::any(),
                 false,
                 Mockery::any()
             )->once();
 
-        $this->assertNull(verify('subject 3')->withOrder()->doesNotEqual('test 3'));
-        $this->assertNull(verify('message 4', 'subject 4')->withOrder()->doesNotEqual('test 4'));
+        $this->assertSame($this->subject, $this->subject->withOrder()->equalTo('expected with order'));
 
-        // Explicitly true
-        $this->mockAssert->shouldReceive('assertNotEquals')
+        $this->subject = new Verify('actual w/o order', 'message w/o order');
+        $this->setModifierCondition($modifierCondition);
+
+        $this->mockAssert->shouldReceive($assertMethod)
             ->with(
-                'test 5',
-                'subject 5',
-                Mockery::any(),
-                Mockery::any(),
-                Mockery::any(),
-                true,
-                Mockery::any()
-            )->once();
-        $this->mockAssert->shouldReceive('assertNotEquals')
-            ->with(
-                'test 6',
-                'subject 6',
-                'message 6',
+                'expected w/o order',
+                'actual w/o order',
+                'message w/o order',
                 Mockery::any(),
                 Mockery::any(),
                 true,
                 Mockery::any()
             )->once();
 
-        $this->assertNull(verify('subject 5')->withoutOrder()->doesNotEqual('test 5'));
-        $this->assertNull(verify('message 6', 'subject 6')->withoutOrder()->doesNotEqual('test 6'));
+        $this->assertSame($this->subject, $this->subject->withoutOrder()->equalTo('expected w/o order'));
     }
 
-    public function testInstanceOf()
+    /**
+     * Test Verify::equalToXmlStructure().
+     */
+    public function testEqualToXmlStructure()
     {
-        $this->fireTwoValueTest('isInstanceOf', 'assertInstanceOf');
-        $this->fireTwoValueTest('isNotInstanceOf', 'assertNotInstanceOf');
-    }
+        $this->setModifierCondition(true);
 
-    public function testInternalType()
-    {
-        $this->fireTwoValueTest('isInternalType', 'assertInternalType');
-        $this->fireTwoValueTest('isNotInternalType', 'assertNotInternalType');
-    }
-
-    public function testJsonMethods()
-    {
-        $this->fireSingleValueTest('isJson', 'assertJson');
-
-        $this->fireTwoValueTest('equalsJsonString', 'assertJsonStringEqualsJsonString');
-        $this->fireTwoValueTest('doesNotEqualJsonString', 'assertJsonStringNotEqualsJsonString');
-
-        $this->fireTwoValueTest('equalsJsonFile', 'assertJsonStringEqualsJsonFile');
-        $this->fireTwoValueTest('doesNotEqualJsonFile', 'assertJsonStringNotEqualsJsonFile');
-    }
-
-    public function testNotContain()
-    {
-        $this->mockAssert->shouldReceive('assertNotContains')
-            ->with(
-                'test 1',
-                'subject 1',
-                Mockery::any(), // Message
-                Mockery::any(), // Ignore Case
-                Mockery::any(), // Object Identity
-                Mockery::any()  // Data Type
-            )->once();
-        $this->mockAssert->shouldReceive('assertNotContains')
-            ->with(
-                'test 2',
-                'subject 2',
-                'message',
-                Mockery::any(),
-                Mockery::any(),
-                Mockery::any()
-            )->once();
-
-        $this->assertNull(verify('subject 1')->doesNotContain('test 1'));
-        $this->assertNull(verify('message', 'subject 2')->doesNotContain('test 2'));
-    }
-
-    public function testNotEquals()
-    {
-        $this->mockAssert->shouldReceive('assertNotEquals')
-            ->with(
-                'test 1',
-                'subject 1',
-                Mockery::any(), // Message
-                Mockery::any(), // Delta
-                Mockery::any(), // Max Depth
-                Mockery::any(), // Canonicalize
-                Mockery::any()  // Ignore Case
-            )->once();
-        $this->mockAssert->shouldReceive('assertNotEquals')
-            ->with(
-                'test 2',
-                'subject 2',
-                'message',
-                Mockery::any(),
-                Mockery::any(),
-                Mockery::any(),
-                Mockery::any()
-            )->once();
-
-        $this->assertNull(verify('subject 1')->doesNotEqual('test 1'));
-        $this->assertNull(verify('message', 'subject 2')->doesNotEqual('test 2'));
-    }
-
-    public function testNotEqualsFile()
-    {
-        $this->mockAssert->shouldReceive('assertStringNotEqualsFile')
-            ->with(
-                'test 1',
-                'subject 1',
-                Mockery::any(), // Message
-                Mockery::any(), // Canonicalize
-                Mockery::any()  // Ignore Case
-            )->once();
-        $this->mockAssert->shouldReceive('assertStringNotEqualsFile')
-            ->with(
-                'test 2',
-                'subject 2',
-                'message',
-                Mockery::any(),
-                Mockery::any()
-            )->once();
-
-        $this->assertNull(verify('subject 1')->doesNotEqualFile('test 1'));
-        $this->assertNull(verify('message', 'subject 2')->doesNotEqualFile('test 2'));
-    }
-
-    public function testObjectIdentityContains()
-    {
-        // Default: true
-        $this->mockAssert->shouldReceive('assertContains')
-            ->with(
-                'test 1',
-                'subject 1',
-                Mockery::any(), // Message
-                Mockery::any(), // Ignore Case
-                true,
-                Mockery::any()  // Data Type
-            )->once();
-        $this->mockAssert->shouldReceive('assertContains')
-            ->with(
-                'test 2',
-                'subject 2',
-                'message 2',
-                Mockery::any(),
-                true,
-                Mockery::any()
-            )->once();
-
-        $this->assertNull(verify('subject 1')->contains('test 1'));
-        $this->assertNull(verify('message 2', 'subject 2')->contains('test 2'));
-
-        // Explicitly false
-        $this->mockAssert->shouldReceive('assertContains')
-            ->with(
-                'test 3',
-                'subject 3',
-                Mockery::any(),
-                Mockery::any(),
-                false,
-                Mockery::any()
-            )->once();
-        $this->mockAssert->shouldReceive('assertContains')
-            ->with(
-                'test 4',
-                'subject 4',
-                'message 4',
-                Mockery::any(),
-                false,
-                Mockery::any()
-            )->once();
-
-        $this->assertNull(verify('subject 3')->withoutIdentity()->contains('test 3'));
-        $this->assertNull(verify('message 4', 'subject 4')->withoutIdentity()->contains('test 4'));
-
-        // Explicitly false
-        $this->mockAssert->shouldReceive('assertContains')
-            ->with(
-                'test 5',
-                'subject 5',
-                Mockery::any(),
-                Mockery::any(),
-                true,
-                Mockery::any()
-            )->once();
-        $this->mockAssert->shouldReceive('assertContains')
-            ->with(
-                'test 6',
-                'subject 6',
-                'message 6',
-                Mockery::any(),
-                true,
-                Mockery::any()
-            )->once();
-
-        $this->assertNull(verify('subject 5')->withIdentity()->contains('test 5'));
-        $this->assertNull(verify('message 6', 'subject 6')->withIdentity()->contains('test 6'));
-    }
-
-    public function testObjectIdentityNotContains()
-    {
-        // Default: true
-        $this->mockAssert->shouldReceive('assertNotContains')
-            ->with(
-                'test 1',
-                'subject 1',
-                Mockery::any(), // Message
-                Mockery::any(), // Ignore Case
-                true,
-                Mockery::any()  // Data Type
-            )->once();
-        $this->mockAssert->shouldReceive('assertNotContains')
-            ->with(
-                'test 2',
-                'subject 2',
-                'message 2',
-                Mockery::any(),
-                true,
-                Mockery::any()
-            )->once();
-
-        $this->assertNull(verify('subject 1')->doesNotContain('test 1'));
-        $this->assertNull(verify('message 2', 'subject 2')->doesNotContain('test 2'));
-
-        // Explicitly false
-        $this->mockAssert->shouldReceive('assertNotContains')
-            ->with(
-                'test 3',
-                'subject 3',
-                Mockery::any(),
-                Mockery::any(),
-                false,
-                Mockery::any()
-            )->once();
-        $this->mockAssert->shouldReceive('assertNotContains')
-            ->with(
-                'test 4',
-                'subject 4',
-                'message 4',
-                Mockery::any(),
-                false,
-                Mockery::any()
-            )->once();
-
-        $this->assertNull(verify('subject 3')->withoutIdentity()->doesNotContain('test 3'));
-        $this->assertNull(verify('message 4', 'subject 4')->withoutIdentity()->doesNotContain('test 4'));
-
-        // Explicitly false
-        $this->mockAssert->shouldReceive('assertNotContains')
-            ->with(
-                'test 5',
-                'subject 5',
-                Mockery::any(),
-                Mockery::any(),
-                true,
-                Mockery::any()
-            )->once();
-        $this->mockAssert->shouldReceive('assertNotContains')
-            ->with(
-                'test 6',
-                'subject 6',
-                'message 6',
-                Mockery::any(),
-                true,
-                Mockery::any()
-            )->once();
-
-        $this->assertNull(verify('subject 5')->withIdentity()->doesNotContain('test 5'));
-        $this->assertNull(verify('message 6', 'subject 6')->withIdentity()->doesNotContain('test 6'));
-    }
-
-    public function testRegExpFormats()
-    {
-        $this->fireTwoValueTest('matchesRegExp', 'assertRegExp');
-        $this->fireTwoValueTest('doesNotMatchRegExp', 'assertNotRegExp');
-
-        $this->fireTwoValueTest('matchesFormat', 'assertStringMatchesFormat');
-        $this->fireTwoValueTest('doesNotMatchFormat', 'assertStringNotMatchesFormat');
-
-        $this->fireTwoValueTest('matchesFormatFile', 'assertStringMatchesFormatFile');
-        $this->fireTwoValueTest('doesNotMatchFormatFile', 'assertStringNotMatchesFormatFile');
-    }
-
-    public function testRelativeInequality()
-    {
-        $this->fireTwoValueTest('isGreaterThan', 'assertGreaterThan');
-        $this->fireTwoValueTest('isLessThan', 'assertLessThan');
-        $this->fireTwoValueTest('isGreaterOrEqualTo', 'assertGreaterThanOrEqual');
-        $this->fireTwoValueTest('isLessOrEqualTo', 'assertLessThanOrEqual');
-    }
-
-    public function testSame()
-    {
-        $this->fireTwoValueTest('sameAs', 'assertSame');
-        $this->fireTwoValueTest('notSameAs', 'assertNotSame');
-    }
-
-    public function testShortHandMethods()
-    {
-        $this->mockAssert->shouldReceive('assertNotEmpty')->with('subject', Mockery::any())->once();
-        $this->mockAssert->shouldReceive('assertEmpty')->with('subject', Mockery::any())->once();
-
-        $this->assertNull(verify_that('subject'));
-        $this->assertNull(verify_not('subject'));
-    }
-
-    public function testSize()
-    {
-        $this->fireTwoValueTest('sameSizeAs', 'assertSameSize');
-        $this->fireTwoValueTest('notSameSizeAs', 'assertNotSameSize');
-    }
-
-    public function testStartsEndsWith()
-    {
-        $this->fireTwoValueTest('startsWith', 'assertStringStartsWith');
-        $this->fireTwoValueTest('doesNotStartWith', 'assertStringStartsNotWith');
-
-        $this->fireTwoValueTest('endsWith', 'assertStringEndsWith');
-        $this->fireTwoValueTest('doesNotEndWith', 'assertStringEndsNotWith');
-    }
-
-    public function testTrueFalseNullEmpty()
-    {
-        $this->fireSingleValueTest('isTrue', 'assertTrue');
-        $this->fireSingleValueTest('isNotTrue', 'assertNotTrue');
-        $this->fireSingleValueTest('isFalse', 'assertFalse');
-        $this->fireSingleValueTest('isNotFalse', 'assertNotFalse');
-        $this->fireSingleValueTest('isNull', 'assertNull');
-        $this->fireSingleValueTest('isNotNull', 'assertNotNull');
-        $this->fireSingleValueTest('isEmpty', 'assertEmpty');
-        $this->fireSingleValueTest('isNotEmpty', 'assertNotEmpty');
-    }
-
-    public function testVerifyFunction()
-    {
-        $obj = verify('value');
-
-        $this->assertAttributeSame('value', 'actual', $obj);
-        $this->assertAttributeEmpty('description', $obj);
-
-        $this->assertInstanceOf('BeBat\\Verify\\Verify', $obj);
-
-        $obj = verify('message', 'value');
-
-        $this->assertAttributeSame('value', 'actual', $obj);
-        $this->assertAttributeSame('message', 'description', $obj);
-
-        $this->assertInstanceOf('BeBat\\Verify\\Verify', $obj);
-    }
-
-    public function testVerifyTooFewArgs()
-    {
-        $this->expectException('BadMethodCallException');
-        verify();
-    }
-
-    public function testVerifyTooManyArgs()
-    {
-        $this->expectException('BadMethodCallException');
-        verify('arg1', 'arg2', 'arg3');
-    }
-
-    public function testXmlFilesString()
-    {
-        $this->fireTwoValueTest('equalsXmlFile', 'assertXmlStringEqualsXmlFile');
-        $this->fireTwoValueTest('doesNotEqualXmlFile', 'assertXmlStringNotEqualsXmlFile');
-
-        $this->fireTwoValueTest('equalsXmlString', 'assertXmlStringEqualsXmlString');
-        $this->fireTwoValueTest('doesNotEqualXmlString', 'assertXmlStringNotEqualsXmlString');
-    }
-
-    public function testXmlStructure()
-    {
-        $subject1 = new DOMDocument();
-        $target1  = new DOMElement('target1');
-
-        // Default: false
-        $this->mockAssert->shouldReceive('assertEqualXMLStructure')
-            ->with($target1, $subject1, false, Mockery::any())->once();
-        $this->mockAssert->shouldReceive('assertEqualXMLStructure')
-            ->with($target1, $subject1, false, 'message')->once();
-
-        $this->assertNull(verify($subject1)->equalsXmlStructure($target1));
-        $this->assertNull(verify('message', $subject1)->equalsXmlStructure($target1));
-
-        // Explicitly false
-        $subject2 = new DOMDocument();
-        $target2  = new DOMElement('target2');
+        $expected = new DOMElement('expected');
 
         $this->mockAssert->shouldReceive('assertEqualXMLStructure')
-            ->with($target2, $subject2, false, Mockery::any())->once();
+            ->with($expected, 'actual value', Mockery::any(), 'some message')
+            ->once();
+
+        $this->assertSame($this->subject, $this->subject->equalToXmlStructure($expected));
+
+        $this->subject = new Verify('actual with attributes', 'message with attributes');
+        $this->setModifierCondition(true);
+
+        $expected = new DOMElement('with_attributes');
+
         $this->mockAssert->shouldReceive('assertEqualXMLStructure')
-            ->with($target2, $subject2, false, 'message')->once();
+            ->with($expected, 'actual with attributes', true, 'message with attributes')
+            ->once();
 
-        $this->assertNull(verify($subject2)->withoutAttributes()->equalsXmlStructure($target2));
-        $this->assertNull(verify('message', $subject2)->withoutAttributes()->equalsXmlStructure($target2));
+        $this->assertSame($this->subject, $this->subject->withAttributes()->equalToXmlStructure($expected));
 
-        // Explicitly false
-        $subject3 = new DOMDocument();
-        $target3  = new DOMElement('target3');
+        $this->subject = new Verify('actual w/o attributes', 'message w/o attributes');
+        $this->setModifierCondition(true);
+
+        $expected = new DOMElement('without_attributes');
 
         $this->mockAssert->shouldReceive('assertEqualXMLStructure')
-            ->with($target3, $subject3, true, Mockery::any())->once();
-        $this->mockAssert->shouldReceive('assertEqualXMLStructure')
-            ->with($target3, $subject3, true, 'message')->once();
+            ->with($expected, 'actual w/o attributes', false, 'message w/o attributes')
+            ->once();
 
-        $this->assertNull(verify($subject3)->withAttributes()->equalsXmlStructure($target3));
-        $this->assertNull(verify('message', $subject3)->withAttributes()->equalsXmlStructure($target3));
+        $this->assertSame($this->subject, $this->subject->withoutAttributes()->equalToXmlStructure($expected));
+    }
+
+    /**
+     * Test MissingConditionException is thrown for all methods.
+     *
+     * @param string $verifyMethod
+     * @param mixed  $value
+     *
+     * @dataProvider allVerifyMethods
+     */
+    public function testMissingConditionException(string $verifyMethod, $value = 'dummy value')
+    {
+        $this->expectException(MissingConditionException::class);
+
+        $this->subject->{$verifyMethod}($value);
+    }
+
+    /**
+     * Test verify methods that don't take any value.
+     *
+     * @param bool   $modifierCondition
+     * @param string $verifyMethod
+     * @param string $assertMethod
+     *
+     * @dataProvider noParamMethods
+     */
+    public function testNoParamMethods(bool $modifierCondition, string $verifyMethod, string $assertMethod)
+    {
+        $this->setModifierCondition($modifierCondition);
+
+        $this->mockAssert->shouldReceive($assertMethod)
+            ->with('actual value', 'some message')
+            ->once();
+
+        $this->assertSame($this->subject, $this->subject->{$verifyMethod}());
+    }
+
+    /**
+     * Test verify methods that take in a single value for comparison.
+     *
+     * @param bool   $modifierCondition
+     * @param string $verifyMethod
+     * @param string $assertMethod
+     * @param mixed  $expectedValue
+     *
+     * @dataProvider singleParamMethods
+     */
+    public function testSingleParamMethods(
+        bool $modifierCondition,
+        string $verifyMethod,
+        string $assertMethod,
+        $expectedValue = 'some value'
+    ) {
+        $this->setModifierCondition($modifierCondition);
+
+        $this->mockAssert->shouldReceive($assertMethod)
+            ->with($expectedValue, 'actual value', 'some message')
+            ->once();
+
+        $this->assertSame($this->subject, $this->subject->{$verifyMethod}($expectedValue));
+    }
+
+    /**
+     * Test Verify::subset().
+     */
+    public function testSubset()
+    {
+        $this->setModifierCondition(true);
+
+        $this->mockAssert->shouldReceive('assertArraySubset')
+            ->with('subset', 'actual value', Mockery::any(), 'some message')
+            ->once();
+
+        $this->assertSame($this->subject, $this->subject->subset('subset'));
+
+        $this->subject = new Verify('actual with type', 'message with type');
+        $this->setModifierCondition(true);
+
+        $this->mockAssert->shouldReceive('assertArraySubset')
+            ->with('subset with type', 'actual with type', true, 'message with type')
+            ->once();
+
+        $this->assertSame($this->subject, $this->subject->withType()->subset('subset with type'));
+
+        $this->subject = new Verify('actual w/o type', 'message w/o type');
+        $this->setModifierCondition(true);
+
+        $this->mockAssert->shouldReceive('assertArraySubset')
+            ->with('subset w/o type', 'actual w/o type', false, 'message w/o type')
+            ->once();
+
+        $this->assertSame($this->subject, $this->subject->withoutType()->subset('subset w/o type'));
+    }
+
+    /**
+     * Test methods that do not support negative conditions throw an exception.
+     *
+     * @param string $methodName
+     * @param mixed  $value
+     *
+     * @dataProvider methodsWithoutNegativeCondition
+     */
+    public function testUnsupportedNegativeCondition(string $methodName, $value = 'dummy value')
+    {
+        $this->setModifierCondition(false);
+
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessage($methodName . ' does not support negative condition.');
+
+        $this->subject->{$methodName}($value);
+    }
+
+    protected function setModifierCondition(bool $value)
+    {
+        $reflection       = new \ReflectionObject($this->subject);
+        $modifierProperty = $reflection->getProperty('modifierCondition');
+        $modifierProperty->setAccessible(true);
+        $modifierProperty->setValue($this->subject, $value);
     }
 }

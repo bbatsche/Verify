@@ -20,7 +20,8 @@ class VerifyFile extends VerifyBase
      */
     public function doesNotEqual($expected)
     {
-        a::assertFileNotEquals($expected, $this->actual, $this->description, $this->ignoreOrder, $this->ignoreCase);
+        // $canonicalize hard coded to false as it has no effect.
+        a::assertFileNotEquals($expected, $this->actual, $this->description, false, $this->ignoreCase);
     }
 
     /**
@@ -58,7 +59,8 @@ class VerifyFile extends VerifyBase
      */
     public function equals($expected)
     {
-        a::assertFileEquals($expected, $this->actual, $this->description, $this->ignoreOrder, $this->ignoreCase);
+        // $canonicalize hard coded to false as it has no effect.
+        a::assertFileEquals($expected, $this->actual, $this->description, false, $this->ignoreCase);
     }
 
     /**

@@ -11,9 +11,26 @@ namespace BeBat\Verify;
  * At this point, just the constructor and common properties to both.
  *
  * @abstract
+ *
+ * @method self and()
+ * @method self be()
+ * @method self does()
+ * @method self doesNot()
+ * @method self has()
+ * @method self have()
+ * @method self is()
+ * @method self isNot()
+ * @method self will()
+ * @method self willNot()
  */
 abstract class VerifyBase
 {
+    public static $negativeConjunctions = ['doesNot', 'isNot', 'willNot'];
+
+    public static $neutralConjunctions = ['and', 'be', 'have'];
+
+    public static $positiveConjunctions = ['does', 'has', 'is', 'will'];
+
     /**
      * Actual value for Subject Under Test (SUT).
      *
@@ -36,11 +53,11 @@ abstract class VerifyBase
     protected $ignoreCase = false;
 
     /**
-     * Ignore element ordering when checking array values.
+     * Whether the condition we're asserting is positive or negative.
      *
      * @var bool
      */
-    protected $ignoreOrder = false;
+    protected $modifierCondition;
 
     /**
      * Constructor; shared between Verify and VerifyFile.
@@ -55,11 +72,40 @@ abstract class VerifyBase
     }
 
     /**
+     * Set positive or negative modifier and chain method calls along.
+     *
+     * @param string $method
+     * @param array  $arguments
+     *
+     * @return self
+     */
+    public function __call(string $method, array $arguments = []): self
+    {
+        if (\in_array($method, self::$positiveConjunctions)) {
+            $this->modifierCondition = true;
+
+            return $this;
+        }
+
+        if (\in_array($method, self::$negativeConjunctions)) {
+            $this->modifierCondition = false;
+
+            return $this;
+        }
+
+        if (\in_array($method, self::$neutralConjunctions)) {
+            return $this;
+        }
+
+        throw new \BadMethodCallException("Unknown method {$method}.");
+    }
+
+    /**
      * Turn on case sensitivity when checking SUT.
      *
      * @return self
      */
-    public function withCase()
+    public function withCase(): self
     {
         $this->ignoreCase = false;
 
@@ -71,7 +117,7 @@ abstract class VerifyBase
      *
      * @return self
      */
-    public function withoutCase()
+    public function withoutCase(): self
     {
         $this->ignoreCase = true;
 
