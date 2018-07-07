@@ -50,7 +50,8 @@
         "cs-check": "php-cs-fixer fix -v --allow-risky=yes --ansi --dry-run --diff",
         "cs-check-file": "php-cs-fixer fix -v --allow-risky=yes --ansi --dry-run --diff --path-mode=intersection",
         "cs-fix": "php-cs-fixer fix -v --allow-risky=yes --ansi",
-        "test": "phpunit --colors=always"
+        "test": "phpunit --colors=always",
+        "test-coverage": "phpunit --coverage-clover=coverage.xml"
     },
     "extra": {
         "branch-alias": {
