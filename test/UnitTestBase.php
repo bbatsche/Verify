@@ -8,8 +8,9 @@ use BeBat\Verify\Assert;
 use BeBat\Verify\MissingConditionException;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use PHPUnit\Framework\TestCase;
 
-abstract class UnitTestBase extends \PHPUnit\Framework\TestCase
+abstract class UnitTestBase extends TestCase
 {
     use MockeryPHPUnitIntegration;
 

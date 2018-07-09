@@ -12,7 +12,7 @@ namespace BeBat\Verify;
  *                                  will be used as a description to display if the assertion fails.
  * @param mixed        $actual      Optional value for SUT when called with two arguments
  *
- * @throws \BadMethodCallException When called with 0 arguments, or more than two arguments
+ * @throws \BadFunctionCallException When called with 0 arguments, or more than two arguments
  *
  * @return \BeBat\Verify\Verify
  */
@@ -24,7 +24,7 @@ function verify()
         case 2:
             return new Verify(\func_get_arg(1), \func_get_arg(0));
         default:
-            throw new \BadMethodCallException('verify() must be called with exactly 1 or 2 arguments.');
+            throw new \BadFunctionCallException('verify() must be called with exactly 1 or 2 arguments.');
     }
 }
 
@@ -56,7 +56,7 @@ function verify_not($fallacy)
  *                            will be used as a description to display if the assertion fails.
  * @param string $actual      Optional file name for SUT when called with two arguments
  *
- * @throws \BadMethodCallException When called with 0 arguments, or more than two arguments
+ * @throws \BadFunctionCallException When called with 0 arguments, or more than two arguments
  *
  * @return \BeBat\Verify\VerifyFile
  */
@@ -68,7 +68,7 @@ function verify_file()
         case 2:
             return new VerifyFile(\func_get_arg(1), \func_get_arg(0));
         default:
-            throw new \BadMethodCallException('verify_file() must be called with exactly 1 or 2 arguments.');
+            throw new \BadFunctionCallException('verify_file() must be called with exactly 1 or 2 arguments.');
     }
 }
 
@@ -80,7 +80,7 @@ function verify_file()
  *                            will be used as a description to display if the assertion fails.
  * @param string $actual      Optional file name for SUT when called with two arguments
  *
- * @throws \BadMethodCallException When called with 0 arguments, or more than two arguments
+ * @throws \BadFunctionCallException When called with 0 arguments, or more than two arguments
  *
  * @return \BeBat\Verify\VerifyDirectory
  */
@@ -92,6 +92,6 @@ function verify_directory()
         case 2:
             return new VerifyDirectory(\func_get_arg(1), \func_get_arg(0));
         default:
-            throw new \BadMethodCallException('verify_directory() must be called with exactly 1 or 2 arguments.');
+            throw new \BadFunctionCallException('verify_directory() must be called with exactly 1 or 2 arguments.');
     }
 }
