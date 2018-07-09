@@ -664,6 +664,35 @@ class VerifyTest extends UnitTestBase
     }
 
     /**
+     * Test exception for invalid conjunction.
+     */
+    public function testConjunctionException()
+    {
+        $this->expectException(\BadMethodCallException::class);
+        $this->subject->some_invalid_conjunction();
+        $this->assertAttributeSame(null, 'modifierCondition', $this->subject);
+    }
+
+    /**
+     * Test conjunction magic method.
+     */
+    public function testConjunctions()
+    {
+        Verify::$positiveConjunctions = ['positive_conjunction'];
+        Verify::$negativeConjunctions = ['negative_conjunction'];
+        Verify::$neutralConjunctions  = ['neutral_conjunction'];
+
+        $this->assertSame($this->subject, $this->subject->neutral_conjunction());
+        $this->assertAttributeSame(null, 'modifierCondition', $this->subject);
+
+        $this->assertSame($this->subject, $this->subject->positive_conjunction());
+        $this->assertAttributeSame(true, 'modifierCondition', $this->subject);
+
+        $this->assertSame($this->subject, $this->subject->negative_conjunction());
+        $this->assertAttributeSame(false, 'modifierCondition', $this->subject);
+    }
+
+    /**
      * Test Verify::contain() basic case.
      *
      * @param bool   $modifierCondition
