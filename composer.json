@@ -52,10 +52,5 @@
         "cs-fix": "php-cs-fixer fix -v --allow-risky=yes --ansi",
         "test": "phpunit --colors=always",
         "test-coverage": "phpunit --coverage-clover=coverage.xml"
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "2.0-dev"
-        }
     }
 }
