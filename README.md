@@ -38,7 +38,7 @@ To install the current version of Verify from [Packagist](https://packagist.org/
 composer require --dev bebat/verify
 ```
 
-Verify will be added to your `composer.json` under `require-dev` and installed in your `vendor` directory. Verify takes advantage of PHP ability to namespace functions, so to have it in your unit tests you should add `use function` statements to the top of your files:
+Verify will be added to your `composer.json` under `require-dev` and installed in your `vendor` directory. Verify uses namespaced functions, so to include it in your unit tests you should add `use function` statements to the top of your files:
 
 ```php
 // assertions for code
@@ -53,7 +53,7 @@ You can then start using it in your unit tests.
 
 ## Basic Usage
 
-To use Verify in your unit tests, call the `verify()` function followed by one or more conjunction, and then the assertion(s). For example:
+To use Verify in your unit tests, call the `verify()` function, followed by one or more conjunction, and then your assertion(s). For example:
 
 ```php
 $testValue = true;
@@ -74,6 +74,7 @@ To better match TDD/BDD style, you may wish to give Verify's functions a differe
 ```php
 use function BeBat\Verify\verify as expect;
 use function BeBat\Verify\verify_file as expect_file;
+use function BeBat\Verify\verify_directory as expect_directory;
 ```
 
 Now, in your unit test code, you can write:
@@ -86,7 +87,7 @@ expect('test value should not equal "bad value"', $testValue)->willNot()->be()->
 
 ## Conjunctions
 
-Conjunctions are used tie your *subject* to your *assertions*. They control whether the assertion is "positive" (ie, assert that subject *is* a certain value) or "negative" (subject *is not* a certain value). There are also "neutral" conjunctions that do not change whether the assertion is positive or negative; they can be used to aid in readability in your tests. The default set of conjunctions are as follows:
+Conjunctions are used tie your *subject* to your *assertions*. They control whether the assertion is "positive" (ie, assert that subject *is* a certain value) or "negative" (subject *is not* a certain value). There are also "neutral" conjunctions that do not change whether the assertion is positive or negative; they can be used to make your tests a bit more readable. The default set of conjunctions are as follows:
 
 - **Positive**
     - `is()`
@@ -104,16 +105,19 @@ Conjunctions are used tie your *subject* to your *assertions*. They control whet
 
 ### Custom Conjunctions
 
-Conjunctions are configured through a set of static arrays or strings in `BeBat\Verify\VerifyBase`. This is done so that they can be tailored to developers native grammar and language patterns if necessary. You can manipulate these value like you would any other array. For example:
+Conjunctions are configured through a set of static arrays of strings in `BeBat\Verify\VerifyBase`. This is done so that they can be tailored to developers' native grammar and language patterns if necessary. You can manipulate these value like you would any other array. For example:
 
 ```php
-BeBat\Verify\Verify::$positiveConjuctions[] = 'to';
-BeBat\Verify\Verify::$positiveConjuctions[] = 'should';
-BeBat\Verify\Verify::$negativeConjuctions[] = 'shouldNot';
-BeBat\Verify\Verify::$neutraleConjuctions[] = 'also';
+BeBat\Verify\Verify::$positiveConjunctions[] = 'to';
+BeBat\Verify\Verify::$positiveConjunctions[] = 'should';
+
+BeBat\Verify\Verify::$negativeConjunctions[] = 'shouldNot';
+
+BeBat\Verify\Verify::$neutralConjunctions[] = 'also';
+BeBat\Verify\Verify::$neutralConjunctions[] = 'or';
 ```
 
-You should add that somewhere in your test suite's bootstrap code so that it is done before any assertions are performed and is shared across your tests.
+This should be performed somewhere in your test suite's bootstrap code so that it is done before any assertions are called and is shared across your tests.
 
 ## Available Assertions
 
@@ -127,6 +131,7 @@ verify($objectInstance)->is()->sameAs($sameObjectInstance);
 
 verify($test)->is()->equalToFile('/path/to/file.txt');
 
+
 // Truthiness
 verify($value)->is()->true();
 verify($value)->is()->false();
@@ -135,11 +140,18 @@ verify($value)->is()->null();
 
 verify($value)->is()->empty();
 
+
 // Numeric Comparison
 verify($numericValue)->is()->greaterThan($tooSmall);
 verify($numericValue)->is()->greaterOrEqualTo($min);
 verify($numericValue)->is()->lessThan($tooBig);
 verify($numericValue)->is()->lessOrEqualTo($max);
+
+verify($numericValue)->is()->finite();
+verify($numericValue)->is()->infinite();
+verify($numericValue)->is()->nan();
+// Note: nan() does not support negative assertions
+
 
 // String Values
 verify($stringTest)->will()->contain('expected value');
@@ -151,6 +163,7 @@ verify($stringTest)->will()->matchRegExp('/[a-zA-Z]+/');
 
 verify($stringTest)->will()->matchFormat('%i');
 verify($stringTest)->will()->matchFormatFile('/path/to/format.txt');
+
 
 // Array Elements
 verify($arrayValue)->will()->contain('expected value');
@@ -166,17 +179,18 @@ verify($arrayValue)->is()->sameSizeAs($someOtherArray);
 // // Contains only methods work for both object instances and internal types
 verify($arrayValue)->will()->containOnly('string');
 
+
 // Objects, Classes, and Internal Types
 verify($object)->is()->instanceOf('ClassName');
 
 verify($value)->is()->internalType('int');
-verify($value)->isNotInternalType('boolean');
 
 verify($object)->has()->attribute('attributeName');
 
 verify('ClassName')->has()->attribute('attributeName');
 
 verify('ClassName')->has()->staticAttribute('attributeName');
+
 
 // JSON and XML
 verify($jsonValue)->is()->json();
@@ -280,7 +294,7 @@ verify([1, 2, 3])->withOrder()->is()->equalTo([1, 2, 3]);
 verify([1, 2, 3])->withoutOrder()->is()->equalTo([3, 1, 2]);
 
 // Whether to check for identity when comparing object values
-verify([$objectA])->withIdentity()->wll()->contain($objectA);
+verify([$objectA])->withIdentity()->will()->contain($objectA);
 verify([$objectA])->withoutIdentity()->does()->contain($objectB);
 
 // Whether to include type when comparing values
@@ -305,9 +319,9 @@ verify($value)->is()->internalType('array')
     ->and()->will()->contain('my value');
 ```
 
-The above performs three separate assertions against `$value` in sequence, without haven't to redeclare our subject, and does so in a concise, easy to read syntax.
+The above performs three separate assertions against `$value` in sequence, without having to redeclare our subject, and does so in a concise, easy to read syntax.
 
-You can switch between positive and negative assertions on the fly, the condition will apply to whatever assertions follow the most recent conjunction. For example:
+You can switch between positive and negative assertions on the fly--the condition will apply to whatever assertions follow the most recent conjunction. For example:
 
 ```php
 verify($value)->will()->contain('value 1')
@@ -316,7 +330,7 @@ verify($value)->will()->contain('value 1')
     ->and()->doesNot()->contain('value d');
 ```
 
-The above snippet will assert that `$value` contains `'value 1'` and `'value 2'`, and does *not* contain `'value c'` and `'value d'`. Notice that the second use of `doesNot()` is optional and was only included to aide in readability.
+The above snippet will assert that `$value` contains `'value 1'` and `'value 2'`, and does *not* contain `'value c'` or `'value d'`. Notice that the second use of `doesNot()` is optional and was only included to aide in readability.
 
 Chaining also applies to attributes and modifiers. The only exception is that once your chain contains an attribute, you can no longer add assertions about their containing object. Put another way, always write your assertions about an object *first* before writing any about its attributes. For example:
 
