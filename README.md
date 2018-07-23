@@ -21,13 +21,12 @@ Most of the original work was done by [@DavertMik](http://github.com/DavertMik) 
 - [Basic Usage](#basic-usage)
     - [Alternate Functions](#alternate-functions)
 - [Conjunctions](#conjunctions)
-    - [Custom Conjunctions](#custom-conjuctions)
+    - [Custom Conjunctions](#custom-conjunctions)
 - [Available Assertions](#available-assertions)
     - [File Assertions](#file-assertions)
     - [Directory Assertions](#directory-assertions)
     - [Attribute Assertions](#attribute-assertions)
     - [Assertion Modifiers](#assertion-modifiers)
-- [Additional Information](#additional-information)
 - [Chaining Assertions](#chaining-assertions)
 
 ## Installation
@@ -206,6 +205,30 @@ verify($xmlString)->is()->equalToXmlString('<valid><xml /></valid>');
 verify($xmlString)->is()->equalToXmlFile('/path/to/file.xml');
 ```
 
+### File Assertions
+
+If the subject under test is a file, you must use the `verify_file()` function to access filesystem assertions.
+
+```php
+verify_file('/path/to/test.txt')->does()->exist();
+verify_file('/path/to/test.txt')->is()->readable();
+verify_file('/path/to/test.txt')->is()->writable();
+
+verify_file('/path/to/test.txt')->is()->equalTo('/path/to/b.txt');
+verify_file('/path/to/test.json')->is()->equalToJsonFile('/path/to/other.json');
+verify_file('/path/to/test.xml')->is()->equalToXmlFile('/path/to/other.xml');
+```
+
+### Directory Assertions
+
+There are also a handful of assertions specific to directories. To call these assertions, use the `verify_directory()` function.
+
+```php
+verify_directory('/path/to/test/dir')->does()->exist();
+verify_directory('/path/to/test/dir')->is()->readable();
+verify_directory('/path/to/test/dir')->is()->writable();
+```
+
 ### Attribute Assertions
 
 Verify (and PHPUnit) has the ability to test the value of protected and private object properties (or "attributes"). While this is typically considered a violation of best unit testing practice, there are times when inspecting a protected value can be the simplest way of checking your code. The attribute you wish to check can be tacked on after calling `verify()`, just like if you were accessing it as a public value. For example, if you had an object called `$user` with a private `first_name` property that should be equal to `'Alice'`, you can assert that with the following code:
@@ -242,30 +265,6 @@ If you would rather explicitly identify your attribute/property, you can do so w
 
 ```php
 verify($obj)->attributeNamed('fooBar')->is()->equalTo(false);
-```
-
-### File Assertions
-
-If the subject under test is a file, you must use the `verify_file()` function to access filesystem assertions.
-
-```php
-verify_file('/path/to/test.txt')->does()->exist();
-verify_file('/path/to/test.txt')->is()->readable();
-verify_file('/path/to/test.txt')->is()->writable();
-
-verify_file('/path/to/test.txt')->is()->equalTo('/path/to/b.txt');
-verify_file('/path/to/test.json')->is()->equalToJsonFile('/path/to/other.json');
-verify_file('/path/to/test.xml')->is()->equalToXmlFile('/path/to/other.xml');
-```
-
-### Directory Assertions
-
-There are also a handful of assertions specific to directories. To call these assertions, use the `verify_directory()` function.
-
-```php
-verify_directory('/path/to/test/dir')->does()->exist();
-verify_directory('/path/to/test/dir')->is()->readable();
-verify_directory('/path/to/test/dir')->is()->writable();
 ```
 
 ### Assertion Modifiers
