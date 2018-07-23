@@ -29,26 +29,6 @@ function verify()
 }
 
 /**
- * Assert a value is not empty or "true".
- *
- * @param mixed $truth SUT expected to be not empty
- */
-function verify_that($truth)
-{
-    verify($truth)->isNotEmpty();
-}
-
-/**
- * Assert a value is empty or "false".
- *
- * @param mixed $fallacy SUT expected to be empty
- */
-function verify_not($fallacy)
-{
-    verify($fallacy)->isEmpty();
-}
-
-/**
  * Interface into Verify with assertions specific to file system objects.
  *
  * @param string $description When called with a single parameter, will be used as the Subject
