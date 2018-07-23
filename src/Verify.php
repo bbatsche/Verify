@@ -37,6 +37,13 @@ class Verify extends VerifyBase
     protected $floatDelta = 0.0;
 
     /**
+     * Ignore element ordering when checking array values.
+     *
+     * @var bool
+     */
+    protected $ignoreOrder = false;
+
+    /**
      * Maximum depth when checking array equality.
      *
      * PHPUnit does not use this value in any way, it's included here for consistency.
@@ -67,9 +74,39 @@ class Verify extends VerifyBase
      *
      * @return self
      */
-    public function __get($attr)
+    public function __get(string $attr): self
     {
-        return $this->attribute($attr);
+        return $this->attributeNamed($attr);
+    }
+
+    /**
+     * Assert SUT does or does not have a given class attribute.
+     *
+     * @param string $attribute Name of attribute expected to be in SUT
+     *
+     * @return self
+     */
+    public function attribute(string $attribute): self
+    {
+        if (!isset($this->modifierCondition)) {
+            throw new MissingConditionException();
+        }
+
+        if ($this->modifierCondition) {
+            if (\is_string($this->actual)) {
+                a::assertClassHasAttribute($attribute, $this->actual, $this->description);
+            } else {
+                a::assertObjectHasAttribute($attribute, $this->actual, $this->description);
+            }
+        } else {
+            if (\is_string($this->actual)) {
+                a::assertClassNotHasAttribute($attribute, $this->actual, $this->description);
+            } else {
+                a::assertObjectNotHasAttribute($attribute, $this->actual, $this->description);
+            }
+        }
+
+        return $this;
     }
 
     /**
@@ -79,7 +116,7 @@ class Verify extends VerifyBase
      *
      * @return self
      */
-    public function attribute(string $attr): self
+    public function attributeNamed(string $attr): self
     {
         $this->attributeName = $attr;
 
@@ -87,720 +124,905 @@ class Verify extends VerifyBase
     }
 
     /**
-     * Assert SUT contains a given value.
+     * Assert SUT does or does not contain a given value.
      *
      * @param mixed $needle Value expected to be in SUT
+     *
+     * @return self
      */
-    public function contains($needle)
+    public function contain($needle): self
     {
-        if (isset($this->attributeName)) {
-            a::assertAttributeContains(
-                $needle,
-                $this->attributeName,
-                $this->actual,
-                $this->description,
-                $this->ignoreCase,
-                $this->objectIdentity,
-                $this->dataType
-            );
-        } else {
-            a::assertContains(
-                $needle,
-                $this->actual,
-                $this->description,
-                $this->ignoreCase,
-                $this->objectIdentity,
-                $this->dataType
-            );
+        if (!isset($this->modifierCondition)) {
+            throw new MissingConditionException();
         }
+
+        if ($this->modifierCondition) {
+            if (isset($this->attributeName)) {
+                a::assertAttributeContains(
+                    $needle,
+                    $this->attributeName,
+                    $this->actual,
+                    $this->description,
+                    $this->ignoreCase,
+                    $this->objectIdentity,
+                    $this->dataType
+                );
+            } else {
+                a::assertContains(
+                    $needle,
+                    $this->actual,
+                    $this->description,
+                    $this->ignoreCase,
+                    $this->objectIdentity,
+                    $this->dataType
+                );
+            }
+        } else {
+            if (isset($this->attributeName)) {
+                a::assertAttributeNotContains(
+                    $needle,
+                    $this->attributeName,
+                    $this->actual,
+                    $this->description,
+                    $this->ignoreCase,
+                    $this->objectIdentity,
+                    $this->dataType
+                );
+            } else {
+                a::assertNotContains(
+                    $needle,
+                    $this->actual,
+                    $this->description,
+                    $this->ignoreCase,
+                    $this->objectIdentity,
+                    $this->dataType
+                );
+            }
+        }
+
+        return $this;
     }
 
     /**
-     * Assert SUT contains only instances of a given class or internal PHP type.
+     * Assert SUT does or does not contain only instances of a given class or internal PHP type.
      *
      * @param string $type Class name or internal PHP type expected to be in SUT
+     *
+     * @return self
      */
-    public function containsOnly(string $type)
+    public function containOnly(string $type): self
     {
-        if (isset($this->attributeName)) {
-            a::assertAttributeContainsOnly($type, $this->attributeName, $this->actual, null, $this->description);
-        } else {
-            a::assertContainsOnly($type, $this->actual, null, $this->description);
+        if (!isset($this->modifierCondition)) {
+            throw new MissingConditionException();
         }
-    }
 
-    /**
-     * Assert SUT does not contain a given value.
-     *
-     * @param mixed $needle Value expected to be abscent from SUT
-     */
-    public function doesNotContain($needle)
-    {
-        if (isset($this->attributeName)) {
-            a::assertAttributeNotContains(
-                $needle,
-                $this->attributeName,
-                $this->actual,
-                $this->description,
-                $this->ignoreCase,
-                $this->objectIdentity,
-                $this->dataType
-            );
+        if ($this->modifierCondition) {
+            if (isset($this->attributeName)) {
+                // $isNativeType can be determined automatically
+                a::assertAttributeContainsOnly($type, $this->attributeName, $this->actual, null, $this->description);
+            } else {
+                // $isNativeType can be determined automatically
+                a::assertContainsOnly($type, $this->actual, null, $this->description);
+            }
         } else {
-            a::assertNotContains(
-                $needle,
-                $this->actual,
-                $this->description,
-                $this->ignoreCase,
-                $this->objectIdentity,
-                $this->dataType
-            );
+            if (isset($this->attributeName)) {
+                // $isNativeType can be determined automatically
+                a::assertAttributeNotContainsOnly($type, $this->attributeName, $this->actual, null, $this->description);
+            } else {
+                // $isNativeType can be determined automatically
+                a::assertNotContainsOnly($type, $this->actual, null, $this->description);
+            }
         }
+
+        return $this;
     }
 
     /**
-     * Assert SUT does not contain just instances of a given class or internal PHP type.
+     * Assert SUT does or does not have a given number of elements.
      *
-     * This is frankly one of the odder assertions. Just to be clear, SUT *may* contain
-     * instances of $type, so long as it *also* contains values of an additional type.
+     * @param int $count Expected number of elements to be in SUT
      *
-     * @param string $type Class name or internal PHP type expected to not be the exclusive type in SUT
+     * @return self
      */
-    public function doesNotContainOnly(string $type)
+    public function count(int $count)
     {
-        if (isset($this->attributeName)) {
-            a::assertAttributeNotContainsOnly($type, $this->attributeName, $this->actual, null, $this->description);
+        if (!isset($this->modifierCondition)) {
+            throw new MissingConditionException();
+        }
+
+        if ($this->modifierCondition) {
+            if (isset($this->attributeName)) {
+                a::assertAttributeCount($count, $this->attributeName, $this->actual, $this->description);
+            } else {
+                a::assertCount($count, $this->actual, $this->description);
+            }
         } else {
-            a::assertNotContainsOnly($type, $this->actual, null, $this->description);
+            if (isset($this->attributeName)) {
+                a::assertAttributeNotCount($count, $this->attributeName, $this->actual, $this->description);
+            } else {
+                a::assertNotCount($count, $this->actual, $this->description);
+            }
         }
+
+        return $this;
     }
 
     /**
-     * Assert SUT does not end with a given value.
+     * Assert SUT is or is not empty.
      *
-     * @param string $suffix Value SUT is expected to not end with
+     * @return self
      */
-    public function doesNotEndWith(string $suffix)
+    public function empty(): self
     {
-        a::assertStringEndsNotWith($suffix, $this->actual, $this->description);
-    }
+        if (!isset($this->modifierCondition)) {
+            throw new MissingConditionException();
+        }
 
-    /**
-     * Assert SUT does not equal a given value.
-     *
-     * @param mixed $expected Value SUT is expected to differ from
-     */
-    public function doesNotEqual($expected)
-    {
-        if (isset($this->attributeName)) {
-            a::assertAttributeNotEquals(
-                $expected,
-                $this->attributeName,
-                $this->actual,
-                $this->description,
-                $this->floatDelta,
-                $this->maxDepth,
-                $this->ignoreOrder,
-                $this->ignoreCase
-            );
+        if ($this->modifierCondition) {
+            if (isset($this->attributeName)) {
+                a::assertAttributeEmpty($this->attributeName, $this->actual, $this->description);
+            } else {
+                a::assertEmpty($this->actual, $this->description);
+            }
         } else {
-            a::assertNotEquals(
-                $expected,
-                $this->actual,
-                $this->description,
-                $this->floatDelta,
-                $this->maxDepth,
-                $this->ignoreOrder,
-                $this->ignoreCase
-            );
+            if (isset($this->attributeName)) {
+                a::assertAttributeNotEmpty($this->attributeName, $this->actual, $this->description);
+            } else {
+                a::assertNotEmpty($this->actual, $this->description);
+            }
         }
+
+        return $this;
     }
 
     /**
-     * Assert SUT does not equal the contents of a given file.
-     *
-     * @param string $file Name of file SUT is expected to differ from
-     */
-    public function doesNotEqualFile(string $file)
-    {
-        // $canonicalize hardcoded to false
-        a::assertStringNotEqualsFile($file, $this->actual, $this->description, false, $this->ignoreCase);
-    }
-
-    /**
-     * Assert SUT's JSON value is different from JSON stored in given file.
-     *
-     * @param string $file Name of file with JSON SUT is epxected to be different from
-     */
-    public function doesNotEqualJsonFile(string $file)
-    {
-        a::assertJsonStringNotEqualsJsonFile($file, $this->actual, $this->description);
-    }
-
-    /**
-     * Assert SUT's JSON value differs from a given JSON value.
-     *
-     * @param string $string JSON value SUT is expected to be different from
-     */
-    public function doesNotEqualJsonString(string $string)
-    {
-        a::assertJsonStringNotEqualsJsonString($string, $this->actual, $this->description);
-    }
-
-    /**
-     * Assert SUT's XML value differs from the XML stored in a given file.
-     *
-     * @param string $file Name of XML file SUT is expected to differ from
-     */
-    public function doesNotEqualXmlFile(string $file)
-    {
-        a::assertXmlStringNotEqualsXmlFile($file, $this->actual, $this->description);
-    }
-
-    /**
-     * Assert SUT's XML value differs from a given string of XML.
-     *
-     * @param string $xmlString XML data SUT is expected to differ from
-     */
-    public function doesNotEqualXmlString(string $xmlString)
-    {
-        a::assertXmlStringNotEqualsXmlString($xmlString, $this->actual, $this->description);
-    }
-
-    /**
-     * Assert SUT does not have a given class attribute.
-     *
-     * @param string $attribute Name of attribute expected to be abscent from SUT
-     */
-    public function doesNotHaveAttribute(string $attribute)
-    {
-        if (\is_string($this->actual)) {
-            a::assertClassNotHasAttribute($attribute, $this->actual, $this->description);
-        } else {
-            a::assertObjectNotHasAttribute($attribute, $this->actual, $this->description);
-        }
-    }
-
-    /**
-     * Assert SUT does not have a given number of elements.
-     *
-     * @param int $count Number of elements SUT is not expected to contain
-     */
-    public function doesNotHaveCount(int $count)
-    {
-        if (isset($this->attributeName)) {
-            a::assertAttributeNotCount($count, $this->attributeName, $this->actual, $this->description);
-        } else {
-            a::assertNotCount($count, $this->actual, $this->description);
-        }
-    }
-
-    /**
-     * Assert SUT does not have a given key.
-     *
-     * @param int|string $key Key expected to be abscent from SUT
-     */
-    public function doesNotHaveKey($key)
-    {
-        a::assertArrayNotHasKey($key, $this->actual, $this->description);
-    }
-
-    /**
-     * Assert SUT does not contain a given static attribute.
-     *
-     * @param string $attribute Name of static attribute expected to be abscent from SUT
-     */
-    public function doesNotHaveStaticAttribute(string $attribute)
-    {
-        a::assertClassNotHasStaticAttribute($attribute, $this->actual, $this->description);
-    }
-
-    /**
-     * Assert SUT does not match a given format.
-     *
-     * @param string $format Format code(s) SUT is exptected to differ from
-     *
-     * @see https://phpunit.de/manual/current/en/appendixes.assertions.html#appendixes.assertions.assertStringMatchesFormat
-     */
-    public function doesNotMatchFormat(string $format)
-    {
-        a::assertStringNotMatchesFormat($format, $this->actual, $this->description);
-    }
-
-    /**
-     * Assert SUT does not match a format stored in a given file.
-     *
-     * @param string $formatFile Filename to read format code(s) from
-     *
-     * @see https://phpunit.de/manual/current/en/appendixes.assertions.html#appendixes.assertions.assertStringMatchesFormat
-     */
-    public function doesNotMatchFormatFile(string $formatFile)
-    {
-        a::assertStringNotMatchesFormatFile($formatFile, $this->actual, $this->description);
-    }
-
-    /**
-     * Assert SUT does not match a given regular expression.
-     *
-     * @param string $expression Regular expression SUT is exted to not match
-     */
-    public function doesNotMatchRegExp(string $expression)
-    {
-        a::assertNotRegExp($expression, $this->actual, $this->description);
-    }
-
-    /**
-     * Assert SUT does not start with a given value.
-     *
-     * @param string $prefix Value SUT is expected to not start with
-     */
-    public function doesNotStartWith(string $prefix)
-    {
-        a::assertStringStartsNotWith($prefix, $this->actual, $this->description);
-    }
-
-    /**
-     * Assert SUT ends with a given value.
+     * Assert SUT does or does not end with a given value.
      *
      * @param string $suffix Value SUT is expected to end with
+     *
+     * @return self
      */
-    public function endsWith(string $suffix)
+    public function endWith(string $suffix): self
     {
-        a::assertStringEndsWith($suffix, $this->actual, $this->description);
+        if (!isset($this->modifierCondition)) {
+            throw new MissingConditionException();
+        }
+
+        if ($this->modifierCondition) {
+            a::assertStringEndsWith($suffix, $this->actual, $this->description);
+        } else {
+            a::assertStringEndsNotWith($suffix, $this->actual, $this->description);
+        }
+
+        return $this;
     }
 
     /**
-     * Assert SUT equals a given value.
+     * Assert SUT does or does not equal a given value.
      *
      * @param mixed $expected Expected value for SUT
+     *
+     * @return self
      */
-    public function equals($expected)
+    public function equalTo($expected): self
     {
-        if (isset($this->attributeName)) {
-            a::assertAttributeEquals(
-                $expected,
-                $this->attributeName,
-                $this->actual,
-                $this->description,
-                $this->floatDelta,
-                $this->maxDepth,
-                $this->ignoreOrder,
-                $this->ignoreCase
-            );
-        } else {
-            a::assertEquals(
-                $expected,
-                $this->actual,
-                $this->description,
-                $this->floatDelta,
-                $this->maxDepth,
-                $this->ignoreOrder,
-                $this->ignoreCase
-            );
+        if (!isset($this->modifierCondition)) {
+            throw new MissingConditionException();
         }
+
+        if ($this->modifierCondition) {
+            if (isset($this->attributeName)) {
+                a::assertAttributeEquals(
+                    $expected,
+                    $this->attributeName,
+                    $this->actual,
+                    $this->description,
+                    $this->floatDelta,
+                    $this->maxDepth,
+                    $this->ignoreOrder,
+                    $this->ignoreCase
+                );
+            } else {
+                a::assertEquals(
+                    $expected,
+                    $this->actual,
+                    $this->description,
+                    $this->floatDelta,
+                    $this->maxDepth,
+                    $this->ignoreOrder,
+                    $this->ignoreCase
+                );
+            }
+        } else {
+            if (isset($this->attributeName)) {
+                a::assertAttributeNotEquals(
+                    $expected,
+                    $this->attributeName,
+                    $this->actual,
+                    $this->description,
+                    $this->floatDelta,
+                    $this->maxDepth,
+                    $this->ignoreOrder,
+                    $this->ignoreCase
+                );
+            } else {
+                a::assertNotEquals(
+                    $expected,
+                    $this->actual,
+                    $this->description,
+                    $this->floatDelta,
+                    $this->maxDepth,
+                    $this->ignoreOrder,
+                    $this->ignoreCase
+                );
+            }
+        }
+
+        return $this;
     }
 
     /**
-     * Assert SUT equals the contents of a given file.
+     * Assert SUT does or does not equal the contents of a given file.
      *
      * @param string $file Name of file SUT is expected to match
+     *
+     * @return self
      */
-    public function equalsFile(string $file)
+    public function equalToFile(string $file): self
     {
-        // $canonicalize hardcoded to false
-        a::assertStringEqualsFile($file, $this->actual, $this->description, false, $this->ignoreCase);
+        if (!isset($this->modifierCondition)) {
+            throw new MissingConditionException();
+        }
+
+        if ($this->modifierCondition) {
+            // $canonicalize hardcoded to false
+            a::assertStringEqualsFile($file, $this->actual, $this->description, false, $this->ignoreCase);
+        } else {
+            // $canonicalize hardcoded to false
+            a::assertStringNotEqualsFile($file, $this->actual, $this->description, false, $this->ignoreCase);
+        }
+
+        return $this;
     }
 
     /**
-     * Assert SUT's JSON value is the same as JSON in a given file.
+     * Assert SUT's JSON value is or is not the same as JSON in a given file.
      *
      * @param string $file Name of file with JSON expected to match SUT
+     *
+     * @return self
      */
-    public function equalsJsonFile(string $file)
+    public function equalToJsonFile(string $file): self
     {
-        a::assertJsonStringEqualsJsonFile($file, $this->actual, $this->description);
+        if (!isset($this->modifierCondition)) {
+            throw new MissingConditionException();
+        }
+
+        if ($this->modifierCondition) {
+            a::assertJsonStringEqualsJsonFile($file, $this->actual, $this->description);
+        } else {
+            a::assertJsonStringNotEqualsJsonFile($file, $this->actual, $this->description);
+        }
+
+        return $this;
     }
 
     /**
-     * Assert SUT's JSON value equals a given JSON value.
+     * Assert SUT's JSON value does or does not equal a given JSON value.
      *
      * @param string $string JSON value SUT is expected to be equal to
+     *
+     * @return self
      */
-    public function equalsJsonString(string $string)
+    public function equalToJsonString(string $string): self
     {
-        a::assertJsonStringEqualsJsonString($string, $this->actual, $this->description);
+        if (!isset($this->modifierCondition)) {
+            throw new MissingConditionException();
+        }
+
+        if ($this->modifierCondition) {
+            a::assertJsonStringEqualsJsonString($string, $this->actual, $this->description);
+        } else {
+            a::assertJsonStringNotEqualsJsonString($string, $this->actual, $this->description);
+        }
+
+        return $this;
     }
 
     /**
-     * Assert SUT's XML value is equal to the XML stored in a given file.
+     * Assert SUT's XML value is or is not equal to the XML stored in a given file.
      *
      * @param string $file Name of XML file SUT is expected to match
+     *
+     * @return self
      */
-    public function equalsXmlFile(string $file)
+    public function equalToXmlFile(string $file): self
     {
-        a::assertXmlStringEqualsXmlFile($file, $this->actual, $this->description);
+        if (!isset($this->modifierCondition)) {
+            throw new MissingConditionException();
+        }
+
+        if ($this->modifierCondition) {
+            a::assertXmlStringEqualsXmlFile($file, $this->actual, $this->description);
+        } else {
+            a::assertXmlStringNotEqualsXmlFile($file, $this->actual, $this->description);
+        }
+
+        return $this;
     }
 
     /**
-     * Assert SUT's XML value is the same as a given string of XML.
+     * Assert SUT's XML value is or is not the same as a given string of XML.
      *
      * @param string $xmlString XML data SUT is expected to equal
+     *
+     * @return self
      */
-    public function equalsXmlString(string $xmlString)
+    public function equalToXmlString(string $xmlString): self
     {
-        a::assertXmlStringEqualsXmlString($xmlString, $this->actual, $this->description);
+        if (!isset($this->modifierCondition)) {
+            throw new MissingConditionException();
+        }
+
+        if ($this->modifierCondition) {
+            a::assertXmlStringEqualsXmlString($xmlString, $this->actual, $this->description);
+        } else {
+            a::assertXmlStringNotEqualsXmlString($xmlString, $this->actual, $this->description);
+        }
+
+        return $this;
     }
 
     /**
      * Assert SUT has the same XML structur as a given DOMElement.
      *
      * @param \DOMElement $xml Structure SUT is expected to match
-     */
-    public function equalsXmlStructure(\DOMElement $xml)
-    {
-        a::assertEqualXMLStructure($xml, $this->actual, $this->xmlAttributes, $this->description);
-    }
-
-    /**
-     * Assert SUT has a given class attribute.
      *
-     * @param string $attribute Name of attribute expected to be in SUT
+     * @return self
      */
-    public function hasAttribute(string $attribute)
+    public function equalToXmlStructure(\DOMElement $xml): self
     {
-        if (\is_string($this->actual)) {
-            a::assertClassHasAttribute($attribute, $this->actual, $this->description);
-        } else {
-            a::assertObjectHasAttribute($attribute, $this->actual, $this->description);
+        if (!isset($this->modifierCondition)) {
+            throw new MissingConditionException();
         }
+
+        if ($this->modifierCondition) {
+            a::assertEqualXMLStructure($xml, $this->actual, $this->xmlAttributes, $this->description);
+        } else {
+            throw new \BadMethodCallException(__METHOD__ . ' does not support negative condition.');
+        }
+
+        return $this;
     }
 
     /**
-     * Assert SUT has a given number of elements.
+     * Assert SUT is or is not false.
      *
-     * @param int $count Expected number of elements to be in SUT
+     * @return self
      */
-    public function hasCount(int $count)
+    public function false(): self
     {
-        if (isset($this->attributeName)) {
-            a::assertAttributeCount($count, $this->attributeName, $this->actual, $this->description);
-        } else {
-            a::assertCount($count, $this->actual, $this->description);
+        if (!isset($this->modifierCondition)) {
+            throw new MissingConditionException();
         }
+
+        if ($this->modifierCondition) {
+            a::assertFalse($this->actual, $this->description);
+        } else {
+            a::assertNotFalse($this->actual, $this->description);
+        }
+
+        return $this;
     }
 
     /**
-     * Assert SUT has a given key.
+     * Assert SUT is or is not finite.
+     *
+     * @return self
+     */
+    public function finite(): self
+    {
+        if (!isset($this->modifierCondition)) {
+            throw new MissingConditionException();
+        }
+
+        if ($this->modifierCondition) {
+            a::assertFinite($this->actual, $this->description);
+        } else {
+            a::assertInfinite($this->actual, $this->description);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert SUT is or is not greater than or equal to a given value.
+     *
+     * @param int|float $expected Value SUT is expected to be greater than or equal to
+     *
+     * @return self
+     */
+    public function greaterOrEqualTo($expected): self
+    {
+        if (!isset($this->modifierCondition)) {
+            throw new MissingConditionException();
+        }
+
+        if ($this->modifierCondition) {
+            if (isset($this->attributeName)) {
+                a::assertAttributeGreaterThanOrEqual($expected, $this->attributeName, $this->actual, $this->description);
+            } else {
+                a::assertGreaterThanOrEqual($expected, $this->actual, $this->description);
+            }
+        } else {
+            if (isset($this->attributeName)) {
+                a::assertAttributeLessThan($expected, $this->attributeName, $this->actual, $this->description);
+            } else {
+                a::assertLessThan($expected, $this->actual, $this->description);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert SUT is or is not greater than a given value.
+     *
+     * @param int|float $expected Value SUT is expected to be greater than
+     *
+     * @return self
+     */
+    public function greaterThan($expected): self
+    {
+        if (!isset($this->modifierCondition)) {
+            throw new MissingConditionException();
+        }
+
+        if ($this->modifierCondition) {
+            if (isset($this->attributeName)) {
+                a::assertAttributeGreaterThan($expected, $this->attributeName, $this->actual, $this->description);
+            } else {
+                a::assertGreaterThan($expected, $this->actual, $this->description);
+            }
+        } else {
+            if (isset($this->attributeName)) {
+                a::assertAttributeLessThanOrEqual($expected, $this->attributeName, $this->actual, $this->description);
+            } else {
+                a::assertLessThanOrEqual($expected, $this->actual, $this->description);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert SUT is or is not infinite.
+     *
+     * @return self
+     */
+    public function infinite(): self
+    {
+        if (!isset($this->modifierCondition)) {
+            throw new MissingConditionException();
+        }
+
+        if ($this->modifierCondition) {
+            a::assertInfinite($this->actual, $this->description);
+        } else {
+            a::assertFinite($this->actual, $this->description);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert SUT is or is not an instance of a given class.
+     *
+     * @param string $class Name of class SUT is expected to be an instance of
+     *
+     * @return self
+     */
+    public function instanceOf(string $class): self
+    {
+        if (!isset($this->modifierCondition)) {
+            throw new MissingConditionException();
+        }
+
+        if ($this->modifierCondition) {
+            if (isset($this->attributeName)) {
+                a::assertAttributeInstanceOf($class, $this->attributeName, $this->actual, $this->description);
+            } else {
+                a::assertInstanceOf($class, $this->actual, $this->description);
+            }
+        } else {
+            if (isset($this->attributeName)) {
+                a::assertAttributeNotInstanceOf($class, $this->attributeName, $this->actual, $this->description);
+            } else {
+                a::assertNotInstanceOf($class, $this->actual, $this->description);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert SUT is or is not a given PHP data type.
+     *
+     * @param string $type Data type SUT is expected to be
+     *
+     * @return self
+     */
+    public function internalType(string $type): self
+    {
+        if (!isset($this->modifierCondition)) {
+            throw new MissingConditionException();
+        }
+
+        if ($this->modifierCondition) {
+            if (isset($this->attributeName)) {
+                a::assertAttributeInternalType($type, $this->attributeName, $this->actual, $this->description);
+            } else {
+                a::assertInternalType($type, $this->actual, $this->description);
+            }
+        } else {
+            if (isset($this->attributeName)) {
+                a::assertAttributeNotInternalType($type, $this->attributeName, $this->actual, $this->description);
+            } else {
+                a::assertNotInternalType($type, $this->actual, $this->description);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert SUT is or is not a string containing valid JSON data.
+     *
+     * @return self
+     */
+    public function json(): self
+    {
+        if (!isset($this->modifierCondition)) {
+            throw new MissingConditionException();
+        }
+
+        if ($this->modifierCondition) {
+            a::assertJson($this->actual, $this->description);
+        } else {
+            throw new \BadMethodCallException(__METHOD__ . ' does not support negative condition.');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert SUT does or does not have a given key.
      *
      * @param int|string $key Key expected to be in SUT
+     *
+     * @return self
      */
-    public function hasKey($key)
+    public function key($key): self
     {
-        a::assertArrayHasKey($key, $this->actual, $this->description);
+        if (!isset($this->modifierCondition)) {
+            throw new MissingConditionException();
+        }
+
+        if ($this->modifierCondition) {
+            a::assertArrayHasKey($key, $this->actual, $this->description);
+        } else {
+            a::assertArrayNotHasKey($key, $this->actual, $this->description);
+        }
+
+        return $this;
     }
 
     /**
-     * Assert SUT has a given static attribute.
+     * Assert SUT is or is not less than or equal to a given value.
+     *
+     * @param int|float $expected Value SUT is expected to be less than or equal to
+     *
+     * @return self
+     */
+    public function lessOrEqualTo($expected): self
+    {
+        if (!isset($this->modifierCondition)) {
+            throw new MissingConditionException();
+        }
+
+        if ($this->modifierCondition) {
+            if (isset($this->attributeName)) {
+                a::assertAttributeLessThanOrEqual($expected, $this->attributeName, $this->actual, $this->description);
+            } else {
+                a::assertLessThanOrEqual($expected, $this->actual, $this->description);
+            }
+        } else {
+            if (isset($this->attributeName)) {
+                a::assertAttributeGreaterThan($expected, $this->attributeName, $this->actual, $this->description);
+            } else {
+                a::assertGreaterThan($expected, $this->actual, $this->description);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert SUT is or is not less than a given value.
+     *
+     * @param int|float $expected Value SUT is expected to be less than
+     *
+     * @return self
+     */
+    public function lessThan($expected): self
+    {
+        if (!isset($this->modifierCondition)) {
+            throw new MissingConditionException();
+        }
+
+        if ($this->modifierCondition) {
+            if (isset($this->attributeName)) {
+                a::assertAttributeLessThan($expected, $this->attributeName, $this->actual, $this->description);
+            } else {
+                a::assertLessThan($expected, $this->actual, $this->description);
+            }
+        } else {
+            if (isset($this->attributeName)) {
+                a::assertAttributeGreaterThanOrEqual($expected, $this->attributeName, $this->actual, $this->description);
+            } else {
+                a::assertGreaterThanOrEqual($expected, $this->actual, $this->description);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert SUT does or does not match a given format.
+     *
+     * @param string $format Format code(s) SUT is expected to match
+     *
+     * @see https://phpunit.de/manual/current/en/appendixes.assertions.html#appendixes.assertions.assertStringMatchesFormat
+     *
+     * @return self
+     */
+    public function matchFormat(string $format): self
+    {
+        if (!isset($this->modifierCondition)) {
+            throw new MissingConditionException();
+        }
+
+        if ($this->modifierCondition) {
+            a::assertStringMatchesFormat($format, $this->actual, $this->description);
+        } else {
+            a::assertStringNotMatchesFormat($format, $this->actual, $this->description);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert SUT does or does not match a format stored in a given file.
+     *
+     * @param string $formatFile Filename to read format code(s) from
+     *
+     * @see https://phpunit.de/manual/current/en/appendixes.assertions.html#appendixes.assertions.assertStringMatchesFormat
+     *
+     * @return self
+     */
+    public function matchFormatFile(string $formatFile): self
+    {
+        if (!isset($this->modifierCondition)) {
+            throw new MissingConditionException();
+        }
+
+        if ($this->modifierCondition) {
+            a::assertStringMatchesFormatFile($formatFile, $this->actual, $this->description);
+        } else {
+            a::assertStringNotMatchesFormatFile($formatFile, $this->actual, $this->description);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert SUT does or does not match a given regular expression.
+     *
+     * @param string $expression Regular expression SUT is expected to match
+     *
+     * @return self
+     */
+    public function matchRegExp(string $expression): self
+    {
+        if (!isset($this->modifierCondition)) {
+            throw new MissingConditionException();
+        }
+
+        if ($this->modifierCondition) {
+            a::assertRegExp($expression, $this->actual, $this->description);
+        } else {
+            a::assertNotRegExp($expression, $this->actual, $this->description);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert SUT is NaN.
+     *
+     * @return self
+     */
+    public function nan(): self
+    {
+        if (!isset($this->modifierCondition)) {
+            throw new MissingConditionException();
+        }
+
+        if ($this->modifierCondition) {
+            a::assertNan($this->actual, $this->description);
+        } else {
+            throw new \BadMethodCallException(__METHOD__ . ' does not support negative condition.');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert SUT is or is not null.
+     *
+     * @return self
+     */
+    public function null(): self
+    {
+        if (!isset($this->modifierCondition)) {
+            throw new MissingConditionException();
+        }
+
+        if ($this->modifierCondition) {
+            a::assertNull($this->actual, $this->description);
+        } else {
+            a::assertNotNull($this->actual, $this->description);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert SUT does or does not have both the same value and type as a given value.
+     *
+     * @param mixed $expected Value SUT is exptected to match
+     *
+     * @return self
+     */
+    public function sameAs($expected): self
+    {
+        if (!isset($this->modifierCondition)) {
+            throw new MissingConditionException();
+        }
+
+        if ($this->modifierCondition) {
+            if (isset($this->attributeName)) {
+                a::assertAttributeSame($expected, $this->attributeName, $this->actual, $this->description);
+            } else {
+                a::assertSame($expected, $this->actual, $this->description);
+            }
+        } else {
+            if (isset($this->attributeName)) {
+                a::assertAttributeNotSame($expected, $this->attributeName, $this->actual, $this->description);
+            } else {
+                a::assertNotSame($expected, $this->actual, $this->description);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert SUT does or does not have the same number of elements as given array/Countable/Traversable object.
+     *
+     * @param array|Countable|Traversable $expected Value SUT is expected to be the same size as
+     *
+     * @return self
+     */
+    public function sameSizeAs($expected): self
+    {
+        if (!isset($this->modifierCondition)) {
+            throw new MissingConditionException();
+        }
+
+        if ($this->modifierCondition) {
+            a::assertSameSize($expected, $this->actual, $this->description);
+        } else {
+            a::assertNotSameSize($expected, $this->actual, $this->description);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert SUT does or does not start with a given value.
+     *
+     * @param string $prefix Value SUT is expected to start with
+     *
+     * @return self
+     */
+    public function startWith(string $prefix): self
+    {
+        if (!isset($this->modifierCondition)) {
+            throw new MissingConditionException();
+        }
+
+        if ($this->modifierCondition) {
+            a::assertStringStartsWith($prefix, $this->actual, $this->description);
+        } else {
+            a::assertStringStartsNotWith($prefix, $this->actual, $this->description);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert SUT does or does not have a given static attribute.
      *
      * @param string $attribute Name of attribute expected to be in SUT
+     *
+     * @return self
      */
-    public function hasStaticAttribute(string $attribute)
+    public function staticAttribute(string $attribute): self
     {
-        a::assertClassHasStaticAttribute($attribute, $this->actual, $this->description);
+        if (!isset($this->modifierCondition)) {
+            throw new MissingConditionException();
+        }
+
+        if ($this->modifierCondition) {
+            a::assertClassHasStaticAttribute($attribute, $this->actual, $this->description);
+        } else {
+            a::assertClassNotHasStaticAttribute($attribute, $this->actual, $this->description);
+        }
+
+        return $this;
     }
 
     /**
      * Assert SUT contains a given subset of values.
      *
      * @param array $array Subset expected to be in SUT
+     *
+     * @return self
      */
-    public function hasSubset($array)
+    public function subset($array): self
     {
-        a::assertArraySubset($array, $this->actual, $this->dataType, $this->description);
-    }
-
-    /**
-     * Assert SUT is empty.
-     */
-    public function isEmpty()
-    {
-        if (isset($this->attributeName)) {
-            a::assertAttributeEmpty($this->attributeName, $this->actual, $this->description);
-        } else {
-            a::assertEmpty($this->actual, $this->description);
+        if (!isset($this->modifierCondition)) {
+            throw new MissingConditionException();
         }
-    }
 
-    /**
-     * Assert SUT is false.
-     */
-    public function isFalse()
-    {
-        a::assertFalse($this->actual, $this->description);
-    }
-
-    /**
-     * Assert SUT is greater than or equal to a given value.
-     *
-     * @param int|float $expected Value SUT is expected to be greater than or equal to
-     */
-    public function isGreaterOrEqualTo($expected)
-    {
-        if (isset($this->attributeName)) {
-            a::assertAttributeGreaterThanOrEqual($expected, $this->attributeName, $this->actual, $this->description);
+        if ($this->modifierCondition) {
+            a::assertArraySubset($array, $this->actual, $this->dataType, $this->description);
         } else {
-            a::assertGreaterThanOrEqual($expected, $this->actual, $this->description);
+            throw new \BadMethodCallException(__METHOD__ . ' does not support negative condition.');
         }
+
+        return $this;
     }
 
     /**
-     * Assert SUT is greater than a given value.
+     * Assert that SUT is or is not true.
      *
-     * @param int|float $expected Value SUT is expected to be greater than
+     * return self
      */
-    public function isGreaterThan($expected)
+    public function true(): self
     {
-        if (isset($this->attributeName)) {
-            a::assertAttributeGreaterThan($expected, $this->attributeName, $this->actual, $this->description);
+        if (!isset($this->modifierCondition)) {
+            throw new MissingConditionException();
+        }
+
+        if ($this->modifierCondition) {
+            a::assertTrue($this->actual, $this->description);
         } else {
-            a::assertGreaterThan($expected, $this->actual, $this->description);
+            a::assertNotTrue($this->actual, $this->description);
         }
-    }
 
-    /**
-     * Assert SUT is an instance of a given class.
-     *
-     * @param string $class Name of class SUT is expected to be an instance of
-     */
-    public function isInstanceOf(string $class)
-    {
-        if (isset($this->attributeName)) {
-            a::assertAttributeInstanceOf($class, $this->attributeName, $this->actual, $this->description);
-        } else {
-            a::assertInstanceOf($class, $this->actual, $this->description);
-        }
-    }
-
-    /**
-     * Assert SUT is a given PHP data type.
-     *
-     * @param string $type Data type SUT is expected to be
-     */
-    public function isInternalType(string $type)
-    {
-        if (isset($this->attributeName)) {
-            a::assertAttributeInternalType($type, $this->attributeName, $this->actual, $this->description);
-        } else {
-            a::assertInternalType($type, $this->actual, $this->description);
-        }
-    }
-
-    /**
-     * Assert SUT is a string containing valid JSON data.
-     */
-    public function isJson()
-    {
-        a::assertJson($this->actual, $this->description);
-    }
-
-    /**
-     * Assert SUT is less than or equal to a given value.
-     *
-     * @param int|float $expected Value SUT is expected to be less than or equal to
-     */
-    public function isLessOrEqualTo($expected)
-    {
-        if (isset($this->attributeName)) {
-            a::assertAttributeLessThanOrEqual($expected, $this->attributeName, $this->actual, $this->description);
-        } else {
-            a::assertLessThanOrEqual($expected, $this->actual, $this->description);
-        }
-    }
-
-    /**
-     * Assert SUT is less than a given value.
-     *
-     * @param int|float $expected Value SUT is expected to be less than
-     */
-    public function isLessThan($expected)
-    {
-        if (isset($this->attributeName)) {
-            a::assertAttributeLessThan($expected, $this->attributeName, $this->actual, $this->description);
-        } else {
-            a::assertLessThan($expected, $this->actual, $this->description);
-        }
-    }
-
-    /**
-     * Assert SUT is not empty.
-     */
-    public function isNotEmpty()
-    {
-        if (isset($this->attributeName)) {
-            a::assertAttributeNotEmpty($this->attributeName, $this->actual, $this->description);
-        } else {
-            a::assertNotEmpty($this->actual, $this->description);
-        }
-    }
-
-    /**
-     * Assert SUT is not false.
-     */
-    public function isNotFalse()
-    {
-        a::assertNotFalse($this->actual, $this->description);
-    }
-
-    /**
-     * Assert SUT is not an instance of a given class.
-     *
-     * @param string $class Name of class SUT is expect to not be
-     */
-    public function isNotInstanceOf(string $class)
-    {
-        if (isset($this->attributeName)) {
-            a::assertAttributeNotInstanceOf($class, $this->attributeName, $this->actual, $this->description);
-        } else {
-            a::assertNotInstanceOf($class, $this->actual, $this->description);
-        }
-    }
-
-    /**
-     * Assert SUT is not a given PHP data type.
-     *
-     * @param string $type Data type SUT is expected to not be
-     */
-    public function isNotInternalType(string $type)
-    {
-        if (isset($this->attributeName)) {
-            a::assertAttributeNotInternalType($type, $this->attributeName, $this->actual, $this->description);
-        } else {
-            a::assertNotInternalType($type, $this->actual, $this->description);
-        }
-    }
-
-    /**
-     * Assert SUT is not null.
-     */
-    public function isNotNull()
-    {
-        a::assertNotNull($this->actual, $this->description);
-    }
-
-    /**
-     * Assert SUT is not true.
-     */
-    public function isNotTrue()
-    {
-        a::assertNotTrue($this->actual, $this->description);
-    }
-
-    /**
-     * Assert SUT is null.
-     */
-    public function isNull()
-    {
-        a::assertNull($this->actual, $this->description);
-    }
-
-    /**
-     * Assert that SUT is true.
-     */
-    public function isTrue()
-    {
-        a::assertTrue($this->actual, $this->description);
-    }
-
-    /**
-     * Assert SUT matches a given format.
-     *
-     * @param string $format Format code(s) SUT is expected to match
-     *
-     * @see https://phpunit.de/manual/current/en/appendixes.assertions.html#appendixes.assertions.assertStringMatchesFormat
-     */
-    public function matchesFormat(string $format)
-    {
-        a::assertStringMatchesFormat($format, $this->actual, $this->description);
-    }
-
-    /**
-     * Assert SUT matches a format stored in a given file.
-     *
-     * @param string $formatFile Filename to read format code(s) from
-     *
-     * @see https://phpunit.de/manual/current/en/appendixes.assertions.html#appendixes.assertions.assertStringMatchesFormat
-     */
-    public function matchesFormatFile(string $formatFile)
-    {
-        a::assertStringMatchesFormatFile($formatFile, $this->actual, $this->description);
-    }
-
-    /**
-     * Assert SUT matches a given regular expression.
-     *
-     * @param string $expression Regular expression SUT is expected to match
-     */
-    public function matchesRegExp(string $expression)
-    {
-        a::assertRegExp($expression, $this->actual, $this->description);
-    }
-
-    /**
-     * Assert SUT does not have the same value and type as a given value.
-     *
-     * @param mixed $expected Value SUT is expected to differ from
-     */
-    public function notSameAs($expected)
-    {
-        if (isset($this->attributeName)) {
-            a::assertAttributeNotSame($expected, $this->attributeName, $this->actual, $this->description);
-        } else {
-            a::assertNotSame($expected, $this->actual, $this->description);
-        }
-    }
-
-    /**
-     * Assert SUT does not thave the same number of elements as a given array (or `Countable` or `Traversable` objects).
-     *
-     * @param array|Countable|Traversable $expected Value SUT is expected to have a different number of elements from
-     */
-    public function notSameSizeAs($expected)
-    {
-        a::assertNotSameSize($expected, $this->actual, $this->description);
-    }
-
-    /**
-     * Assert SUT has both the same value and type as a given value.
-     *
-     * @param mixed $expected Value SUT is exptected to match
-     */
-    public function sameAs($expected)
-    {
-        if (isset($this->attributeName)) {
-            a::assertAttributeSame($expected, $this->attributeName, $this->actual, $this->description);
-        } else {
-            a::assertSame($expected, $this->actual, $this->description);
-        }
-    }
-
-    /**
-     * Assert SUT has the same number of elements as given array (or `Countable` or `Traversable` objects).
-     *
-     * @param array|Countable|Traversable $expected Value SUT is expected to be the same size as
-     */
-    public function sameSizeAs($expected)
-    {
-        a::assertSameSize($expected, $this->actual, $this->description);
-    }
-
-    /**
-     * Assert SUT starts with a given value.
-     *
-     * @param string $prefix Value SUT is expected to start with
-     */
-    public function startsWith(string $prefix)
-    {
-        a::assertStringStartsWith($prefix, $this->actual, $this->description);
+        return $this;
     }
 
     /**

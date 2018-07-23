@@ -4,43 +4,108 @@ declare(strict_types=1);
 
 namespace BeBat\Verify\Test;
 
+use BeBat\Verify\Assert;
+use BeBat\Verify\MissingConditionException;
 use Mockery;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use PHPUnit\Framework\TestCase;
 
-abstract class UnitTestBase extends \PHPUnit\Framework\TestCase
+abstract class UnitTestBase extends TestCase
 {
+    use MockeryPHPUnitIntegration;
+
+    /**
+     * Default value used for Verify objects.
+     *
+     * @var string
+     */
+    protected $defaultActualValue;
+
+    /**
+     * Assertion mock.
+     *
+     * @var Assert|\Mockery\MockInterface
+     */
     protected $mockAssert;
 
-    protected static $verifyMethod;
+    /**
+     * Verify class.
+     *
+     * @var \BeBat\Verify\Verify|\BeBat\Verify\VerifyFile|\BeBat\Verify\VerifyDirectory
+     */
+    protected $subject;
 
     protected function setUp()
     {
-        $this->mockAssert = Mockery::mock('alias:BeBat\\Verify\\Assert');
+        $this->mockAssert = Mockery::mock('alias:' . Assert::class);
     }
 
-    protected function tearDown()
+    /**
+     * Test MissingConditionException is thrown for all methods.
+     *
+     * @param string $verifyMethod
+     * @param mixed  $value
+     *
+     * @dataProvider allMethods
+     */
+    public function testMissingConditionException(string $verifyMethod, $value = 'dummy value')
     {
-        Mockery::close();
+        $this->expectException(MissingConditionException::class);
+
+        $this->subject->{$verifyMethod}($value);
     }
 
-    protected function fireSingleValueTest($verifyMethod, $assertMethod)
+    /**
+     * Test VerifyFile methods that don't take any value.
+     *
+     * @param bool   $modifierCondition
+     * @param string $verifyMethod
+     * @param string $assertMethod
+     *
+     * @dataProvider noParamMethods
+     */
+    public function testNoParamMethods(bool $modifierCondition, string $verifyMethod, string $assertMethod)
     {
-        $verifyFunction = '\\BeBat\\Verify\\' . static::$verifyMethod;
+        $this->setModifierCondition($modifierCondition);
 
-        $this->mockAssert->shouldReceive($assertMethod)->with('subject 1', Mockery::any())->once();
-        $this->mockAssert->shouldReceive($assertMethod)->with('subject 2', 'message')->once();
+        $this->mockAssert->shouldReceive($assertMethod)
+            ->with($this->defaultActualValue, 'some message')
+            ->once();
 
-        $this->assertNull(\call_user_func($verifyFunction, 'subject 1')->{$verifyMethod}());
-        $this->assertNull(\call_user_func($verifyFunction, 'message', 'subject 2')->{$verifyMethod}());
+        $this->assertSame($this->subject, $this->subject->{$verifyMethod}());
     }
 
-    protected function fireTwoValueTest($verifyMethod, $assertMethod)
+    /**
+     * Test verify methods that take in a single value for comparison.
+     *
+     * @param bool   $modifierCondition
+     * @param string $verifyMethod
+     * @param string $assertMethod
+     * @param mixed  $expectedValue
+     *
+     * @dataProvider singleParamMethods
+     */
+    public function testSingleParamMethods(
+        bool $modifierCondition,
+        string $verifyMethod,
+        string $assertMethod,
+        $expectedValue = 'some value'
+    ) {
+        $this->setModifierCondition($modifierCondition);
+
+        $this->mockAssert->shouldReceive($assertMethod)
+            ->with($expectedValue, $this->defaultActualValue, 'some message')
+            ->once();
+
+        $this->assertSame($this->subject, $this->subject->{$verifyMethod}($expectedValue));
+    }
+
+    protected function setModifierCondition(bool $value)
     {
-        $verifyFunction = '\\BeBat\\Verify\\' . static::$verifyMethod;
-
-        $this->mockAssert->shouldReceive($assertMethod)->with('test 1', 'subject 1', Mockery::any())->once();
-        $this->mockAssert->shouldReceive($assertMethod)->with('test 2', 'subject 2', 'message')->once();
-
-        $this->assertNull(\call_user_func($verifyFunction, 'subject 1')->{$verifyMethod}('test 1'));
-        $this->assertNull(\call_user_func($verifyFunction, 'message', 'subject 2')->{$verifyMethod}('test 2'));
+        $reflection       = new \ReflectionObject($this->subject);
+        $modifierProperty = $reflection->getProperty('modifierCondition');
+        $modifierProperty->setAccessible(true);
+        $modifierProperty->setValue($this->subject, $value);
+        $modifierProperty->setAccessible(false);
     }
 }
