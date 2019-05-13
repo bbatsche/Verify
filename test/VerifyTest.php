@@ -8,11 +8,21 @@ use BeBat\Verify\Verify;
 use DOMElement;
 use Mockery;
 
-class VerifyTest extends UnitTestBase
+/**
+ * @internal
+ */
+final class VerifyTest extends UnitTestBase
 {
     protected $defaultActualValue = 'actual value';
 
-    public function setUp()
+    /**
+     * Verify class.
+     *
+     * @var \BeBat\Verify\Verify
+     */
+    protected $subject;
+
+    protected function setUp()
     {
         $this->subject = new Verify($this->defaultActualValue, 'some message');
 
@@ -21,8 +31,6 @@ class VerifyTest extends UnitTestBase
 
     /**
      * All possible verify methods.
-     *
-     * @return array
      */
     public function allMethods(): array
     {
@@ -67,8 +75,6 @@ class VerifyTest extends UnitTestBase
 
     /**
      * Sample data for testing attribute() method.
-     *
-     * @return array
      */
     public function attributeAssertMethods(): array
     {
@@ -82,8 +88,6 @@ class VerifyTest extends UnitTestBase
 
     /**
      * Assert methods used by contain() for attributes.
-     *
-     * @return array
      */
     public function attributeContainAssertMethods(): array
     {
@@ -95,8 +99,6 @@ class VerifyTest extends UnitTestBase
 
     /**
      * Assert methods used by containOnly() for attributes.
-     *
-     * @return array
      */
     public function attributeContainOnlyAssertMethods(): array
     {
@@ -108,8 +110,6 @@ class VerifyTest extends UnitTestBase
 
     /**
      * Assert methods used by equalTo() for attributes.
-     *
-     * @return array
      */
     public function attributeEqualToAssertMethods(): array
     {
@@ -121,8 +121,6 @@ class VerifyTest extends UnitTestBase
 
     /**
      * Verify methods and their PHPUnit assertions for object attributes.
-     *
-     * @return array
      */
     public function attributeMethods(): array
     {
@@ -148,8 +146,6 @@ class VerifyTest extends UnitTestBase
 
     /**
      * Assert methods used by contain().
-     *
-     * @return array
      */
     public function containAssertMethods(): array
     {
@@ -161,8 +157,6 @@ class VerifyTest extends UnitTestBase
 
     /**
      * Assert methods used by containOnly().
-     *
-     * @return array
      */
     public function containOnlyAssertMethods(): array
     {
@@ -174,8 +168,6 @@ class VerifyTest extends UnitTestBase
 
     /**
      * Assert methods used by equalTo().
-     *
-     * @return array
      */
     public function equalToAssertMethods(): array
     {
@@ -187,8 +179,6 @@ class VerifyTest extends UnitTestBase
 
     /**
      * Assert methods used by equalToFile().
-     *
-     * @return array
      */
     public function equalToFileAssertMethods(): array
     {
@@ -200,8 +190,6 @@ class VerifyTest extends UnitTestBase
 
     /**
      * Verify methods that cannot be used with a negative condition.
-     *
-     * @return array
      */
     public function methodsWithoutNegativeCondition(): array
     {
@@ -215,8 +203,6 @@ class VerifyTest extends UnitTestBase
 
     /**
      * Verify methods and their PHPUnit assertions that don't take any comparison value.
-     *
-     * @return array
      */
     public function noParamMethods(): array
     {
@@ -240,8 +226,6 @@ class VerifyTest extends UnitTestBase
 
     /**
      * Verify methods and their PHPUNit assertions that take a comparison value.
-     *
-     * @return array
      */
     public function singleParamMethods(): array
     {
@@ -292,9 +276,6 @@ class VerifyTest extends UnitTestBase
     /**
      * Test Verify::contain() with & without case sensitivity for attributes.
      *
-     * @param bool   $modifierCondition
-     * @param string $assertMethod
-     *
      * @dataProvider attributeContainAssertMethods
      */
     public function testAttribueContainCaseSensitive(bool $modifierCondition, string $assertMethod)
@@ -336,9 +317,6 @@ class VerifyTest extends UnitTestBase
 
     /**
      * Test Verify::contain() with & without data type for attributes.
-     *
-     * @param bool   $modifierCondition
-     * @param string $assertMethod
      *
      * @dataProvider attributeContainAssertMethods
      */
@@ -382,9 +360,6 @@ class VerifyTest extends UnitTestBase
     /**
      * Test Verify::contain() with & without object identity for attributes.
      *
-     * @param bool   $modifierCondition
-     * @param string $assertMethod
-     *
      * @dataProvider attributeContainAssertMethods
      */
     public function testAttribueContainObjectIdentity(bool $modifierCondition, string $assertMethod)
@@ -427,9 +402,7 @@ class VerifyTest extends UnitTestBase
     /**
      * Test Verify::attribute().
      *
-     * @param bool          $modifierCondition
      * @param string|object $actualValue
-     * @param string        $assertMethod
      *
      * @dataProvider attributeAssertMethods
      */
@@ -449,10 +422,7 @@ class VerifyTest extends UnitTestBase
     /**
      * Test negative assertions for object attributes.
      *
-     * @param bool   $modifierCondition
-     * @param string $verifyMethod
-     * @param string $assertMethod
-     * @param mixed  $expectedValue
+     * @param mixed $expectedValue
      *
      * @dataProvider attributeMethods
      */
@@ -476,9 +446,6 @@ class VerifyTest extends UnitTestBase
     /**
      * Test Verify::contain() basic case for attributes.
      *
-     * @param bool   $modifierCondition
-     * @param string $assertMethod
-     *
      * @dataProvider attributeContainAssertMethods
      */
     public function testAttributeContain(bool $modifierCondition, string $assertMethod)
@@ -496,9 +463,6 @@ class VerifyTest extends UnitTestBase
     /**
      * Test Verify::containOnly() for object attributes.
      *
-     * @param bool   $modifierCondition
-     * @param string $assertMethod
-     *
      * @dataProvider attributeContainOnlyAssertMethods
      */
     public function testAttributeContainOnly(bool $modifierCondition, string $assertMethod)
@@ -515,9 +479,6 @@ class VerifyTest extends UnitTestBase
 
     /**
      * Test Verify::equalTo() for attributes.
-     *
-     * @param bool   $modifierCondition
-     * @param string $assertMethod
      *
      * @dataProvider attributeEqualToAssertMethods
      */
@@ -543,9 +504,6 @@ class VerifyTest extends UnitTestBase
 
     /**
      * Test Verify::equalTo() for attributes with or without case sensitivity.
-     *
-     * @param bool   $modifierCondition
-     * @param string $assertMethod
      *
      * @dataProvider attributeEqualToAssertMethods
      */
@@ -591,9 +549,6 @@ class VerifyTest extends UnitTestBase
     /**
      * Test Verify::equalTo() for attributes with some float delta.
      *
-     * @param bool   $modifierCondition
-     * @param string $assertMethod
-     *
      * @dataProvider attributeEqualToAssertMethods
      */
     public function testAttributeEqualToFloatDelta(bool $modifierCondition, string $assertMethod)
@@ -618,9 +573,6 @@ class VerifyTest extends UnitTestBase
 
     /**
      * Test Verify::equalTo() for attributes with or without order.
-     *
-     * @param bool   $modifierCondition
-     * @param string $assertMethod
      *
      * @dataProvider attributeEqualToAssertMethods
      */
@@ -695,9 +647,6 @@ class VerifyTest extends UnitTestBase
     /**
      * Test Verify::contain() basic case.
      *
-     * @param bool   $modifierCondition
-     * @param string $assertMethod
-     *
      * @dataProvider containAssertMethods
      */
     public function testContain(bool $modifierCondition, string $assertMethod)
@@ -713,9 +662,6 @@ class VerifyTest extends UnitTestBase
 
     /**
      * Test Verify::contain() with & without case sensitivity.
-     *
-     * @param bool   $modifierCondition
-     * @param string $assertMethod
      *
      * @dataProvider containAssertMethods
      */
@@ -743,9 +689,6 @@ class VerifyTest extends UnitTestBase
     /**
      * Test Verify::contain() with & without data type.
      *
-     * @param bool   $modifierCondition
-     * @param string $assertMethod
-     *
      * @dataProvider containAssertMethods
      */
     public function testContainDataType(bool $modifierCondition, string $assertMethod)
@@ -771,9 +714,6 @@ class VerifyTest extends UnitTestBase
 
     /**
      * Test Verify::contain() with & without object identity.
-     *
-     * @param bool   $modifierCondition
-     * @param string $assertMethod
      *
      * @dataProvider containAssertMethods
      */
@@ -801,9 +741,6 @@ class VerifyTest extends UnitTestBase
     /**
      * Test Verify::containOnly().
      *
-     * @param bool   $modifierCondition
-     * @param string $assertMethod
-     *
      * @dataProvider containOnlyAssertMethods
      */
     public function testContainOnly(bool $modifierCondition, string $assertMethod)
@@ -819,9 +756,6 @@ class VerifyTest extends UnitTestBase
 
     /**
      * Test Verify::equalTo().
-     *
-     * @param bool   $modifierCondition
-     * @param string $assertMethod
      *
      * @dataProvider equalToAssertMethods
      */
@@ -845,9 +779,6 @@ class VerifyTest extends UnitTestBase
 
     /**
      * Test Verify::equalTo() with or without case sensitivity.
-     *
-     * @param bool   $modifierCondition
-     * @param string $assertMethod
      *
      * @dataProvider equalToAssertMethods
      */
@@ -889,9 +820,6 @@ class VerifyTest extends UnitTestBase
     /**
      * Test Verify::equalToFile().
      *
-     * @param bool   $modifierCondition
-     * @param string $assertMethod
-     *
      * @dataProvider equalToFileAssertMethods
      */
     public function testEqualToFile(bool $modifierCondition, string $assertMethod)
@@ -912,9 +840,6 @@ class VerifyTest extends UnitTestBase
 
     /**
      * Test Verify::equalToFile() with or without case sensitivity.
-     *
-     * @param bool   $modifierCondition
-     * @param string $assertMethod
      *
      * @dataProvider equalToFileAssertMethods
      */
@@ -952,9 +877,6 @@ class VerifyTest extends UnitTestBase
     /**
      * Test Verify::equalTo() with some float delta.
      *
-     * @param bool   $modifierCondition
-     * @param string $assertMethod
-     *
      * @dataProvider equalToAssertMethods
      */
     public function testEqualToFloatDelta(bool $modifierCondition, string $assertMethod)
@@ -977,9 +899,6 @@ class VerifyTest extends UnitTestBase
 
     /**
      * Test Verify::equalTo() with or without order.
-     *
-     * @param bool   $modifierCondition
-     * @param string $assertMethod
      *
      * @dataProvider equalToAssertMethods
      */
@@ -1064,35 +983,34 @@ class VerifyTest extends UnitTestBase
         $this->setModifierCondition(true);
 
         $this->mockAssert->shouldReceive('assertArraySubset')
-            ->with('subset', 'actual value', Mockery::any(), 'some message')
+            ->with(['subset'], 'actual value', Mockery::any(), 'some message')
             ->once();
 
-        $this->assertSame($this->subject, $this->subject->subset('subset'));
+        $this->assertSame($this->subject, $this->subject->subset(['subset']));
 
         $this->subject = new Verify('actual with type', 'message with type');
         $this->setModifierCondition(true);
 
         $this->mockAssert->shouldReceive('assertArraySubset')
-            ->with('subset with type', 'actual with type', true, 'message with type')
+            ->with(['subset with type'], 'actual with type', true, 'message with type')
             ->once();
 
-        $this->assertSame($this->subject, $this->subject->withType()->subset('subset with type'));
+        $this->assertSame($this->subject, $this->subject->withType()->subset(['subset with type']));
 
         $this->subject = new Verify('actual w/o type', 'message w/o type');
         $this->setModifierCondition(true);
 
         $this->mockAssert->shouldReceive('assertArraySubset')
-            ->with('subset w/o type', 'actual w/o type', false, 'message w/o type')
+            ->with(['subset w/o type'], 'actual w/o type', false, 'message w/o type')
             ->once();
 
-        $this->assertSame($this->subject, $this->subject->withoutType()->subset('subset w/o type'));
+        $this->assertSame($this->subject, $this->subject->withoutType()->subset(['subset w/o type']));
     }
 
     /**
      * Test methods that do not support negative conditions throw an exception.
      *
-     * @param string $methodName
-     * @param mixed  $value
+     * @param mixed $value
      *
      * @dataProvider methodsWithoutNegativeCondition
      */

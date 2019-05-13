@@ -6,11 +6,14 @@ namespace BeBat\Verify\Test;
 
 use BeBat\Verify\VerifyDirectory;
 
-class VerifyDirectoryTest extends UnitTestBase
+/**
+ * @internal
+ */
+final class VerifyDirectoryTest extends UnitTestBase
 {
     protected $defaultActualValue = 'directory under test';
 
-    public function setUp()
+    protected function setUp()
     {
         $this->subject = new VerifyDirectory($this->defaultActualValue, 'some message');
 
@@ -19,8 +22,6 @@ class VerifyDirectoryTest extends UnitTestBase
 
     /**
      * All VerifyDirectory methods.
-     *
-     * @return array
      */
     public function allMethods(): array
     {
@@ -33,8 +34,6 @@ class VerifyDirectoryTest extends UnitTestBase
 
     /**
      * All VerifyDirectory methods and their PHPUnit assertions that do not take a value for comparison.
-     *
-     * @return array
      */
     public function noParamMethods(): array
     {
@@ -51,10 +50,7 @@ class VerifyDirectoryTest extends UnitTestBase
     /**
      * VerifyDirectory doesn't have any comparison methods so override parent test with a no-op.
      *
-     * @param bool   $modifierCondition
-     * @param string $verifyMethod
-     * @param string $assertMethod
-     * @param mixed  $expectedValue
+     * @param mixed $expectedValue
      *
      * @doesNotPerformAssertions
      */

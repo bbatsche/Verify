@@ -1,0 +1,21 @@
+parameters:
+  ignoreErrors:
+    -
+      message: '/PHPDoc tag @param references unknown parameter: \$actual/'
+      path: %currentWorkingDirectory%/src/function.php
+    -
+      message: '/PHPDoc tag @param references unknown parameter: \$description/'
+      path: %currentWorkingDirectory%/src/function.php
+    -
+      message: '/Trying to invoke string but it might not be a callable/'
+      path: %currentWorkingDirectory%/test/FunctionsTest.php
+    -
+      message: '/Property [a-zA-Z\\:$]+ \([a-zA-Z\\&|]+\) does not accept alias:[a-zA-Z\\&|]+/'
+      path: %currentWorkingDirectory%/test/UnitTestBase.php
+    -
+      message: '/Call to an undefined method BeBat\\Verify\\Verify::[a-z_]+_conjunction\(\)/'
+      path: %currentWorkingDirectory%/test/VerifyTest.php
+includes:
+  - vendor/phpstan/phpstan-mockery/extension.neon
+  - vendor/phpstan/phpstan-phpunit/extension.neon
+  - vendor/phpstan/phpstan-phpunit/rules.neon

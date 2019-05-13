@@ -74,26 +74,23 @@ abstract class VerifyBase
     /**
      * Set positive or negative modifier and chain method calls along.
      *
-     * @param string $method
-     * @param array  $arguments
-     *
-     * @return self
+     * @return static
      */
     public function __call(string $method, array $arguments = []): self
     {
-        if (\in_array($method, self::$positiveConjunctions)) {
+        if (\in_array($method, self::$positiveConjunctions, true)) {
             $this->modifierCondition = true;
 
             return $this;
         }
 
-        if (\in_array($method, self::$negativeConjunctions)) {
+        if (\in_array($method, self::$negativeConjunctions, true)) {
             $this->modifierCondition = false;
 
             return $this;
         }
 
-        if (\in_array($method, self::$neutralConjunctions)) {
+        if (\in_array($method, self::$neutralConjunctions, true)) {
             return $this;
         }
 
@@ -103,7 +100,7 @@ abstract class VerifyBase
     /**
      * Turn on case sensitivity when checking SUT.
      *
-     * @return self
+     * @return static
      */
     public function withCase(): self
     {
@@ -115,7 +112,7 @@ abstract class VerifyBase
     /**
      * Turn off case sensitivity when checking SUT.
      *
-     * @return self
+     * @return static
      */
     public function withoutCase(): self
     {

@@ -9,13 +9,13 @@ use BeBat\Verify\VerifyDirectory;
 use BeBat\Verify\VerifyFile;
 use PHPUnit\Framework\TestCase;
 
-class FunctionsTest extends TestCase
+/**
+ * @internal
+ */
+final class FunctionsTest extends TestCase
 {
     /**
      * Test verify*() methods' default behavior.
-     *
-     * @param string $functionName
-     * @param string $className
      *
      * @dataProvider verifyFunctions
      */
@@ -36,8 +36,6 @@ class FunctionsTest extends TestCase
     /**
      * Test exception thrown with zero arguments.
      *
-     * @param string $functionName
-     *
      * @dataProvider verifyFunctions
      */
     public function testFunctionNoArguments(string $functionName)
@@ -49,8 +47,6 @@ class FunctionsTest extends TestCase
     /**
      * Test exception thrown with too many arguments.
      *
-     * @param string $functionName
-     *
      * @dataProvider verifyFunctions
      */
     public function testFunctionTooManyArguments(string $functionName)
@@ -61,8 +57,6 @@ class FunctionsTest extends TestCase
 
     /**
      * All verify functions and their corresponding classes.
-     *
-     * @return array
      */
     public function verifyFunctions(): array
     {

@@ -5,8 +5,6 @@ BDD Assertions for PHPUnit and Codeception
 This is very tiny wrapper for PHPUnit assertions, that are aimed to make tests a bit more readable.
 With BDD assertions influenced by Chai, Jasmine, and RSpec your assertions would be a bit closer to natural language.
 
-[![Ready Stories](https://badge.waffle.io/bbatsche/Verify.png?label=ready&title=Ready)](https://waffle.io/bbatsche/Verify)
-[![Stories In Progress](https://badge.waffle.io/bbatsche/Verify.png?label=in+progress&title=In+Progress)](https://waffle.io/bbatsche/Verify)
 [![Latest Stable Version](https://img.shields.io/packagist/v/bebat/verify.svg?style=plastic)](https://packagist.org/packages/bebat/verify)
 [![Total Downloads](https://img.shields.io/packagist/dt/bebat/verify.svg?style=plastic)](https://packagist.org/packages/bebat/verify)
 [![License](https://img.shields.io/packagist/l/bebat/verify.svg?style=plastic)](https://packagist.org/packages/bebat/verify)

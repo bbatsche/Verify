@@ -24,7 +24,7 @@ abstract class UnitTestBase extends TestCase
     /**
      * Assertion mock.
      *
-     * @var Assert|\Mockery\MockInterface
+     * @var Assert&\Mockery\MockInterface
      */
     protected $mockAssert;
 
@@ -43,8 +43,7 @@ abstract class UnitTestBase extends TestCase
     /**
      * Test MissingConditionException is thrown for all methods.
      *
-     * @param string $verifyMethod
-     * @param mixed  $value
+     * @param mixed $value
      *
      * @dataProvider allMethods
      */
@@ -57,10 +56,6 @@ abstract class UnitTestBase extends TestCase
 
     /**
      * Test VerifyFile methods that don't take any value.
-     *
-     * @param bool   $modifierCondition
-     * @param string $verifyMethod
-     * @param string $assertMethod
      *
      * @dataProvider noParamMethods
      */
@@ -78,10 +73,7 @@ abstract class UnitTestBase extends TestCase
     /**
      * Test verify methods that take in a single value for comparison.
      *
-     * @param bool   $modifierCondition
-     * @param string $verifyMethod
-     * @param string $assertMethod
-     * @param mixed  $expectedValue
+     * @param mixed $expectedValue
      *
      * @dataProvider singleParamMethods
      */

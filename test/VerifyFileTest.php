@@ -7,11 +7,21 @@ namespace BeBat\Verify\Test;
 use BeBat\Verify\VerifyFile;
 use Mockery;
 
-class VerifyFileTest extends UnitTestBase
+/**
+ * @internal
+ */
+final class VerifyFileTest extends UnitTestBase
 {
     protected $defaultActualValue = 'file under test';
 
-    public function setUp()
+    /**
+     * VerifyFile class.
+     *
+     * @var \BeBat\Verify\VerifyFile
+     */
+    protected $subject;
+
+    protected function setUp()
     {
         $this->subject = new VerifyFile($this->defaultActualValue, 'some message');
 
@@ -20,8 +30,6 @@ class VerifyFileTest extends UnitTestBase
 
     /**
      * All VerifyFile methods.
-     *
-     * @return array
      */
     public function allMethods(): array
     {
@@ -37,8 +45,6 @@ class VerifyFileTest extends UnitTestBase
 
     /**
      * PHPUnit assertions used by VerifyFile::equalTo().
-     *
-     * @return array
      */
     public function equalToMethods(): array
     {
@@ -50,8 +56,6 @@ class VerifyFileTest extends UnitTestBase
 
     /**
      * All VerifyFile methods and their PHPUnit assertions that do not take a value for comparison.
-     *
-     * @return array
      */
     public function noParamMethods(): array
     {
@@ -67,8 +71,6 @@ class VerifyFileTest extends UnitTestBase
 
     /**
      * All VerifyFile methods and their PHPUnit assertions that take in a single parameter.
-     *
-     * @return array
      */
     public function singleParamMethods(): array
     {
@@ -82,9 +84,6 @@ class VerifyFileTest extends UnitTestBase
 
     /**
      * Test VerifyFile::equalTo().
-     *
-     * @param bool   $modifierConition
-     * @param string $assertMethod
      *
      * @dataProvider equalToMethods
      */

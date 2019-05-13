@@ -2,11 +2,18 @@
     "name": "bebat/verify",
     "description": "BDD assertion library for PHPUnit",
     "keywords": [
-        "bdd", "assertions", "unit testing", "unit test", "phpunit", "codeception", "unit", "test", "testing"
+        "bdd",
+        "assertions",
+        "unit testing",
+        "unit test",
+        "phpunit",
+        "codeception",
+        "unit",
+        "test",
+        "testing"
     ],
     "homepage": "https://github.com/bbatsche/Verify",
     "license": "MIT",
-    "minimum-stability": "stable",
     "authors": [
         {
             "name": "Michael Bodnarchuk",
@@ -17,40 +24,53 @@
             "homepage": "http://github.com/bbatsche"
         }
     ],
-    "support": {
-        "issues": "https://waffle.io/bbatsche/verify",
-        "docs": "http://bbatsche.github.io/Verify/"
-    },
     "require": {
-        "php": ">=7.0",
-        "phpunit/phpunit": ">=6.0"
-    },
-    "require-dev": {
-        "friendsofphp/php-cs-fixer": "^2.12",
-        "mockery/mockery": "^1.0"
+        "php": "^7.0",
+        "phpunit/phpunit": "^6.0 || ^7.0"
     },
     "replace": {
         "codeception/verify": "*"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^2.15",
+        "localheinz/composer-normalize": "^1.1",
+        "mockery/mockery": "^1.0",
+        "maglnet/composer-require-checker": "^2.0",
+        "phpstan/phpstan": "^0.11.6",
+        "phpstan/phpstan-mockery": "^0.11.0",
+        "phpstan/phpstan-phpunit": "^0.11.0"
     },
     "suggest": {
         "codeception/specify": "Highly readable test code blocks for PHPUnit and Codeception"
     },
     "autoload": {
-        "files": ["src/function.php"],
         "psr-4": {
             "BeBat\\Verify\\": "src"
-        }
+        },
+        "files": [
+            "src/function.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
             "BeBat\\Verify\\Test\\": "test"
         }
     },
+    "minimum-stability": "stable",
     "scripts": {
-        "cs-check": "php-cs-fixer fix -v --allow-risky=yes --ansi --dry-run --diff",
-        "cs-check-file": "php-cs-fixer fix -v --allow-risky=yes --ansi --dry-run --diff --path-mode=intersection",
-        "cs-fix": "php-cs-fixer fix -v --allow-risky=yes --ansi",
-        "test": "phpunit --colors=always",
-        "test-coverage": "phpunit --coverage-clover=coverage.xml"
+        "cs:check": "php-cs-fixer fix -v --allow-risky=yes --ansi --dry-run --diff",
+        "cs:fix": "php-cs-fixer fix -v --allow-risky=yes --ansi",
+        "test:all": [
+            "@composer cs:check",
+            "@composer test:static",
+            "@composer test:unit"
+        ],
+        "test:coverage": "phpunit --coverage-clover=coverage.xml",
+        "test:static": "phpstan analyze --ansi --level 7 src test",
+        "test:unit": "phpunit --colors=always"
+    },
+    "support": {
+        "issues": "https://github.com/bbatsche/Verify/issues",
+        "docs": "https://github.com/bbatsche/Verify/blob/master/README.md"
     }
 }
