@@ -85,6 +85,26 @@ class Verify extends VerifyBase
     }
 
     /**
+     * Assert that SUT is or is not an array.
+     *
+     * return self
+     */
+    public function array(): self
+    {
+        if (!isset($this->modifierCondition)) {
+            throw new MissingConditionException();
+        }
+
+        if ($this->modifierCondition) {
+            a::assertIsArray($this->getActualValue(), $this->description);
+        } else {
+            a::assertIsNotArray($this->getActualValue(), $this->description);
+        }
+
+        return $this;
+    }
+
+    /**
      * Assert SUT does or does not have a given class attribute.
      *
      * @param string $attribute Name of attribute expected to be in SUT
@@ -120,6 +140,46 @@ class Verify extends VerifyBase
     public function attributeNamed(string $attr): self
     {
         $this->attributeName = $attr;
+
+        return $this;
+    }
+
+    /**
+     * Assert that SUT is or is not a boolean.
+     *
+     * return self
+     */
+    public function bool(): self
+    {
+        if (!isset($this->modifierCondition)) {
+            throw new MissingConditionException();
+        }
+
+        if ($this->modifierCondition) {
+            a::assertIsBool($this->getActualValue(), $this->description);
+        } else {
+            a::assertIsNotBool($this->getActualValue(), $this->description);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert that SUT is or is not callable.
+     *
+     * return self
+     */
+    public function callable(): self
+    {
+        if (!isset($this->modifierCondition)) {
+            throw new MissingConditionException();
+        }
+
+        if ($this->modifierCondition) {
+            a::assertIsCallable($this->getActualValue(), $this->description);
+        } else {
+            a::assertIsNotCallable($this->getActualValue(), $this->description);
+        }
 
         return $this;
     }
@@ -435,6 +495,26 @@ class Verify extends VerifyBase
     }
 
     /**
+     * Assert that SUT is or is not a float.
+     *
+     * return self
+     */
+    public function float(): self
+    {
+        if (!isset($this->modifierCondition)) {
+            throw new MissingConditionException();
+        }
+
+        if ($this->modifierCondition) {
+            a::assertIsFloat($this->getActualValue(), $this->description);
+        } else {
+            a::assertIsNotFloat($this->getActualValue(), $this->description);
+        }
+
+        return $this;
+    }
+
+    /**
      * Assert SUT is or is not greater than or equal to a given value.
      *
      * @param int|float $expected Value SUT is expected to be greater than or equal to
@@ -513,6 +593,26 @@ class Verify extends VerifyBase
     }
 
     /**
+     * Assert that SUT is or is not an integer.
+     *
+     * return self
+     */
+    public function int(): self
+    {
+        if (!isset($this->modifierCondition)) {
+            throw new MissingConditionException();
+        }
+
+        if ($this->modifierCondition) {
+            a::assertIsInt($this->getActualValue(), $this->description);
+        } else {
+            a::assertIsNotInt($this->getActualValue(), $this->description);
+        }
+
+        return $this;
+    }
+
+    /**
      * Assert SUT is or is not a given PHP data type.
      *
      * @param string $type Data type SUT is expected to be
@@ -527,6 +627,26 @@ class Verify extends VerifyBase
             a::assertInternalType($type, $this->getActualValue(), $this->description);
         } else {
             a::assertNotInternalType($type, $this->getActualValue(), $this->description);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert that SUT is or is not iterable.
+     *
+     * return self
+     */
+    public function iterable(): self
+    {
+        if (!isset($this->modifierCondition)) {
+            throw new MissingConditionException();
+        }
+
+        if ($this->modifierCondition) {
+            a::assertIsIterable($this->getActualValue(), $this->description);
+        } else {
+            a::assertIsNotIterable($this->getActualValue(), $this->description);
         }
 
         return $this;
@@ -711,6 +831,66 @@ class Verify extends VerifyBase
     }
 
     /**
+     * Assert that SUT is or is not numeric.
+     *
+     * return self
+     */
+    public function numeric(): self
+    {
+        if (!isset($this->modifierCondition)) {
+            throw new MissingConditionException();
+        }
+
+        if ($this->modifierCondition) {
+            a::assertIsNumeric($this->getActualValue(), $this->description);
+        } else {
+            a::assertIsNotNumeric($this->getActualValue(), $this->description);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert that SUT is or is not an object.
+     *
+     * return self
+     */
+    public function object(): self
+    {
+        if (!isset($this->modifierCondition)) {
+            throw new MissingConditionException();
+        }
+
+        if ($this->modifierCondition) {
+            a::assertIsObject($this->getActualValue(), $this->description);
+        } else {
+            a::assertIsNotObject($this->getActualValue(), $this->description);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert that SUT is or is not a resource.
+     *
+     * return self
+     */
+    public function resource(): self
+    {
+        if (!isset($this->modifierCondition)) {
+            throw new MissingConditionException();
+        }
+
+        if ($this->modifierCondition) {
+            a::assertIsResource($this->getActualValue(), $this->description);
+        } else {
+            a::assertIsNotResource($this->getActualValue(), $this->description);
+        }
+
+        return $this;
+    }
+
+    /**
      * Assert SUT does or does not have both the same value and type as a given value.
      *
      * @param mixed $expected Value SUT is exptected to match
@@ -751,6 +931,26 @@ class Verify extends VerifyBase
     }
 
     /**
+     * Assert that SUT is or is not scalar.
+     *
+     * return self
+     */
+    public function scalar(): self
+    {
+        if (!isset($this->modifierCondition)) {
+            throw new MissingConditionException();
+        }
+
+        if ($this->modifierCondition) {
+            a::assertIsScalar($this->getActualValue(), $this->description);
+        } else {
+            a::assertIsNotScalar($this->getActualValue(), $this->description);
+        }
+
+        return $this;
+    }
+
+    /**
      * Assert SUT does or does not start with a given value.
      *
      * @param string $prefix Value SUT is expected to start with
@@ -785,6 +985,26 @@ class Verify extends VerifyBase
             a::assertClassHasStaticAttribute($attribute, $this->getActualValue(), $this->description);
         } else {
             a::assertClassNotHasStaticAttribute($attribute, $this->getActualValue(), $this->description);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert that SUT is or is not a string.
+     *
+     * return self
+     */
+    public function string(): self
+    {
+        if (!isset($this->modifierCondition)) {
+            throw new MissingConditionException();
+        }
+
+        if ($this->modifierCondition) {
+            a::assertIsString($this->getActualValue(), $this->description);
+        } else {
+            a::assertIsNotString($this->getActualValue(), $this->description);
         }
 
         return $this;
