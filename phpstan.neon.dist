@@ -15,6 +15,9 @@ parameters:
       message: '/has parameter \$args with no typehint specified/'
       path: %currentWorkingDirectory%/src/function.php
     -
+      message: '/Negated boolean expression is always false/'
+      path: %currentWorkingDirectory%/src/Verify.php
+    -
       message: '/Trying to invoke string but it might not be a callable/'
       path: %currentWorkingDirectory%/test/FunctionsTest.php
     -

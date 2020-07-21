@@ -8,6 +8,9 @@ use BadMethodCallException;
 use BeBat\Verify\Assert as a;
 use Countable;
 use DOMElement;
+use ReflectionClass;
+use ReflectionException;
+use ReflectionObject;
 use Traversable;
 
 /**
@@ -94,15 +97,15 @@ class Verify extends VerifyBase
 
         if ($this->modifierCondition) {
             if (\is_string($this->actual)) {
-                a::assertClassHasAttribute($attribute, $this->actual, $this->description);
+                a::assertClassHasAttribute($attribute, $this->getActualValue(), $this->description);
             } else {
-                a::assertObjectHasAttribute($attribute, $this->actual, $this->description);
+                a::assertObjectHasAttribute($attribute, $this->getActualValue(), $this->description);
             }
         } else {
             if (\is_string($this->actual)) {
-                a::assertClassNotHasAttribute($attribute, $this->actual, $this->description);
+                a::assertClassNotHasAttribute($attribute, $this->getActualValue(), $this->description);
             } else {
-                a::assertObjectNotHasAttribute($attribute, $this->actual, $this->description);
+                a::assertObjectNotHasAttribute($attribute, $this->getActualValue(), $this->description);
             }
         }
 
@@ -133,47 +136,23 @@ class Verify extends VerifyBase
         }
 
         if ($this->modifierCondition) {
-            if (isset($this->attributeName)) {
-                a::assertAttributeContains(
-                    $needle,
-                    $this->attributeName,
-                    $this->actual,
-                    $this->description,
-                    $this->ignoreCase,
-                    $this->objectIdentity,
-                    $this->dataType
-                );
-            } else {
-                a::assertContains(
-                    $needle,
-                    $this->actual,
-                    $this->description,
-                    $this->ignoreCase,
-                    $this->objectIdentity,
-                    $this->dataType
-                );
-            }
+            a::assertContains(
+                $needle,
+                $this->getActualValue(),
+                $this->description,
+                $this->ignoreCase,
+                $this->objectIdentity,
+                $this->dataType
+            );
         } else {
-            if (isset($this->attributeName)) {
-                a::assertAttributeNotContains(
-                    $needle,
-                    $this->attributeName,
-                    $this->actual,
-                    $this->description,
-                    $this->ignoreCase,
-                    $this->objectIdentity,
-                    $this->dataType
-                );
-            } else {
-                a::assertNotContains(
-                    $needle,
-                    $this->actual,
-                    $this->description,
-                    $this->ignoreCase,
-                    $this->objectIdentity,
-                    $this->dataType
-                );
-            }
+            a::assertNotContains(
+                $needle,
+                $this->getActualValue(),
+                $this->description,
+                $this->ignoreCase,
+                $this->objectIdentity,
+                $this->dataType
+            );
         }
 
         return $this;
@@ -191,21 +170,11 @@ class Verify extends VerifyBase
         }
 
         if ($this->modifierCondition) {
-            if (isset($this->attributeName)) {
-                // $isNativeType can be determined automatically
-                a::assertAttributeContainsOnly($type, $this->attributeName, $this->actual, null, $this->description);
-            } else {
-                // $isNativeType can be determined automatically
-                a::assertContainsOnly($type, $this->actual, null, $this->description);
-            }
+            // $isNativeType can be determined automatically
+            a::assertContainsOnly($type, $this->getActualValue(), null, $this->description);
         } else {
-            if (isset($this->attributeName)) {
-                // $isNativeType can be determined automatically
-                a::assertAttributeNotContainsOnly($type, $this->attributeName, $this->actual, null, $this->description);
-            } else {
-                // $isNativeType can be determined automatically
-                a::assertNotContainsOnly($type, $this->actual, null, $this->description);
-            }
+            // $isNativeType can be determined automatically
+            a::assertNotContainsOnly($type, $this->getActualValue(), null, $this->description);
         }
 
         return $this;
@@ -225,17 +194,9 @@ class Verify extends VerifyBase
         }
 
         if ($this->modifierCondition) {
-            if (isset($this->attributeName)) {
-                a::assertAttributeCount($count, $this->attributeName, $this->actual, $this->description);
-            } else {
-                a::assertCount($count, $this->actual, $this->description);
-            }
+            a::assertCount($count, $this->getActualValue(), $this->description);
         } else {
-            if (isset($this->attributeName)) {
-                a::assertAttributeNotCount($count, $this->attributeName, $this->actual, $this->description);
-            } else {
-                a::assertNotCount($count, $this->actual, $this->description);
-            }
+            a::assertNotCount($count, $this->getActualValue(), $this->description);
         }
 
         return $this;
@@ -251,17 +212,9 @@ class Verify extends VerifyBase
         }
 
         if ($this->modifierCondition) {
-            if (isset($this->attributeName)) {
-                a::assertAttributeEmpty($this->attributeName, $this->actual, $this->description);
-            } else {
-                a::assertEmpty($this->actual, $this->description);
-            }
+            a::assertEmpty($this->getActualValue(), $this->description);
         } else {
-            if (isset($this->attributeName)) {
-                a::assertAttributeNotEmpty($this->attributeName, $this->actual, $this->description);
-            } else {
-                a::assertNotEmpty($this->actual, $this->description);
-            }
+            a::assertNotEmpty($this->getActualValue(), $this->description);
         }
 
         return $this;
@@ -279,9 +232,9 @@ class Verify extends VerifyBase
         }
 
         if ($this->modifierCondition) {
-            a::assertStringEndsWith($suffix, $this->actual, $this->description);
+            a::assertStringEndsWith($suffix, $this->getActualValue(), $this->description);
         } else {
-            a::assertStringEndsNotWith($suffix, $this->actual, $this->description);
+            a::assertStringEndsNotWith($suffix, $this->getActualValue(), $this->description);
         }
 
         return $this;
@@ -299,51 +252,25 @@ class Verify extends VerifyBase
         }
 
         if ($this->modifierCondition) {
-            if (isset($this->attributeName)) {
-                a::assertAttributeEquals(
-                    $expected,
-                    $this->attributeName,
-                    $this->actual,
-                    $this->description,
-                    $this->floatDelta,
-                    $this->maxDepth,
-                    $this->ignoreOrder,
-                    $this->ignoreCase
-                );
-            } else {
-                a::assertEquals(
-                    $expected,
-                    $this->actual,
-                    $this->description,
-                    $this->floatDelta,
-                    $this->maxDepth,
-                    $this->ignoreOrder,
-                    $this->ignoreCase
-                );
-            }
+            a::assertEquals(
+                $expected,
+                $this->getActualValue(),
+                $this->description,
+                $this->floatDelta,
+                $this->maxDepth,
+                $this->ignoreOrder,
+                $this->ignoreCase
+            );
         } else {
-            if (isset($this->attributeName)) {
-                a::assertAttributeNotEquals(
-                    $expected,
-                    $this->attributeName,
-                    $this->actual,
-                    $this->description,
-                    $this->floatDelta,
-                    $this->maxDepth,
-                    $this->ignoreOrder,
-                    $this->ignoreCase
-                );
-            } else {
-                a::assertNotEquals(
-                    $expected,
-                    $this->actual,
-                    $this->description,
-                    $this->floatDelta,
-                    $this->maxDepth,
-                    $this->ignoreOrder,
-                    $this->ignoreCase
-                );
-            }
+            a::assertNotEquals(
+                $expected,
+                $this->getActualValue(),
+                $this->description,
+                $this->floatDelta,
+                $this->maxDepth,
+                $this->ignoreOrder,
+                $this->ignoreCase
+            );
         }
 
         return $this;
@@ -362,10 +289,10 @@ class Verify extends VerifyBase
 
         if ($this->modifierCondition) {
             // $canonicalize hardcoded to false
-            a::assertStringEqualsFile($file, $this->actual, $this->description, false, $this->ignoreCase);
+            a::assertStringEqualsFile($file, $this->getActualValue(), $this->description, false, $this->ignoreCase);
         } else {
             // $canonicalize hardcoded to false
-            a::assertStringNotEqualsFile($file, $this->actual, $this->description, false, $this->ignoreCase);
+            a::assertStringNotEqualsFile($file, $this->getActualValue(), $this->description, false, $this->ignoreCase);
         }
 
         return $this;
@@ -383,9 +310,9 @@ class Verify extends VerifyBase
         }
 
         if ($this->modifierCondition) {
-            a::assertJsonStringEqualsJsonFile($file, $this->actual, $this->description);
+            a::assertJsonStringEqualsJsonFile($file, $this->getActualValue(), $this->description);
         } else {
-            a::assertJsonStringNotEqualsJsonFile($file, $this->actual, $this->description);
+            a::assertJsonStringNotEqualsJsonFile($file, $this->getActualValue(), $this->description);
         }
 
         return $this;
@@ -403,9 +330,9 @@ class Verify extends VerifyBase
         }
 
         if ($this->modifierCondition) {
-            a::assertJsonStringEqualsJsonString($string, $this->actual, $this->description);
+            a::assertJsonStringEqualsJsonString($string, $this->getActualValue(), $this->description);
         } else {
-            a::assertJsonStringNotEqualsJsonString($string, $this->actual, $this->description);
+            a::assertJsonStringNotEqualsJsonString($string, $this->getActualValue(), $this->description);
         }
 
         return $this;
@@ -423,9 +350,9 @@ class Verify extends VerifyBase
         }
 
         if ($this->modifierCondition) {
-            a::assertXmlStringEqualsXmlFile($file, $this->actual, $this->description);
+            a::assertXmlStringEqualsXmlFile($file, $this->getActualValue(), $this->description);
         } else {
-            a::assertXmlStringNotEqualsXmlFile($file, $this->actual, $this->description);
+            a::assertXmlStringNotEqualsXmlFile($file, $this->getActualValue(), $this->description);
         }
 
         return $this;
@@ -443,9 +370,9 @@ class Verify extends VerifyBase
         }
 
         if ($this->modifierCondition) {
-            a::assertXmlStringEqualsXmlString($xmlString, $this->actual, $this->description);
+            a::assertXmlStringEqualsXmlString($xmlString, $this->getActualValue(), $this->description);
         } else {
-            a::assertXmlStringNotEqualsXmlString($xmlString, $this->actual, $this->description);
+            a::assertXmlStringNotEqualsXmlString($xmlString, $this->getActualValue(), $this->description);
         }
 
         return $this;
@@ -463,7 +390,7 @@ class Verify extends VerifyBase
         }
 
         if ($this->modifierCondition) {
-            a::assertEqualXMLStructure($xml, $this->actual, $this->xmlAttributes, $this->description);
+            a::assertEqualXMLStructure($xml, $this->getActualValue(), $this->xmlAttributes, $this->description);
         } else {
             throw new BadMethodCallException(__METHOD__ . ' does not support negative condition.');
         }
@@ -481,9 +408,9 @@ class Verify extends VerifyBase
         }
 
         if ($this->modifierCondition) {
-            a::assertFalse($this->actual, $this->description);
+            a::assertFalse($this->getActualValue(), $this->description);
         } else {
-            a::assertNotFalse($this->actual, $this->description);
+            a::assertNotFalse($this->getActualValue(), $this->description);
         }
 
         return $this;
@@ -499,9 +426,9 @@ class Verify extends VerifyBase
         }
 
         if ($this->modifierCondition) {
-            a::assertFinite($this->actual, $this->description);
+            a::assertFinite($this->getActualValue(), $this->description);
         } else {
-            a::assertInfinite($this->actual, $this->description);
+            a::assertInfinite($this->getActualValue(), $this->description);
         }
 
         return $this;
@@ -519,17 +446,9 @@ class Verify extends VerifyBase
         }
 
         if ($this->modifierCondition) {
-            if (isset($this->attributeName)) {
-                a::assertAttributeGreaterThanOrEqual($expected, $this->attributeName, $this->actual, $this->description);
-            } else {
-                a::assertGreaterThanOrEqual($expected, $this->actual, $this->description);
-            }
+            a::assertGreaterThanOrEqual($expected, $this->getActualValue(), $this->description);
         } else {
-            if (isset($this->attributeName)) {
-                a::assertAttributeLessThan($expected, $this->attributeName, $this->actual, $this->description);
-            } else {
-                a::assertLessThan($expected, $this->actual, $this->description);
-            }
+            a::assertLessThan($expected, $this->getActualValue(), $this->description);
         }
 
         return $this;
@@ -547,17 +466,9 @@ class Verify extends VerifyBase
         }
 
         if ($this->modifierCondition) {
-            if (isset($this->attributeName)) {
-                a::assertAttributeGreaterThan($expected, $this->attributeName, $this->actual, $this->description);
-            } else {
-                a::assertGreaterThan($expected, $this->actual, $this->description);
-            }
+            a::assertGreaterThan($expected, $this->getActualValue(), $this->description);
         } else {
-            if (isset($this->attributeName)) {
-                a::assertAttributeLessThanOrEqual($expected, $this->attributeName, $this->actual, $this->description);
-            } else {
-                a::assertLessThanOrEqual($expected, $this->actual, $this->description);
-            }
+            a::assertLessThanOrEqual($expected, $this->getActualValue(), $this->description);
         }
 
         return $this;
@@ -573,9 +484,9 @@ class Verify extends VerifyBase
         }
 
         if ($this->modifierCondition) {
-            a::assertInfinite($this->actual, $this->description);
+            a::assertInfinite($this->getActualValue(), $this->description);
         } else {
-            a::assertFinite($this->actual, $this->description);
+            a::assertFinite($this->getActualValue(), $this->description);
         }
 
         return $this;
@@ -593,17 +504,9 @@ class Verify extends VerifyBase
         }
 
         if ($this->modifierCondition) {
-            if (isset($this->attributeName)) {
-                a::assertAttributeInstanceOf($class, $this->attributeName, $this->actual, $this->description);
-            } else {
-                a::assertInstanceOf($class, $this->actual, $this->description);
-            }
+            a::assertInstanceOf($class, $this->getActualValue(), $this->description);
         } else {
-            if (isset($this->attributeName)) {
-                a::assertAttributeNotInstanceOf($class, $this->attributeName, $this->actual, $this->description);
-            } else {
-                a::assertNotInstanceOf($class, $this->actual, $this->description);
-            }
+            a::assertNotInstanceOf($class, $this->getActualValue(), $this->description);
         }
 
         return $this;
@@ -621,17 +524,9 @@ class Verify extends VerifyBase
         }
 
         if ($this->modifierCondition) {
-            if (isset($this->attributeName)) {
-                a::assertAttributeInternalType($type, $this->attributeName, $this->actual, $this->description);
-            } else {
-                a::assertInternalType($type, $this->actual, $this->description);
-            }
+            a::assertInternalType($type, $this->getActualValue(), $this->description);
         } else {
-            if (isset($this->attributeName)) {
-                a::assertAttributeNotInternalType($type, $this->attributeName, $this->actual, $this->description);
-            } else {
-                a::assertNotInternalType($type, $this->actual, $this->description);
-            }
+            a::assertNotInternalType($type, $this->getActualValue(), $this->description);
         }
 
         return $this;
@@ -647,7 +542,7 @@ class Verify extends VerifyBase
         }
 
         if ($this->modifierCondition) {
-            a::assertJson($this->actual, $this->description);
+            a::assertJson($this->getActualValue(), $this->description);
         } else {
             throw new BadMethodCallException(__METHOD__ . ' does not support negative condition.');
         }
@@ -667,9 +562,9 @@ class Verify extends VerifyBase
         }
 
         if ($this->modifierCondition) {
-            a::assertArrayHasKey($key, $this->actual, $this->description);
+            a::assertArrayHasKey($key, $this->getActualValue(), $this->description);
         } else {
-            a::assertArrayNotHasKey($key, $this->actual, $this->description);
+            a::assertArrayNotHasKey($key, $this->getActualValue(), $this->description);
         }
 
         return $this;
@@ -687,17 +582,9 @@ class Verify extends VerifyBase
         }
 
         if ($this->modifierCondition) {
-            if (isset($this->attributeName)) {
-                a::assertAttributeLessThanOrEqual($expected, $this->attributeName, $this->actual, $this->description);
-            } else {
-                a::assertLessThanOrEqual($expected, $this->actual, $this->description);
-            }
+            a::assertLessThanOrEqual($expected, $this->getActualValue(), $this->description);
         } else {
-            if (isset($this->attributeName)) {
-                a::assertAttributeGreaterThan($expected, $this->attributeName, $this->actual, $this->description);
-            } else {
-                a::assertGreaterThan($expected, $this->actual, $this->description);
-            }
+            a::assertGreaterThan($expected, $this->getActualValue(), $this->description);
         }
 
         return $this;
@@ -715,17 +602,9 @@ class Verify extends VerifyBase
         }
 
         if ($this->modifierCondition) {
-            if (isset($this->attributeName)) {
-                a::assertAttributeLessThan($expected, $this->attributeName, $this->actual, $this->description);
-            } else {
-                a::assertLessThan($expected, $this->actual, $this->description);
-            }
+            a::assertLessThan($expected, $this->getActualValue(), $this->description);
         } else {
-            if (isset($this->attributeName)) {
-                a::assertAttributeGreaterThanOrEqual($expected, $this->attributeName, $this->actual, $this->description);
-            } else {
-                a::assertGreaterThanOrEqual($expected, $this->actual, $this->description);
-            }
+            a::assertGreaterThanOrEqual($expected, $this->getActualValue(), $this->description);
         }
 
         return $this;
@@ -745,9 +624,9 @@ class Verify extends VerifyBase
         }
 
         if ($this->modifierCondition) {
-            a::assertStringMatchesFormat($format, $this->actual, $this->description);
+            a::assertStringMatchesFormat($format, $this->getActualValue(), $this->description);
         } else {
-            a::assertStringNotMatchesFormat($format, $this->actual, $this->description);
+            a::assertStringNotMatchesFormat($format, $this->getActualValue(), $this->description);
         }
 
         return $this;
@@ -767,9 +646,9 @@ class Verify extends VerifyBase
         }
 
         if ($this->modifierCondition) {
-            a::assertStringMatchesFormatFile($formatFile, $this->actual, $this->description);
+            a::assertStringMatchesFormatFile($formatFile, $this->getActualValue(), $this->description);
         } else {
-            a::assertStringNotMatchesFormatFile($formatFile, $this->actual, $this->description);
+            a::assertStringNotMatchesFormatFile($formatFile, $this->getActualValue(), $this->description);
         }
 
         return $this;
@@ -787,9 +666,9 @@ class Verify extends VerifyBase
         }
 
         if ($this->modifierCondition) {
-            a::assertRegExp($expression, $this->actual, $this->description);
+            a::assertRegExp($expression, $this->getActualValue(), $this->description);
         } else {
-            a::assertNotRegExp($expression, $this->actual, $this->description);
+            a::assertNotRegExp($expression, $this->getActualValue(), $this->description);
         }
 
         return $this;
@@ -805,7 +684,7 @@ class Verify extends VerifyBase
         }
 
         if ($this->modifierCondition) {
-            a::assertNan($this->actual, $this->description);
+            a::assertNan($this->getActualValue(), $this->description);
         } else {
             throw new BadMethodCallException(__METHOD__ . ' does not support negative condition.');
         }
@@ -823,9 +702,9 @@ class Verify extends VerifyBase
         }
 
         if ($this->modifierCondition) {
-            a::assertNull($this->actual, $this->description);
+            a::assertNull($this->getActualValue(), $this->description);
         } else {
-            a::assertNotNull($this->actual, $this->description);
+            a::assertNotNull($this->getActualValue(), $this->description);
         }
 
         return $this;
@@ -843,17 +722,9 @@ class Verify extends VerifyBase
         }
 
         if ($this->modifierCondition) {
-            if (isset($this->attributeName)) {
-                a::assertAttributeSame($expected, $this->attributeName, $this->actual, $this->description);
-            } else {
-                a::assertSame($expected, $this->actual, $this->description);
-            }
+            a::assertSame($expected, $this->getActualValue(), $this->description);
         } else {
-            if (isset($this->attributeName)) {
-                a::assertAttributeNotSame($expected, $this->attributeName, $this->actual, $this->description);
-            } else {
-                a::assertNotSame($expected, $this->actual, $this->description);
-            }
+            a::assertNotSame($expected, $this->getActualValue(), $this->description);
         }
 
         return $this;
@@ -871,9 +742,9 @@ class Verify extends VerifyBase
         }
 
         if ($this->modifierCondition) {
-            a::assertSameSize($expected, $this->actual, $this->description);
+            a::assertSameSize($expected, $this->getActualValue(), $this->description);
         } else {
-            a::assertNotSameSize($expected, $this->actual, $this->description);
+            a::assertNotSameSize($expected, $this->getActualValue(), $this->description);
         }
 
         return $this;
@@ -891,9 +762,9 @@ class Verify extends VerifyBase
         }
 
         if ($this->modifierCondition) {
-            a::assertStringStartsWith($prefix, $this->actual, $this->description);
+            a::assertStringStartsWith($prefix, $this->getActualValue(), $this->description);
         } else {
-            a::assertStringStartsNotWith($prefix, $this->actual, $this->description);
+            a::assertStringStartsNotWith($prefix, $this->getActualValue(), $this->description);
         }
 
         return $this;
@@ -911,9 +782,9 @@ class Verify extends VerifyBase
         }
 
         if ($this->modifierCondition) {
-            a::assertClassHasStaticAttribute($attribute, $this->actual, $this->description);
+            a::assertClassHasStaticAttribute($attribute, $this->getActualValue(), $this->description);
         } else {
-            a::assertClassNotHasStaticAttribute($attribute, $this->actual, $this->description);
+            a::assertClassNotHasStaticAttribute($attribute, $this->getActualValue(), $this->description);
         }
 
         return $this;
@@ -931,7 +802,7 @@ class Verify extends VerifyBase
         }
 
         if ($this->modifierCondition) {
-            a::assertArraySubset($array, $this->actual, $this->dataType, $this->description);
+            a::assertArraySubset($array, $this->getActualValue(), $this->dataType, $this->description);
         } else {
             throw new BadMethodCallException(__METHOD__ . ' does not support negative condition.');
         }
@@ -951,9 +822,9 @@ class Verify extends VerifyBase
         }
 
         if ($this->modifierCondition) {
-            a::assertTrue($this->actual, $this->description);
+            a::assertTrue($this->getActualValue(), $this->description);
         } else {
-            a::assertNotTrue($this->actual, $this->description);
+            a::assertNotTrue($this->getActualValue(), $this->description);
         }
 
         return $this;
@@ -1049,5 +920,105 @@ class Verify extends VerifyBase
         $this->dataType = true;
 
         return $this;
+    }
+
+    /**
+     * Get the value for an attribute (if specified) otherwise return the subject.
+     *
+     * @return mixed
+     */
+    private function getActualValue()
+    {
+        if (!$this->attributeName) {
+            return $this->actual;
+        }
+
+        return $this->readAttribute();
+    }
+
+    /**
+     * Returns the value of an object's attribute.
+     * This also works for attributes that are declared protected or private.
+     *
+     * @throws InvalidAttributeException if subject doesn't have the named attribute
+     *
+     * @return mixed
+     */
+    private function getObjectAttribute()
+    {
+        $reflector = new ReflectionObject($this->actual);
+
+        do {
+            try {
+                \assert(\is_string($this->attributeName));
+
+                $attribute = $reflector->getProperty($this->attributeName);
+
+                if (!$attribute || $attribute->isPublic()) {
+                    return $this->actual->{$this->attributeName};
+                }
+
+                $attribute->setAccessible(true);
+                $value = $attribute->getValue($this->actual);
+                $attribute->setAccessible(false);
+
+                return $value;
+            } catch (ReflectionException $e) {
+            }
+        } while ($reflector = $reflector->getParentClass());
+
+        throw new InvalidAttributeException("Could not find object property \"{$this->attributeName}\".");
+    }
+
+    /**
+     * Returns the value of a static attribute.
+     * This also works for attributes that are declared protected or private.
+     *
+     * @throws InvalidAttributeException if subject doesn't have the named static attribute
+     *
+     * @return mixed
+     */
+    private function getStaticAttribute()
+    {
+        $class = new ReflectionClass($this->actual);
+
+        while ($class) {
+            $attributes = $class->getStaticProperties();
+
+            \assert(\is_string($this->attributeName));
+
+            if (\array_key_exists($this->attributeName, $attributes)) {
+                return $attributes[$this->attributeName];
+            }
+
+            $class = $class->getParentClass();
+        }
+
+        throw new InvalidAttributeException("Could not find static property \"{$this->attributeName}\".");
+    }
+
+    /**
+     * Returns the value of an attribute of a class or an object.
+     * This also works for attributes that are declared protected or private.
+     *
+     * @throws InvalidSubjectException if subject is not a class name or object
+     *
+     * @return mixed
+     */
+    private function readAttribute()
+    {
+        if (\is_string($this->actual)) {
+            if (!class_exists($this->actual)) {
+                throw new InvalidSubjectException("Could not find class \"{$this->actual}\".");
+            }
+
+            return $this->getStaticAttribute();
+        }
+
+        if (\is_object($this->actual)) {
+            return $this->getObjectAttribute();
+        }
+
+        throw new InvalidSubjectException('Subject must be either an object or class name.');
     }
 }

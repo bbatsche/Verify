@@ -9,6 +9,7 @@ use BeBat\Verify\Verify;
 use BeBat\Verify\VerifyDirectory;
 use BeBat\Verify\VerifyFile;
 use PHPUnit\Framework\TestCase;
+use ReflectionObject;
 
 /**
  * @internal
@@ -29,13 +30,33 @@ final class FunctionsTest extends TestCase
         $object = $functionName('no message');
 
         $this->assertInstanceOf($className, $object);
-        $this->assertAttributeSame('no message', 'actual', $object);
+
+        $reflection = new ReflectionObject($object);
+
+        $actual = $reflection->getProperty('actual');
+        $actual->setAccessible(true);
+
+        $this->assertSame('no message', $actual->getValue($object));
+
+        $actual->setAccessible(false);
 
         $object = $functionName('some message', 'message included');
 
         $this->assertInstanceOf($className, $object);
-        $this->assertAttributeSame('message included', 'actual', $object);
-        $this->assertAttributeSame('some message', 'description', $object);
+
+        $reflection = new ReflectionObject($object);
+
+        $actual      = $reflection->getProperty('actual');
+        $description = $reflection->getProperty('description');
+
+        $actual->setAccessible(true);
+        $description->setAccessible(true);
+
+        $this->assertSame('message included', $actual->getValue($object));
+        $this->assertSame('some message', $description->getValue($object));
+
+        $actual->setAccessible(false);
+        $description->setAccessible(false);
     }
 
     /**

@@ -67,7 +67,7 @@ before_install:
   - if [ $TEST_SUITE == "unit" ]; then composer remove --dev ergebnis/composer-normalize maglnet/composer-require-checker phpstan/phpstan phpstan/phpstan-mockery phpstan/phpstan-phpunit phpstan/phpstan-strict-rules; fi
 
 install:
-  - if [ -e composer.lock ]; then rm composer.lock; fi
+  - if [ -e composer.lock ]; then rm -rf composer.lock vendor; fi
   - composer require phpunit/phpunit:^$PHPUNIT_VERSION --update-no-dev --no-interaction --prefer-dist --no-progress --no-suggest --update-with-all-dependencies
   - travis_retry composer install --dev --no-interaction --prefer-dist
 

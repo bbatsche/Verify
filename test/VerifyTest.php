@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace BeBat\Verify\Test;
 
 use BadMethodCallException;
+use BeBat\Verify\InvalidAttributeException;
+use BeBat\Verify\InvalidSubjectException;
 use BeBat\Verify\Verify;
 use DOMElement;
 use Mockery;
+use ReflectionObject;
 use stdClass;
 
 /**
@@ -82,60 +85,23 @@ final class VerifyTest extends UnitTestBase
     }
 
     /**
-     * Assert methods used by contain() for attributes.
+     * Stub objects and their attribute names & values.
      */
-    public function attributeContainAssertMethods(): array
+    public function attributeValues(): array
     {
         return [
-            [true,  'assertAttributeContains'],
-            [false, 'assertAttributeNotContains'],
-        ];
-    }
-
-    /**
-     * Assert methods used by containOnly() for attributes.
-     */
-    public function attributeContainOnlyAssertMethods(): array
-    {
-        return [
-            [true,  'assertAttributeContainsOnly'],
-            [false, 'assertAttributeNotContainsOnly'],
-        ];
-    }
-
-    /**
-     * Assert methods used by equalTo() for attributes.
-     */
-    public function attributeEqualToAssertMethods(): array
-    {
-        return [
-            [true,  'assertAttributeEquals'],
-            [false, 'assertAttributeNotEquals'],
-        ];
-    }
-
-    /**
-     * Verify methods and their PHPUnit assertions for object attributes.
-     */
-    public function attributeMethods(): array
-    {
-        return [
-            [true,  'count',            'assertAttributeCount', 40],
-            [true,  'greaterThan',      'assertAttributeGreaterThan'],
-            [true,  'greaterOrEqualto', 'assertAttributeGreaterThanOrEqual'],
-            [true,  'lessThan',         'assertAttributeLessThan'],
-            [true,  'lessOrEqualto',    'assertAttributeLessThanOrEqual'],
-            [true,  'instanceOf',       'assertAttributeInstanceOf'],
-            [true,  'internalType',     'assertAttributeInternalType'],
-            [true,  'sameAs',           'assertAttributeSame'],
-            [false, 'count',            'assertAttributeNotCount', 50],
-            [false, 'greaterThan',      'assertAttributeLessThanOrEqual'],
-            [false, 'greaterOrEqualto', 'assertAttributeLessThan'],
-            [false, 'lessThan',         'assertAttributeGreaterThanOrEqual'],
-            [false, 'lessOrEqualto',    'assertAttributeGreaterThan'],
-            [false, 'instanceOf',       'assertAttributeNotInstanceOf'],
-            [false, 'internalType',     'assertAttributeNotInternalType'],
-            [false, 'sameAs',           'assertAttributeNotSame'],
+            [Stub\ExampleChild::class, 'childStaticPrivate',    'child static private property'],
+            [Stub\ExampleChild::class, 'childStaticProtected',  'child static protected property'],
+            [Stub\ExampleChild::class, 'childStaticPublic',     'child static public property'],
+            [Stub\ExampleChild::class, 'parentStaticPrivate',   'parent static private property'],
+            [Stub\ExampleChild::class, 'parentStaticProtected', 'parent static protected property'],
+            [Stub\ExampleChild::class, 'parentStaticPublic',    'parent static public property'],
+            [new Stub\ExampleChild(),  'childPrivate',          'child private property'],
+            [new Stub\ExampleChild(),  'childProtected',        'child protected property'],
+            [new Stub\ExampleChild(),  'childPublic',           'child public property'],
+            [new Stub\ExampleChild(),  'parentPrivate',         'parent private property'],
+            [new Stub\ExampleChild(),  'parentProtected',       'parent protected property'],
+            [new Stub\ExampleChild(),  'parentPublic',          'parent public property'],
         ];
     }
 
@@ -180,6 +146,28 @@ final class VerifyTest extends UnitTestBase
         return [
             [true,  'assertStringEqualsFile'],
             [false, 'assertStringNotEqualsFile'],
+        ];
+    }
+
+    /**
+     * Examples for invalid attribute exceptions.
+     */
+    public function invalidAttributes(): array
+    {
+        return [
+            [Stub\ExampleChild::class, 'Could not find static property "some_attribute".'],
+            [new Stub\ExampleChild(),  'Could not find object property "some_attribute".'],
+        ];
+    }
+
+    /**
+     * Subject values that should throw an exception when trying to access an attribute.
+     */
+    public function invalidSubjects(): array
+    {
+        return [
+            ['Some\Missing\Class', 'Could not find class "Some\Missing\Class".'],
+            [true,                 'Subject must be either an object or class name.'],
         ];
     }
 
@@ -269,138 +257,6 @@ final class VerifyTest extends UnitTestBase
     }
 
     /**
-     * Test Verify::contain() with & without case sensitivity for attributes.
-     *
-     * @dataProvider attributeContainAssertMethods
-     *
-     * @return void
-     */
-    public function testAttribueContainCaseSensitive(bool $modifierCondition, string $assertMethod)
-    {
-        $this->subject = new Verify('value with case', 'message with case');
-        $this->setModifierCondition($modifierCondition);
-        $this->subject->attributeNamed('attribute_with_case');
-
-        $this->mockAssert->shouldReceive($assertMethod)
-            ->with(
-                'needle with case',
-                'attribute_with_case',
-                'value with case',
-                'message with case',
-                false,
-                Mockery::any(),
-                Mockery::any()
-            )->once();
-
-        $this->assertSame($this->subject, $this->subject->withCase()->contain('needle with case'));
-
-        $this->subject = new Verify('value w/o case', 'message w/o case');
-        $this->setModifierCondition($modifierCondition);
-        $this->subject->attributeNamed('attribute_without_case');
-
-        $this->mockAssert->shouldReceive($assertMethod)
-            ->with(
-                'needle w/o case',
-                'attribute_without_case',
-                'value w/o case',
-                'message w/o case',
-                true,
-                Mockery::any(),
-                Mockery::any()
-            )->once();
-
-        $this->assertSame($this->subject, $this->subject->withoutCase()->contain('needle w/o case'));
-    }
-
-    /**
-     * Test Verify::contain() with & without data type for attributes.
-     *
-     * @dataProvider attributeContainAssertMethods
-     *
-     * @return void
-     */
-    public function testAttribueContainDataType(bool $modifierCondition, string $assertMethod)
-    {
-        $this->subject = new Verify('value with type', 'message with type');
-        $this->setModifierCondition($modifierCondition);
-        $this->subject->attributeNamed('attribute_with_type');
-
-        $this->mockAssert->shouldReceive($assertMethod)
-            ->with(
-                'needle with type',
-                'attribute_with_type',
-                'value with type',
-                'message with type',
-                Mockery::any(),
-                Mockery::any(),
-                true
-            )->once();
-
-        $this->assertSame($this->subject, $this->subject->withType()->contain('needle with type'));
-
-        $this->subject = new Verify('value w/o type', 'message w/o type');
-        $this->setModifierCondition($modifierCondition);
-        $this->subject->attributeNamed('attribute_without_type');
-
-        $this->mockAssert->shouldReceive($assertMethod)
-            ->with(
-                'needle w/o type',
-                'attribute_without_type',
-                'value w/o type',
-                'message w/o type',
-                Mockery::any(),
-                Mockery::any(),
-                false
-            )->once();
-
-        $this->assertSame($this->subject, $this->subject->withoutType()->contain('needle w/o type'));
-    }
-
-    /**
-     * Test Verify::contain() with & without object identity for attributes.
-     *
-     * @dataProvider attributeContainAssertMethods
-     *
-     * @return void
-     */
-    public function testAttribueContainObjectIdentity(bool $modifierCondition, string $assertMethod)
-    {
-        $this->subject = new Verify('value with identity', 'message with identity');
-        $this->setModifierCondition($modifierCondition);
-        $this->subject->attributeNamed('attribute_with_identity');
-
-        $this->mockAssert->shouldReceive($assertMethod)
-            ->with(
-                'needle with identity',
-                'attribute_with_identity',
-                'value with identity',
-                'message with identity',
-                Mockery::any(),
-                true,
-                Mockery::any()
-            )->once();
-
-        $this->assertSame($this->subject, $this->subject->withIdentity()->contain('needle with identity'));
-
-        $this->subject = new Verify('value w/o identity', 'message w/o identity');
-        $this->setModifierCondition($modifierCondition);
-        $this->subject->attributeNamed('attribute_without_identity');
-
-        $this->mockAssert->shouldReceive($assertMethod)
-            ->with(
-                'needle w/o identity',
-                'attribute_without_identity',
-                'value w/o identity',
-                'message w/o identity',
-                Mockery::any(),
-                false,
-                Mockery::any()
-            )->once();
-
-        $this->assertSame($this->subject, $this->subject->withoutIdentity()->contain('needle w/o identity'));
-    }
-
-    /**
      * Test Verify::attribute().
      *
      * @param string|object $actualValue
@@ -423,216 +279,6 @@ final class VerifyTest extends UnitTestBase
     }
 
     /**
-     * Test negative assertions for object attributes.
-     *
-     * @param mixed $expectedValue
-     *
-     * @dataProvider attributeMethods
-     *
-     * @return void
-     */
-    public function testAttributeAssertions(
-        bool $modifierCondition,
-        string $verifyMethod,
-        string $assertMethod,
-        $expectedValue = 'some value'
-    ) {
-        $this->setModifierCondition($modifierCondition);
-
-        $this->subject->attributeNamed('my_attribute');
-
-        $this->mockAssert->shouldReceive($assertMethod)
-            ->with($expectedValue, 'my_attribute', 'actual value', 'some message')
-            ->once();
-
-        $this->assertSame($this->subject, $this->subject->{$verifyMethod}($expectedValue));
-    }
-
-    /**
-     * Test Verify::contain() basic case for attributes.
-     *
-     * @dataProvider attributeContainAssertMethods
-     *
-     * @return void
-     */
-    public function testAttributeContain(bool $modifierCondition, string $assertMethod)
-    {
-        $this->setModifierCondition($modifierCondition);
-        $this->subject->attributeNamed('attribute_name');
-
-        $this->mockAssert->shouldReceive($assertMethod)
-            ->with('needle', 'attribute_name', 'actual value', 'some message', Mockery::any(), Mockery::any(), Mockery::any())
-            ->once();
-
-        $this->assertSame($this->subject, $this->subject->contain('needle'));
-    }
-
-    /**
-     * Test Verify::containOnly() for object attributes.
-     *
-     * @dataProvider attributeContainOnlyAssertMethods
-     *
-     * @return void
-     */
-    public function testAttributeContainOnly(bool $modifierCondition, string $assertMethod)
-    {
-        $this->setModifierCondition($modifierCondition);
-        $this->subject->attributeNamed('attribute_name');
-
-        $this->mockAssert->shouldReceive($assertMethod)
-            ->with('data type', 'attribute_name', 'actual value', null, 'some message')
-            ->once();
-
-        $this->assertSame($this->subject, $this->subject->containOnly('data type'));
-    }
-
-    /**
-     * Test Verify::equalTo() for attributes.
-     *
-     * @dataProvider attributeEqualToAssertMethods
-     *
-     * @return void
-     */
-    public function testAttributeEqualTo(bool $modifierCondition, string $assertMethod)
-    {
-        $this->setModifierCondition($modifierCondition);
-        $this->subject->attributeNamed('my_attribute');
-
-        $this->mockAssert->shouldReceive($assertMethod)
-            ->with(
-                'expected value',
-                'my_attribute',
-                'actual value',
-                'some message',
-                Mockery::any(),
-                Mockery::any(),
-                Mockery::any(),
-                Mockery::any()
-            )->once();
-
-        $this->assertSame($this->subject, $this->subject->equalTo('expected value'));
-    }
-
-    /**
-     * Test Verify::equalTo() for attributes with or without case sensitivity.
-     *
-     * @dataProvider attributeEqualToAssertMethods
-     *
-     * @return void
-     */
-    public function testAttributeEqualToCaseSensitive(bool $modifierCondition, string $assertMethod)
-    {
-        $this->subject = new Verify('actual with case', 'message with case');
-        $this->setModifierCondition($modifierCondition);
-        $this->subject->attributeNamed('case_sensitive_attribute');
-
-        $this->mockAssert->shouldReceive($assertMethod)
-            ->with(
-                'expected with case',
-                'case_sensitive_attribute',
-                'actual with case',
-                'message with case',
-                Mockery::any(),
-                Mockery::any(),
-                Mockery::any(),
-                false
-            )->once();
-
-        $this->assertSame($this->subject, $this->subject->withCase()->equalTo('expected with case'));
-
-        $this->subject = new Verify('actual w/o case', 'message w/o case');
-        $this->setModifierCondition($modifierCondition);
-        $this->subject->attributeNamed('uncase_sensitive_attribute');
-
-        $this->mockAssert->shouldReceive($assertMethod)
-            ->with(
-                'expected w/o case',
-                'uncase_sensitive_attribute',
-                'actual w/o case',
-                'message w/o case',
-                Mockery::any(),
-                Mockery::any(),
-                Mockery::any(),
-                true
-            )->once();
-
-        $this->assertSame($this->subject, $this->subject->withoutCase()->equalTo('expected w/o case'));
-    }
-
-    /**
-     * Test Verify::equalTo() for attributes with some float delta.
-     *
-     * @dataProvider attributeEqualToAssertMethods
-     *
-     * @return void
-     */
-    public function testAttributeEqualToFloatDelta(bool $modifierCondition, string $assertMethod)
-    {
-        $this->setModifierCondition($modifierCondition);
-        $this->subject->attributeNamed('my_attribute');
-
-        $this->mockAssert->shouldReceive($assertMethod)
-            ->with(
-                'expected value',
-                'my_attribute',
-                'actual value',
-                'some message',
-                1.62,
-                Mockery::any(),
-                Mockery::any(),
-                Mockery::any()
-            )->once();
-
-        $this->assertSame($this->subject, $this->subject->within(1.62)->equalTo('expected value'));
-    }
-
-    /**
-     * Test Verify::equalTo() for attributes with or without order.
-     *
-     * @dataProvider attributeEqualToAssertMethods
-     *
-     * @return void
-     */
-    public function testAttributeEqualToOrder(bool $modifierCondition, string $assertMethod)
-    {
-        $this->subject = new Verify('actual with order', 'message with order');
-        $this->setModifierCondition($modifierCondition);
-        $this->subject->attributeNamed('ordered_attribute');
-
-        $this->mockAssert->shouldReceive($assertMethod)
-            ->with(
-                'expected with order',
-                'ordered_attribute',
-                'actual with order',
-                'message with order',
-                Mockery::any(),
-                Mockery::any(),
-                false,
-                Mockery::any()
-            )->once();
-
-        $this->assertSame($this->subject, $this->subject->withOrder()->equalTo('expected with order'));
-
-        $this->subject = new Verify('actual w/o order', 'message w/o order');
-        $this->setModifierCondition($modifierCondition);
-        $this->subject->attributeNamed('unordered_attribute');
-
-        $this->mockAssert->shouldReceive($assertMethod)
-            ->with(
-                'expected w/o order',
-                'unordered_attribute',
-                'actual w/o order',
-                'message w/o order',
-                Mockery::any(),
-                Mockery::any(),
-                true,
-                Mockery::any()
-            )->once();
-
-        $this->assertSame($this->subject, $this->subject->withoutOrder()->equalTo('expected w/o order'));
-    }
-
-    /**
      * Test exception for invalid conjunction.
      *
      * @return void
@@ -641,7 +287,6 @@ final class VerifyTest extends UnitTestBase
     {
         $this->expectException(BadMethodCallException::class);
         $this->subject->some_invalid_conjunction();
-        $this->assertAttributeSame(null, 'modifierCondition', $this->subject);
     }
 
     /**
@@ -655,14 +300,21 @@ final class VerifyTest extends UnitTestBase
         Verify::$negativeConjunctions = ['negative_conjunction'];
         Verify::$neutralConjunctions  = ['neutral_conjunction'];
 
+        $reflection = new ReflectionObject($this->subject);
+
+        $condition = $reflection->getProperty('modifierCondition');
+        $condition->setAccessible(true);
+
         $this->assertSame($this->subject, $this->subject->neutral_conjunction());
-        $this->assertAttributeSame(null, 'modifierCondition', $this->subject);
+        $this->assertNull($condition->getValue($this->subject));
 
         $this->assertSame($this->subject, $this->subject->positive_conjunction());
-        $this->assertAttributeSame(true, 'modifierCondition', $this->subject);
+        $this->assertTrue($condition->getValue($this->subject));
 
         $this->assertSame($this->subject, $this->subject->negative_conjunction());
-        $this->assertAttributeSame(false, 'modifierCondition', $this->subject);
+        $this->assertFalse($condition->getValue($this->subject));
+
+        $condition->setAccessible(false);
     }
 
     /**
@@ -1018,6 +670,67 @@ final class VerifyTest extends UnitTestBase
             ->once();
 
         $this->assertSame($this->subject, $this->subject->withoutAttributes()->equalToXmlStructure($expected));
+    }
+
+    /**
+     * Test reading attribute values.
+     *
+     * @param class-string|object $subject
+     *
+     * @dataProvider attributeValues
+     *
+     * @return void
+     */
+    public function testGetAttributeValue($subject, string $attributeName, string $attributeValue)
+    {
+        $this->subject = new Verify($subject);
+        $this->setModifierCondition(true);
+
+        $this->mockAssert->shouldReceive('assertTrue')
+            ->with($attributeValue, Mockery::any())
+            ->once();
+
+        $this->assertSame($this->subject, $this->subject->attributeNamed($attributeName)->true());
+    }
+
+    /**
+     * Test trying to read an invalid attribute will throw an exception.
+     *
+     * @param class-string|object $subject
+     *
+     * @dataProvider invalidAttributes
+     *
+     * @return void
+     */
+    public function testMissingAttributeThrowsException($subject, string $exceptionMessage)
+    {
+        $this->subject = new Verify($subject);
+        $this->setModifierCondition(true);
+
+        $this->expectException(InvalidAttributeException::class);
+        $this->expectExceptionMessage($exceptionMessage);
+
+        $this->subject->attributeNamed('some_attribute')->true();
+    }
+
+    /**
+     * Test validation of subject when trying to read an attribute.
+     *
+     * @param mixed $subject
+     *
+     * @dataProvider invalidSubjects
+     *
+     * @return void
+     */
+    public function testReadAttribueThrowsException($subject, string $exceptionMessage)
+    {
+        $this->subject = new Verify($subject);
+        $this->setModifierCondition(true);
+
+        $this->expectException(InvalidSubjectException::class);
+        $this->expectExceptionMessage($exceptionMessage);
+
+        $this->subject->attributeNamed('some_attribute')->true();
     }
 
     /**
