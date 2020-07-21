@@ -64,9 +64,10 @@ sudo: false
 
 before_install:
   # Remove some dependencies that aren't needed for static test suite and are incompatible with PHP 7 or PHPUnit 6
-  - if [ $TEST_SUITE == "unit" ]; then composer remove --dev localheinz/composer-normalize maglnet/composer-require-checker phpstan/phpstan phpstan/phpstan-mockery phpstan/phpstan-phpunit; fi
+  - if [ $TEST_SUITE == "unit" ]; then composer remove --dev ergebnis/composer-normalize maglnet/composer-require-checker phpstan/phpstan phpstan/phpstan-mockery phpstan/phpstan-phpunit phpstan/phpstan-strict-rules; fi
 
 install:
+  - if [ -e composer.lock ]; then rm composer.lock; fi
   - composer require phpunit/phpunit:^$PHPUNIT_VERSION --update-no-dev --no-interaction --prefer-dist --no-progress --no-suggest --update-with-all-dependencies
   - travis_retry composer install --dev --no-interaction --prefer-dist
 
