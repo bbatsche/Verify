@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BeBat\Verify\Test;
 
+use BadFunctionCallException;
 use BeBat\Verify\Verify;
 use BeBat\Verify\VerifyDirectory;
 use BeBat\Verify\VerifyFile;
@@ -17,7 +18,11 @@ final class FunctionsTest extends TestCase
     /**
      * Test verify*() methods' default behavior.
      *
+     * @param class-string $className
+     *
      * @dataProvider verifyFunctions
+     *
+     * @return void
      */
     public function testFunction(string $functionName, string $className)
     {
@@ -37,10 +42,12 @@ final class FunctionsTest extends TestCase
      * Test exception thrown with zero arguments.
      *
      * @dataProvider verifyFunctions
+     *
+     * @return void
      */
     public function testFunctionNoArguments(string $functionName)
     {
-        $this->expectException(\BadFunctionCallException::class);
+        $this->expectException(BadFunctionCallException::class);
         $functionName();
     }
 
@@ -48,10 +55,12 @@ final class FunctionsTest extends TestCase
      * Test exception thrown with too many arguments.
      *
      * @dataProvider verifyFunctions
+     *
+     * @return void
      */
     public function testFunctionTooManyArguments(string $functionName)
     {
-        $this->expectException(\BadFunctionCallException::class);
+        $this->expectException(BadFunctionCallException::class);
         $functionName('param 1', 'param 2', 'param 3');
     }
 

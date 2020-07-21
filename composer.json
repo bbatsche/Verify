@@ -26,19 +26,20 @@
     ],
     "require": {
         "php": "^7.0",
-        "phpunit/phpunit": "^6.0 || ^7.0"
+        "phpunit/phpunit": "^6.0 || ^7.0 || ^8.0 || ^9.0"
     },
     "replace": {
         "codeception/verify": "*"
     },
     "require-dev": {
+        "ergebnis/composer-normalize": "^2.6",
         "friendsofphp/php-cs-fixer": "^2.15",
-        "localheinz/composer-normalize": "^1.1",
-        "mockery/mockery": "^1.0",
         "maglnet/composer-require-checker": "^2.0",
-        "phpstan/phpstan": "^0.11.6",
-        "phpstan/phpstan-mockery": "^0.11.0",
-        "phpstan/phpstan-phpunit": "^0.11.0"
+        "mockery/mockery": "^1.0",
+        "phpstan/phpstan": "^0.12",
+        "phpstan/phpstan-mockery": "^0.12",
+        "phpstan/phpstan-phpunit": "^0.12",
+        "phpstan/phpstan-strict-rules": "^0.12"
     },
     "suggest": {
         "codeception/specify": "Highly readable test code blocks for PHPUnit and Codeception"
@@ -58,16 +59,24 @@
     },
     "minimum-stability": "stable",
     "scripts": {
-        "cs:check": "php-cs-fixer fix -v --allow-risky=yes --ansi --dry-run --diff",
-        "cs:fix": "php-cs-fixer fix -v --allow-risky=yes --ansi",
-        "test:all": [
-            "@composer cs:check",
-            "@composer test:static",
-            "@composer test:unit"
+        "style:check": "php-cs-fixer fix -v --ansi --dry-run --diff",
+        "style:fix": "php-cs-fixer fix -v --ansi",
+        "test": [
+            "@style:check",
+            "@test:static",
+            "@test:unit"
         ],
         "test:coverage": "phpunit --coverage-clover=coverage.xml",
-        "test:static": "phpstan analyze --ansi --level 7 src test",
+        "test:static": "phpstan analyze --ansi",
         "test:unit": "phpunit --colors=always"
+    },
+    "scripts-descriptions": {
+        "style:check": "Check all files for code style violations.",
+        "style:fix": "Automatically fix code style in all files.",
+        "test": "Check code style, static analysis, and unit tests.",
+        "test:coverage": "Run unit tests and generate coverage report.",
+        "test:static": "Run phpstan static analysis.",
+        "test:unit": "Run unit tests."
     },
     "support": {
         "issues": "https://github.com/bbatsche/Verify/issues",

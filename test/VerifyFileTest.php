@@ -21,13 +21,6 @@ final class VerifyFileTest extends UnitTestBase
      */
     protected $subject;
 
-    protected function setUp()
-    {
-        $this->subject = new VerifyFile($this->defaultActualValue, 'some message');
-
-        parent::setUp();
-    }
-
     /**
      * All VerifyFile methods.
      */
@@ -86,6 +79,8 @@ final class VerifyFileTest extends UnitTestBase
      * Test VerifyFile::equalTo().
      *
      * @dataProvider equalToMethods
+     *
+     * @return void
      */
     public function testEqualTo(bool $modifierConition, string $assertMethod)
     {
@@ -114,5 +109,10 @@ final class VerifyFileTest extends UnitTestBase
             ->once();
 
         $this->assertSame($this->subject, $this->subject->withoutCase()->equalTo('expected file w/o case'));
+    }
+
+    protected function initSubject()
+    {
+        $this->subject = new VerifyFile($this->defaultActualValue, 'some message');
     }
 }

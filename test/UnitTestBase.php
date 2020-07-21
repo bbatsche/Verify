@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace BeBat\Verify\Test;
 
-use BeBat\Verify\Assert;
 use BeBat\Verify\MissingConditionException;
-use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
+use ReflectionObject;
 
 abstract class UnitTestBase extends TestCase
 {
     use MockeryPHPUnitIntegration;
+    use SetupMockeryTrait;
 
     /**
      * Default value used for Verify objects.
@@ -22,23 +22,11 @@ abstract class UnitTestBase extends TestCase
     protected $defaultActualValue;
 
     /**
-     * Assertion mock.
-     *
-     * @var Assert&\Mockery\MockInterface
-     */
-    protected $mockAssert;
-
-    /**
      * Verify class.
      *
      * @var \BeBat\Verify\Verify|\BeBat\Verify\VerifyFile|\BeBat\Verify\VerifyDirectory
      */
     protected $subject;
-
-    protected function setUp()
-    {
-        $this->mockAssert = Mockery::mock('alias:' . Assert::class);
-    }
 
     /**
      * Test MissingConditionException is thrown for all methods.
@@ -46,6 +34,8 @@ abstract class UnitTestBase extends TestCase
      * @param mixed $value
      *
      * @dataProvider allMethods
+     *
+     * @return void
      */
     public function testMissingConditionException(string $verifyMethod, $value = 'dummy value')
     {
@@ -58,6 +48,8 @@ abstract class UnitTestBase extends TestCase
      * Test VerifyFile methods that don't take any value.
      *
      * @dataProvider noParamMethods
+     *
+     * @return void
      */
     public function testNoParamMethods(bool $modifierCondition, string $verifyMethod, string $assertMethod)
     {
@@ -76,6 +68,8 @@ abstract class UnitTestBase extends TestCase
      * @param mixed $expectedValue
      *
      * @dataProvider singleParamMethods
+     *
+     * @return void
      */
     public function testSingleParamMethods(
         bool $modifierCondition,
@@ -92,9 +86,14 @@ abstract class UnitTestBase extends TestCase
         $this->assertSame($this->subject, $this->subject->{$verifyMethod}($expectedValue));
     }
 
+    /**
+     * Inject $value into modifierCondition of subject.
+     *
+     * @return void
+     */
     protected function setModifierCondition(bool $value)
     {
-        $reflection       = new \ReflectionObject($this->subject);
+        $reflection       = new ReflectionObject($this->subject);
         $modifierProperty = $reflection->getProperty('modifierCondition');
         $modifierProperty->setAccessible(true);
         $modifierProperty->setValue($this->subject, $value);

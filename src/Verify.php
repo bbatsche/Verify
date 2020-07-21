@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace BeBat\Verify;
 
+use BadMethodCallException;
 use BeBat\Verify\Assert as a;
+use Countable;
+use DOMElement;
+use Traversable;
 
 /**
  * Verify Class.
@@ -450,9 +454,9 @@ class Verify extends VerifyBase
     /**
      * Assert SUT has the same XML structur as a given DOMElement.
      *
-     * @param \DOMElement $xml Structure SUT is expected to match
+     * @param DOMElement $xml Structure SUT is expected to match
      */
-    public function equalToXmlStructure(\DOMElement $xml): self
+    public function equalToXmlStructure(DOMElement $xml): self
     {
         if (!isset($this->modifierCondition)) {
             throw new MissingConditionException();
@@ -461,7 +465,7 @@ class Verify extends VerifyBase
         if ($this->modifierCondition) {
             a::assertEqualXMLStructure($xml, $this->actual, $this->xmlAttributes, $this->description);
         } else {
-            throw new \BadMethodCallException(__METHOD__ . ' does not support negative condition.');
+            throw new BadMethodCallException(__METHOD__ . ' does not support negative condition.');
         }
 
         return $this;
@@ -580,7 +584,7 @@ class Verify extends VerifyBase
     /**
      * Assert SUT is or is not an instance of a given class.
      *
-     * @param string $class Name of class SUT is expected to be an instance of
+     * @param class-string $class Name of class SUT is expected to be an instance of
      */
     public function instanceOf(string $class): self
     {
@@ -645,7 +649,7 @@ class Verify extends VerifyBase
         if ($this->modifierCondition) {
             a::assertJson($this->actual, $this->description);
         } else {
-            throw new \BadMethodCallException(__METHOD__ . ' does not support negative condition.');
+            throw new BadMethodCallException(__METHOD__ . ' does not support negative condition.');
         }
 
         return $this;
@@ -803,7 +807,7 @@ class Verify extends VerifyBase
         if ($this->modifierCondition) {
             a::assertNan($this->actual, $this->description);
         } else {
-            throw new \BadMethodCallException(__METHOD__ . ' does not support negative condition.');
+            throw new BadMethodCallException(__METHOD__ . ' does not support negative condition.');
         }
 
         return $this;
@@ -858,7 +862,7 @@ class Verify extends VerifyBase
     /**
      * Assert SUT does or does not have the same number of elements as given array/Countable/Traversable object.
      *
-     * @param array|\Countable|\Traversable $expected Value SUT is expected to be the same size as
+     * @param array|Countable|Traversable $expected Value SUT is expected to be the same size as
      */
     public function sameSizeAs($expected): self
     {
@@ -929,7 +933,7 @@ class Verify extends VerifyBase
         if ($this->modifierCondition) {
             a::assertArraySubset($array, $this->actual, $this->dataType, $this->description);
         } else {
-            throw new \BadMethodCallException(__METHOD__ . ' does not support negative condition.');
+            throw new BadMethodCallException(__METHOD__ . ' does not support negative condition.');
         }
 
         return $this;

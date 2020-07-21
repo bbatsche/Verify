@@ -13,13 +13,6 @@ final class VerifyDirectoryTest extends UnitTestBase
 {
     protected $defaultActualValue = 'directory under test';
 
-    protected function setUp()
-    {
-        $this->subject = new VerifyDirectory($this->defaultActualValue, 'some message');
-
-        parent::setUp();
-    }
-
     /**
      * All VerifyDirectory methods.
      */
@@ -60,5 +53,10 @@ final class VerifyDirectoryTest extends UnitTestBase
         string $assertMethod = '',
         $expectedValue = 'some value'
     ) {
+    }
+
+    protected function initSubject()
+    {
+        $this->subject = new VerifyDirectory($this->defaultActualValue, 'some message');
     }
 }

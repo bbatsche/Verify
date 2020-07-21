@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace BeBat\Verify;
 
+use BadMethodCallException;
+
 /**
  * VerifyBase Class.
  *
@@ -25,10 +27,13 @@ namespace BeBat\Verify;
  */
 abstract class VerifyBase
 {
+    /** @var string[] */
     public static $negativeConjunctions = ['doesNot', 'isNot', 'willNot'];
 
+    /** @var string[] */
     public static $neutralConjunctions = ['and', 'be', 'have'];
 
+    /** @var string[] */
     public static $positiveConjunctions = ['does', 'has', 'is', 'will'];
 
     /**
@@ -94,7 +99,7 @@ abstract class VerifyBase
             return $this;
         }
 
-        throw new \BadMethodCallException("Unknown method {$method}.");
+        throw new BadMethodCallException("Unknown method {$method}.");
     }
 
     /**

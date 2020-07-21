@@ -11,7 +11,7 @@ git diff --cached --name-only | while read FILE; do
             fi
 
             if ! [[ "$FILE" =~ src/function.php$ ]]; then
-                composer cs:check "$FILE" 2> /dev/null
+                composer style:check "$FILE" 2> /dev/null
                 if [ $? -ne 0 ]; then
                     echo -e "\033[1;31m\tAborting Commit! Files do not follow coding standards.\033[0m" >&2
                     exit 1
