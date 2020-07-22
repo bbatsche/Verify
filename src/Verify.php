@@ -86,8 +86,6 @@ class Verify extends VerifyBase
 
     /**
      * Assert that SUT is or is not an array.
-     *
-     * return self
      */
     public function array(): self
     {
@@ -146,8 +144,6 @@ class Verify extends VerifyBase
 
     /**
      * Assert that SUT is or is not a boolean.
-     *
-     * return self
      */
     public function bool(): self
     {
@@ -166,8 +162,6 @@ class Verify extends VerifyBase
 
     /**
      * Assert that SUT is or is not callable.
-     *
-     * return self
      */
     public function callable(): self
     {
@@ -195,24 +189,46 @@ class Verify extends VerifyBase
             throw new MissingConditionException();
         }
 
+        $value = $this->getActualValue();
+
         if ($this->modifierCondition) {
-            a::assertContains(
-                $needle,
-                $this->getActualValue(),
-                $this->description,
-                $this->ignoreCase,
-                $this->objectIdentity,
-                $this->dataType
-            );
+            if (\is_string($value) && method_exists(a::class, 'assertStringContainsString')) {
+                if ($this->ignoreCase) {
+                    a::assertStringContainsStringIgnoringCase($needle, $value, $this->description);
+                } else {
+                    a::assertStringContainsString($needle, $value, $this->description);
+                }
+            } elseif (((\is_object($needle) && !$this->objectIdentity) || !$this->dataType) && method_exists(a::class, 'assertContainsEquals')) {
+                a::assertContainsEquals($needle, $value, $this->description);
+            } else {
+                a::assertContains(
+                    $needle,
+                    $value,
+                    $this->description,
+                    $this->ignoreCase,
+                    $this->objectIdentity,
+                    $this->dataType
+                );
+            }
         } else {
-            a::assertNotContains(
-                $needle,
-                $this->getActualValue(),
-                $this->description,
-                $this->ignoreCase,
-                $this->objectIdentity,
-                $this->dataType
-            );
+            if (\is_string($value) && method_exists(a::class, 'assertStringNotContainsString')) {
+                if ($this->ignoreCase) {
+                    a::assertStringNotContainsStringIgnoringCase($needle, $value, $this->description);
+                } else {
+                    a::assertStringNotContainsString($needle, $value, $this->description);
+                }
+            } elseif (((\is_object($needle) && !$this->objectIdentity) || !$this->dataType) && method_exists(a::class, 'assertNotContainsEquals')) {
+                a::assertNotContainsEquals($needle, $value, $this->description);
+            } else {
+                a::assertNotContains(
+                    $needle,
+                    $this->getActualValue(),
+                    $this->description,
+                    $this->ignoreCase,
+                    $this->objectIdentity,
+                    $this->dataType
+                );
+            }
         }
 
         return $this;
@@ -311,26 +327,68 @@ class Verify extends VerifyBase
             throw new MissingConditionException();
         }
 
+        $value = $this->getActualValue();
+
         if ($this->modifierCondition) {
-            a::assertEquals(
-                $expected,
-                $this->getActualValue(),
-                $this->description,
-                $this->floatDelta,
-                $this->maxDepth,
-                $this->ignoreOrder,
-                $this->ignoreCase
-            );
+            if (
+                is_numeric($value) &&
+                $this->floatDelta !== 0.0 &&
+                method_exists(a::class, 'assertEqualsWithDelta')
+            ) {
+                a::assertEqualsWithDelta($expected, $value, $this->floatDelta, $this->description);
+            } elseif (
+                (\is_array($value) || \is_object($value)) &&
+                $this->ignoreOrder &&
+                method_exists(a::class, 'assertEqualsCanonicalizing')
+            ) {
+                a::assertEqualsCanonicalizing($expected, $value, $this->description);
+            } elseif (
+                \is_string($value) &&
+                $this->ignoreCase &&
+                method_exists(a::class, 'assertEqualsIgnoringCase')
+            ) {
+                a::assertEqualsIgnoringCase($expected, $value, $this->description);
+            } else {
+                a::assertEquals(
+                    $expected,
+                    $value,
+                    $this->description,
+                    $this->floatDelta,
+                    $this->maxDepth,
+                    $this->ignoreOrder,
+                    $this->ignoreCase
+                );
+            }
         } else {
-            a::assertNotEquals(
-                $expected,
-                $this->getActualValue(),
-                $this->description,
-                $this->floatDelta,
-                $this->maxDepth,
-                $this->ignoreOrder,
-                $this->ignoreCase
-            );
+            if (
+                is_numeric($value) &&
+                $this->floatDelta !== 0.0 &&
+                method_exists(a::class, 'assertNotEqualsWithDelta')
+            ) {
+                a::assertNotEqualsWithDelta($expected, $value, $this->floatDelta, $this->description);
+            } elseif (
+                (\is_array($value) || \is_object($value)) &&
+                $this->ignoreOrder &&
+                method_exists(a::class, 'assertNotEqualsCanonicalizing')
+            ) {
+                a::assertNotEqualsCanonicalizing($expected, $value, $this->description);
+            } elseif (
+                \is_string($value) &&
+                $this->ignoreCase &&
+                method_exists(a::class, 'assertNotEqualsIgnoringCase')
+            ) {
+                a::assertNotEqualsIgnoringCase($expected, $value, $this->description);
+            } else {
+                a::assertNotEquals(
+                    $expected,
+                    $this->getActualValue(),
+                    $this->description,
+                    $this->floatDelta,
+                    $this->maxDepth,
+                    $this->ignoreOrder,
+                    $this->ignoreCase
+                );
+            }
         }
 
         return $this;
@@ -496,8 +554,6 @@ class Verify extends VerifyBase
 
     /**
      * Assert that SUT is or is not a float.
-     *
-     * return self
      */
     public function float(): self
     {
@@ -594,8 +650,6 @@ class Verify extends VerifyBase
 
     /**
      * Assert that SUT is or is not an integer.
-     *
-     * return self
      */
     public function int(): self
     {
@@ -634,8 +688,6 @@ class Verify extends VerifyBase
 
     /**
      * Assert that SUT is or is not iterable.
-     *
-     * return self
      */
     public function iterable(): self
     {
@@ -832,8 +884,6 @@ class Verify extends VerifyBase
 
     /**
      * Assert that SUT is or is not numeric.
-     *
-     * return self
      */
     public function numeric(): self
     {
@@ -852,8 +902,6 @@ class Verify extends VerifyBase
 
     /**
      * Assert that SUT is or is not an object.
-     *
-     * return self
      */
     public function object(): self
     {
@@ -872,8 +920,6 @@ class Verify extends VerifyBase
 
     /**
      * Assert that SUT is or is not a resource.
-     *
-     * return self
      */
     public function resource(): self
     {
@@ -932,8 +978,6 @@ class Verify extends VerifyBase
 
     /**
      * Assert that SUT is or is not scalar.
-     *
-     * return self
      */
     public function scalar(): self
     {
@@ -992,8 +1036,6 @@ class Verify extends VerifyBase
 
     /**
      * Assert that SUT is or is not a string.
-     *
-     * return self
      */
     public function string(): self
     {
@@ -1032,8 +1074,6 @@ class Verify extends VerifyBase
 
     /**
      * Assert that SUT is or is not true.
-     *
-     * return self
      */
     public function true(): self
     {

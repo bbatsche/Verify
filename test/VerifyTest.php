@@ -10,6 +10,7 @@ use BeBat\Verify\InvalidSubjectException;
 use BeBat\Verify\Verify;
 use DOMElement;
 use Mockery;
+use phpmock\mockery\PHPMockery;
 use ReflectionObject;
 use stdClass;
 
@@ -88,9 +89,9 @@ final class VerifyTest extends UnitTestBase
     public function attributeAssertMethods(): array
     {
         return [
-            [true,  'SomeClass',     'assertClassHasAttribute'],
+            [true,  'SomeClass',    'assertClassHasAttribute'],
             [true,  new stdClass(), 'assertObjectHasAttribute'],
-            [false, 'SomeClass',     'assertClassNotHasAttribute'],
+            [false, 'SomeClass',    'assertClassNotHasAttribute'],
             [false, new stdClass(), 'assertObjectNotHasAttribute'],
         ];
     }
@@ -764,6 +765,154 @@ final class VerifyTest extends UnitTestBase
         $this->expectExceptionMessage($exceptionMessage);
 
         $this->subject->attributeNamed('some_attribute')->true();
+    }
+
+    /**
+     * Test Verify::contains calls to specific assertContains*() methods.
+     *
+     * @runInSeparateProcess
+     *
+     * @return void
+     */
+    public function testSpecificContainsMethods()
+    {
+        PHPMockery::mock('BeBat\\Verify', 'method_exists')->andReturn(true);
+
+        $this->mockAssert->shouldNotReceive('assertContains');
+        $this->mockAssert->shouldNotReceive('assertNotContains');
+
+        $this->subject = new Verify('a string value', 'contains string in string');
+        $this->setModifierCondition(true);
+
+        $this->mockAssert->shouldReceive('assertStringContainsString')
+            ->with('case sensitive string', 'a string value', 'contains string in string')
+            ->once();
+        $this->mockAssert->shouldReceive('assertStringContainsStringIgnoringCase')
+            ->with('case insensitive string', 'a string value', 'contains string in string')
+            ->once();
+
+        $this->assertSame($this->subject, $this->subject->withCase()->contain('case sensitive string'));
+        $this->assertSame($this->subject, $this->subject->withoutCase()->contain('case insensitive string'));
+
+        $needle        = new stdClass();
+        $this->subject = new Verify(['some', 'value'], 'loose compare objects in array');
+        $this->setModifierCondition(true);
+
+        $this->mockAssert->shouldReceive('assertContainsEquals')
+            ->with($needle, ['some', 'value'], 'loose compare objects in array')
+            ->once();
+
+        $this->assertSame($this->subject, $this->subject->withoutIdentity()->contain($needle));
+
+        $this->subject = new Verify(['different', 'values', '21'], 'loose compare scalar value');
+        $this->setModifierCondition(true);
+
+        $this->mockAssert->shouldReceive('assertContainsEquals')
+            ->with(21, ['different', 'values', '21'], 'loose compare scalar value')
+            ->once();
+
+        $this->assertSame($this->subject, $this->subject->withoutType()->contain(21));
+
+        $this->subject = new Verify('different string value', 'not contains string in string');
+        $this->setModifierCondition(false);
+
+        $this->mockAssert->shouldReceive('assertStringNotContainsString')
+            ->with('case sensitive string', 'different string value', 'not contains string in string')
+            ->once();
+        $this->mockAssert->shouldReceive('assertStringNotContainsStringIgnoringCase')
+            ->with('case insensitive string', 'different string value', 'not contains string in string')
+            ->once();
+
+        $this->assertSame($this->subject, $this->subject->withCase()->contain('case sensitive string'));
+        $this->assertSame($this->subject, $this->subject->withoutCase()->contain('case insensitive string'));
+
+        $needle        = new stdClass();
+        $this->subject = new Verify(['negative', 'value'], 'loose compare objects in array');
+        $this->setModifierCondition(false);
+
+        $this->mockAssert->shouldReceive('assertNotContainsEquals')
+            ->with($needle, ['negative', 'value'], 'loose compare objects in array')
+            ->once();
+
+        $this->assertSame($this->subject, $this->subject->withoutIdentity()->contain($needle));
+
+        $this->subject = new Verify(['even', 'more', 'values'], 'loose compare scalar value');
+        $this->setModifierCondition(false);
+
+        $this->mockAssert->shouldReceive('assertNotContainsEquals')
+            ->with('value', ['even', 'more', 'values'], 'loose compare scalar value')
+            ->once();
+
+        $this->assertSame($this->subject, $this->subject->withoutType()->contain('value'));
+    }
+
+    /**
+     * Test Verify::equalTo() calls to specific assertEquals*() methods.
+     *
+     * @runInSeparateProcess
+     *
+     * @return void
+     */
+    public function testSpecificEqualToMethods()
+    {
+        PHPMockery::mock('BeBat\\Verify', 'method_exists')->andReturn(true);
+
+        $this->mockAssert->shouldNotReceive('assertEquals');
+        $this->mockAssert->shouldNotReceive('assertNotEquals');
+
+        $this->subject = new Verify(21, 'numeric value with delta');
+        $this->setModifierCondition(true);
+
+        $this->mockAssert->shouldReceive('assertEqualsWithDelta')
+            ->with(2.72, 21, 12.12, 'numeric value with delta')
+            ->once();
+
+        $this->assertSame($this->subject, $this->subject->within(12.12)->equalTo(2.72));
+
+        $this->subject = new Verify([3, 2, 1], 'array value without order');
+        $this->setModifierCondition(true);
+
+        $this->mockAssert->shouldReceive('assertEqualsCanonicalizing')
+            ->with([1, 2, 3], [3, 2, 1], 'array value without order')
+            ->once();
+
+        $this->assertSame($this->subject, $this->subject->withoutOrder()->equalTo([1, 2, 3]));
+
+        $this->subject = new Verify('a string value', 'string value without case');
+        $this->setModifierCondition(true);
+
+        $this->mockAssert->shouldReceive('assertEqualsIgnoringCase')
+            ->with('A STRING VALUE', 'a string value', 'string value without case')
+            ->once();
+
+        $this->assertSame($this->subject, $this->subject->withoutCase()->equalTo('A STRING VALUE'));
+
+        $this->subject = new Verify(5.2, 'numeric value with delta');
+        $this->setModifierCondition(false);
+
+        $this->mockAssert->shouldReceive('assertNotEqualsWithDelta')
+            ->with(84, 5.2, 1.62, 'numeric value with delta')
+            ->once();
+
+        $this->assertSame($this->subject, $this->subject->within(1.62)->equalTo(84));
+
+        $this->subject = new Verify([2, 4, 8], 'array value without order');
+        $this->setModifierCondition(false);
+
+        $this->mockAssert->shouldReceive('assertNotEqualsCanonicalizing')
+            ->with([16, 32, 64], [2, 4, 8], 'array value without order')
+            ->once();
+
+        $this->assertSame($this->subject, $this->subject->withoutOrder()->equalTo([16, 32, 64]));
+
+        $this->subject = new Verify('a different string', 'string value without case');
+        $this->setModifierCondition(false);
+
+        $this->mockAssert->shouldReceive('assertNotEqualsIgnoringCase')
+            ->with('yet another string', 'a different string', 'string value without case')
+            ->once();
+
+        $this->assertSame($this->subject, $this->subject->withoutCase()->equalTo('yet another string'));
     }
 
     /**

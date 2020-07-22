@@ -39,7 +39,9 @@
         "phpstan/phpstan": "^0.12",
         "phpstan/phpstan-mockery": "^0.12",
         "phpstan/phpstan-phpunit": "^0.12",
-        "phpstan/phpstan-strict-rules": "^0.12"
+        "phpstan/phpstan-strict-rules": "^0.12",
+        "php-mock/php-mock": "^2.2",
+        "php-mock/php-mock-mockery": "^1.3"
     },
     "suggest": {
         "codeception/specify": "Highly readable test code blocks for PHPUnit and Codeception"

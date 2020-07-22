@@ -8,14 +8,17 @@ $finder = PhpCsFixer\Finder::create()
 
 return PhpCsFixer\Config::create()
     ->setRules([
-        '@PHP70Migration'             => true,
-        '@PHP70Migration:risky'       => true,
-        '@PHPUnit60Migration:risky'   => true,
-        '@PhpCsFixer'                 => true,
-        '@PhpCsFixer:risky'           => true,
-        'align_multiline_comment'     => ['comment_type' => 'phpdocs_like'],
-        'backtick_to_shell_exec'      => true,
-        'binary_operator_spaces'      => ['default' => 'align_single_space_minimal'],
+        '@PHP70Migration'           => true,
+        '@PHP70Migration:risky'     => true,
+        '@PHPUnit60Migration:risky' => true,
+        '@PhpCsFixer'               => true,
+        '@PhpCsFixer:risky'         => true,
+        'align_multiline_comment'   => ['comment_type' => 'phpdocs_like'],
+        'backtick_to_shell_exec'    => true,
+        'binary_operator_spaces'    => [
+            'default'   => 'align_single_space_minimal',
+            'operators' => ['||' => null, '&&' => null]
+        ],
         'class_attributes_separation' => ['elements' => ['const', 'method', 'property']],
         'class_definition'            => [
             'single_item_single_line'             => true,

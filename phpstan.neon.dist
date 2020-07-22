@@ -23,5 +23,6 @@ parameters:
     -
       message: '/Call to an undefined method BeBat\\Verify\\Verify::[a-z_]+_conjunction\(\)/'
       path: %currentWorkingDirectory%/test/VerifyTest.php
+    - '/Mockery\\LegacyMockInterface::shouldNotReceive/'
     - '/Mockery\\LegacyMockInterface::shouldReceive/'
     - '/Mockery\\HigherOrderMessage::with/'
