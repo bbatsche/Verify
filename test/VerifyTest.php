@@ -600,6 +600,37 @@ final class VerifyTest extends UnitTestBase
     }
 
     /**
+     * Test Verify::equalToFile() will call assertEqualToFileCaseSensitive() if available.
+     *
+     * @runInSeparateProcess
+     *
+     * @return void
+     */
+    public function testEqualToFileSpecificMethods()
+    {
+        PHPMockery::mock('BeBat\\Verify', 'method_exists')->andReturn(true);
+
+        $this->mockAssert->shouldNotReceive('assertStringEqualsFile');
+        $this->mockAssert->shouldNotReceive('assertStringNotEqualsFile');
+
+        $this->setModifierCondition(true);
+
+        $this->mockAssert->shouldReceive('assertStringEqualsFileIgnoringCase')
+            ->with('case insensitive filename', 'actual value', 'some message')
+            ->once();
+
+        $this->assertSame($this->subject, $this->subject->withoutCase()->equalToFile('case insensitive filename'));
+
+        $this->setModifierCondition(false);
+
+        $this->mockAssert->shouldReceive('assertStringNotEqualsFileIgnoringCase')
+            ->with('different case insensitive file', 'actual value', 'some message')
+            ->once();
+
+        $this->assertSame($this->subject, $this->subject->withoutCase()->equalToFile('different case insensitive file'));
+    }
+
+    /**
      * Test Verify::equalTo() with some float delta.
      *
      * @dataProvider equalToAssertMethods

@@ -406,11 +406,19 @@ class Verify extends VerifyBase
         }
 
         if ($this->modifierCondition) {
-            // $canonicalize hardcoded to false
-            a::assertStringEqualsFile($file, $this->getActualValue(), $this->description, false, $this->ignoreCase);
+            if ($this->ignoreCase && method_exists(a::class, 'assertStringEqualsFileIgnoringCase')) {
+                a::assertStringEqualsFileIgnoringCase($file, $this->getActualValue(), $this->description);
+            } else {
+                // $canonicalize hardcoded to false
+                a::assertStringEqualsFile($file, $this->getActualValue(), $this->description, false, $this->ignoreCase);
+            }
         } else {
-            // $canonicalize hardcoded to false
-            a::assertStringNotEqualsFile($file, $this->getActualValue(), $this->description, false, $this->ignoreCase);
+            if ($this->ignoreCase && method_exists(a::class, 'assertStringNotEqualsFileIgnoringCase')) {
+                a::assertStringNotEqualsFileIgnoringCase($file, $this->getActualValue(), $this->description);
+            } else {
+                // $canonicalize hardcoded to false
+                a::assertStringNotEqualsFile($file, $this->getActualValue(), $this->description, false, $this->ignoreCase);
+            }
         }
 
         return $this;

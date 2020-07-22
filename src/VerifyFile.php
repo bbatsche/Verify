@@ -25,11 +25,19 @@ class VerifyFile extends VerifyBase
         }
 
         if ($this->modifierCondition) {
-            // $canonicalize hard coded to false as it has no effect.
-            a::assertFileEquals($expected, $this->actual, $this->description, false, $this->ignoreCase);
+            if ($this->ignoreCase && method_exists(a::class, 'assertFileEqualsIgnoringCase')) {
+                a::assertFileEqualsIgnoringCase($expected, $this->actual, $this->description);
+            } else {
+                // $canonicalize hard coded to false as it has no effect.
+                a::assertFileEquals($expected, $this->actual, $this->description, false, $this->ignoreCase);
+            }
         } else {
-            // $canonicalize hard coded to false as it has no effect.
-            a::assertFileNotEquals($expected, $this->actual, $this->description, false, $this->ignoreCase);
+            if ($this->ignoreCase && method_exists(a::class, 'assertFileNotEqualsIgnoringCase')) {
+                a::assertFileNotEqualsIgnoringCase($expected, $this->actual, $this->description);
+            } else {
+                // $canonicalize hard coded to false as it has no effect.
+                a::assertFileNotEquals($expected, $this->actual, $this->description, false, $this->ignoreCase);
+            }
         }
 
         return $this;

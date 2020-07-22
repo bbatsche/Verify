@@ -6,6 +6,7 @@ namespace BeBat\Verify\Test;
 
 use BeBat\Verify\VerifyFile;
 use Mockery;
+use phpmock\mockery\PHPMockery;
 
 /**
  * @internal
@@ -109,6 +110,37 @@ final class VerifyFileTest extends UnitTestBase
             ->once();
 
         $this->assertSame($this->subject, $this->subject->withoutCase()->equalTo('expected file w/o case'));
+    }
+
+    /**
+     * Test VerifyFile::equalTo() will call assertFileEqualsIgnoringCase() if available.
+     *
+     * @runInSeparateProcess
+     *
+     * @return void
+     */
+    public function testEqualToSpecificMethods()
+    {
+        PHPMockery::mock('BeBat\\Verify', 'method_exists')->andReturn(true);
+
+        $this->mockAssert->shouldNotReceive('assertFileEquals');
+        $this->mockAssert->shouldNotReceive('assertFileNotEquals');
+
+        $this->setModifierCondition(true);
+
+        $this->mockAssert->shouldReceive('assertFileEqualsIgnoringCase')
+            ->with('case insensitive filename', 'file under test', 'some message')
+            ->once();
+
+        $this->assertSame($this->subject, $this->subject->withoutCase()->equalTo('case insensitive filename'));
+
+        $this->setModifierCondition(false);
+
+        $this->mockAssert->shouldReceive('assertFileNotEqualsIgnoringCase')
+            ->with('different insensitive filename', 'file under test', 'some message')
+            ->once();
+
+        $this->assertSame($this->subject, $this->subject->withoutCase()->equalTo('different insensitive filename'));
     }
 
     protected function initSubject()
