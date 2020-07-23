@@ -72,9 +72,9 @@ install:
   - travis_retry composer install --dev --no-interaction --prefer-dist
 
 script:
-  - if [$TEST_SUITE == "static"]; then composer style:check; fi
-  - if [$TEST_SUITE == "static"]; then composer test:static; fi
-  - if [$TEST_SUITE == "unit"]; then composer test:coverage; fi
+  - if [ $TEST_SUITE == "static" ]; then composer style:check; fi
+  - if [ $TEST_SUITE == "static" ]; then composer test:static; fi
+  - if [ $TEST_SUITE == "unit" ]; then composer test:coverage; fi
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
