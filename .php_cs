@@ -35,7 +35,6 @@ return PhpCsFixer\Config::create()
         'no_php4_constructor'                              => true,
         'no_superfluous_phpdoc_tags'                       => ['allow_mixed' => true],
         'no_unset_on_property'                             => false,
-        'nullable_type_declaration_for_default_null_value' => true,
         'ordered_class_elements'                           => ['sortAlgorithm' => 'alpha'],
         'ordered_imports'                                  => ['imports_order' => ['const', 'class', 'function']],
         'phpdoc_line_span'                                 => ['const' => 'single', 'property' => 'single'],

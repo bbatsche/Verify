@@ -8,7 +8,7 @@ With BDD assertions influenced by Chai, Jasmine, and RSpec your assertions would
 [![Latest Stable Version](https://img.shields.io/packagist/v/bebat/verify.svg?style=plastic)](https://packagist.org/packages/bebat/verify)
 [![Total Downloads](https://img.shields.io/packagist/dt/bebat/verify.svg?style=plastic)](https://packagist.org/packages/bebat/verify)
 [![License](https://img.shields.io/packagist/l/bebat/verify.svg?style=plastic)](https://packagist.org/packages/bebat/verify)
-[![Build Status](https://img.shields.io/travis/bbatsche/Verify.svg?style=plastic)](https://travis-ci.org/bbatsche/Verify)
+[![Build Status](https://img.shields.io/travis/com/bbatsche/Verify.svg?style=plastic)](https://travis-ci.com/bbatsche/Verify)
 [![Code Coverage](https://codecov.io/gh/bbatsche/Verify/branch/master/graph/badge.svg)](https://codecov.io/gh/bbatsche/Verify)
 
 Most of the original work was done by [@DavertMik](http://github.com/DavertMik) and [@Ragazzo](http://github.com/Ragazzo) in the [Codeception/Verify](http://github.com/Codeception/Verify) repo. This fork was created to address some issues and then expand the API & feature set.
