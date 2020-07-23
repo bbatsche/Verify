@@ -1,0 +1,25 @@
+# Ignorable errors specific to PHPUnit 7
+
+includes:
+  - phpstan.neon.dist
+
+parameters:
+  ignoreErrors:
+    -
+      message: '/Call to an undefined static method .+Assert::assertContainsEquals/'
+      path: %currentWorkingDirectory%/src/Verify.php
+    -
+      message: '/Call to an undefined static method .+Assert::assertNotContainsEquals/'
+      path: %currentWorkingDirectory%/src/Verify.php
+    -
+      message: '/Call to an undefined static method .+Assert::assertStringEqualsFileIgnoringCase/'
+      path: %currentWorkingDirectory%/src/Verify.php
+    -
+      message: '/Call to an undefined static method .+Assert::assertStringNotEqualsFileIgnoringCase/'
+      path: %currentWorkingDirectory%/src/Verify.php
+    -
+      message: '/Call to an undefined static method .+Assert::assertFileEqualsIgnoringCase/'
+      path: %currentWorkingDirectory%/src/VerifyFile.php
+    -
+      message: '/Call to an undefined static method .+Assert::assertFileNotEqualsIgnoringCase/'
+      path: %currentWorkingDirectory%/src/VerifyFile.php

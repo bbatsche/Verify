@@ -5,19 +5,18 @@ BDD Assertions for PHPUnit and Codeception
 This is very tiny wrapper for PHPUnit assertions, that are aimed to make tests a bit more readable.
 With BDD assertions influenced by Chai, Jasmine, and RSpec your assertions would be a bit closer to natural language.
 
-[![Ready Stories](https://badge.waffle.io/bbatsche/Verify.png?label=ready&title=Ready)](https://waffle.io/bbatsche/Verify)
-[![Stories In Progress](https://badge.waffle.io/bbatsche/Verify.png?label=in+progress&title=In+Progress)](https://waffle.io/bbatsche/Verify)
 [![Latest Stable Version](https://img.shields.io/packagist/v/bebat/verify.svg?style=plastic)](https://packagist.org/packages/bebat/verify)
 [![Total Downloads](https://img.shields.io/packagist/dt/bebat/verify.svg?style=plastic)](https://packagist.org/packages/bebat/verify)
 [![License](https://img.shields.io/packagist/l/bebat/verify.svg?style=plastic)](https://packagist.org/packages/bebat/verify)
-[![Build Status](https://img.shields.io/travis/bbatsche/Verify.svg?style=plastic)](https://travis-ci.org/bbatsche/Verify)
-[![Code Coverage](https://codecov.io/gh/bbatsche/Verify/branch/2.0/graph/badge.svg)](https://codecov.io/gh/bbatsche/Verify)
+[![Build Status](https://img.shields.io/travis/com/bbatsche/Verify.svg?style=plastic)](https://travis-ci.com/bbatsche/Verify)
+[![Code Coverage](https://codecov.io/gh/bbatsche/Verify/branch/master/graph/badge.svg)](https://codecov.io/gh/bbatsche/Verify)
 
 Most of the original work was done by [@DavertMik](http://github.com/DavertMik) and [@Ragazzo](http://github.com/Ragazzo) in the [Codeception/Verify](http://github.com/Codeception/Verify) repo. This fork was created to address some issues and then expand the API & feature set.
 
 # Contents
 
 - [Installation](#installation)
+    - [Compatibility](#compatibility)
 - [Basic Usage](#basic-usage)
     - [Alternate Functions](#alternate-functions)
 - [Conjunctions](#conjunctions)
@@ -37,7 +36,17 @@ To install the current version of Verify from [Packagist](https://packagist.org/
 composer require --dev bebat/verify
 ```
 
-Verify will be added to your `composer.json` under `require-dev` and installed in your `vendor` directory. Verify uses namespaced functions, so to include it in your unit tests you should add `use function` statements to the top of your files:
+Verify will be added to your `composer.json` under `require-dev` and installed in your `vendor` directory.
+
+### Compatibility
+
+As stated, Verify is built on top of PHPUnit's own assertions. It has been written to be compatibile with any version of PHPUnit from 6.0 through 9.x. That said, some assertions have been removed from later versions of PHPUnit, and others added. Those assertions are noted in documentation below. When using Verify, it is still good practice to declare what version of PHPUnit your project depends on so that there are no surprise compatibility issues.
+
+In addition, Verify is compatibile with any version of PHP 7. You should have no issues integrating it into your legacy projects.
+
+## Basic Usage
+
+Verify uses namespaced functions, so to include it in your unit tests you should add `use function` statements to the top of your files:
 
 ```php
 // assertions for code
@@ -47,10 +56,6 @@ use function BeBat\Verify\verify_file;
 // assertions for directories
 use function BeBat\Verify\verify_directory;
 ````
-
-You can then start using it in your unit tests.
-
-## Basic Usage
 
 To use Verify in your unit tests, call the `verify()` function, followed by one or more conjunction, and then your assertion(s). For example:
 
@@ -140,6 +145,25 @@ verify($value)->is()->null();
 verify($value)->is()->empty();
 
 
+// Type
+verify($object)->is()->instanceOf('ClassName');
+verify($value)->is()->internalType('int');
+// Note: internalType() was deprecated in PHPUnit 8, and removed in version 9
+
+// Node: The following assertions were added in PHPUnit 7
+verify($value)->is()->array();
+verify($value)->is()->bool();
+verify($value)->is()->callable();
+verify($value)->is()->float();
+verify($value)->is()->int();
+verify($value)->is()->iterable();
+verify($value)->is()->numeric();
+verify($value)->is()->object();
+verify($value)->is()->resource();
+verify($value)->is()->scalar();
+verify($value)->is()->string();
+
+
 // Numeric Comparison
 verify($numericValue)->is()->greaterThan($tooSmall);
 verify($numericValue)->is()->greaterOrEqualTo($min);
@@ -169,6 +193,7 @@ verify($arrayValue)->will()->contain('expected value');
 
 verify($arrayValue)->will()->have()->subset($subsetOfValues);
 // Note: subset() does not support negative assertions
+// Note: subset() was deprecated in PHPUnit 8, and removed in version 9
 
 verify($arrayValue)->will()->have()->key('some-key');
 
@@ -179,15 +204,9 @@ verify($arrayValue)->is()->sameSizeAs($someOtherArray);
 verify($arrayValue)->will()->containOnly('string');
 
 
-// Objects, Classes, and Internal Types
-verify($object)->is()->instanceOf('ClassName');
-
-verify($value)->is()->internalType('int');
-
+// Object & Class Properties
 verify($object)->has()->attribute('attributeName');
-
 verify('ClassName')->has()->attribute('attributeName');
-
 verify('ClassName')->has()->staticAttribute('attributeName');
 
 
@@ -231,35 +250,19 @@ verify_directory('/path/to/test/dir')->is()->writable();
 
 ### Attribute Assertions
 
-Verify (and PHPUnit) has the ability to test the value of protected and private object properties (or "attributes"). While this is typically considered a violation of best unit testing practice, there are times when inspecting a protected value can be the simplest way of checking your code. The attribute you wish to check can be tacked on after calling `verify()`, just like if you were accessing it as a public value. For example, if you had an object called `$user` with a private `first_name` property that should be equal to `'Alice'`, you can assert that with the following code:
+Verify has the ability to test the value of object and static class properties (or "attributes"), even those that are protected or private. While writing assertions about a subject's internal state is not considered good practice, there are times when inspecting a protected value can be the simplest way of checking your code. The attribute you wish to check can be tacked on after calling `verify()`, just like if you were accessing it as a public value. For example, if you had an object called `$user` with a private `first_name` property that should be equal to `'Alice'`, you can assert that with the following code:
 
 ```php
 verify($user)->first_name->is()->equalTo('Alice');
 ```
 
-The following subset of assertions support checking attribute values:
+A similar assertion about a class's static properties might look like the following:
 
 ```php
-verify($obj)->attribute_name->is()->equalTo('Some Value');
-
-verify($obj)->attribute_name->does()->contain('Val');
-
-verify($obj)->array_attribute->will()->have()->count(5);
-
-verify($obj)->attribute_name->will()->be()->empty();
-
-verify($obj)->numeric_attribute->is()->greaterThan(0);
-verify($obj)->numeric_attribute->is()->greaterOrEqualTo(1);
-verify($obj)->numeric_attribute->is()->lessThan(10);
-verify($obj)->numeric_attribute->is()->lessOrEqualTo(9.99);
-
-verify($obj)->attribute_name->is()->instanceOf('GoodClass');
-verify($obj)->attribute_name->is()->internalType('string');
-
-verify($obj)->object_attriute->is()->sameAs($validObject);
-
-verify($obj)->array_attribute->will()->containOnly('bool');
+verify(Model::class)->dbc->is()->resource();
 ```
+
+All of Verify's code assertions should be compatible with reading object or class attributes.
 
 If you would rather explicitly identify your attribute/property, you can do so with the `attributeNamed()` method:
 
@@ -302,6 +305,7 @@ verify(['1', '2'])->withoutType()->will()->contain(1);
 
 verify(['1', '2', '3'])->withType()->has()->subset(['1', '3']);
 verify(['1', '2', '3'])->withoutType()->has()->subset([1, 3]);
+// Note: subset() was deprecated in PHPUnit 8, and removed in version 9
 
 // Whether to check element attributes when comparing XML documents
 verify($domDocument)->withAttributes()->is()->equalToXmlStructure($validDocument);

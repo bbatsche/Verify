@@ -16,13 +16,13 @@ namespace BeBat\Verify;
  *
  * @return \BeBat\Verify\Verify
  */
-function verify()
+function verify(...$args)
 {
-    switch (\func_num_args()) {
+    switch (\count($args)) {
         case 1:
-            return new Verify(\func_get_arg(0));
+            return new Verify($args[0]);
         case 2:
-            return new Verify(\func_get_arg(1), \func_get_arg(0));
+            return new Verify($args[1], $args[0]);
         default:
             throw new \BadFunctionCallException('verify() must be called with exactly 1 or 2 arguments.');
     }
@@ -40,13 +40,13 @@ function verify()
  *
  * @return \BeBat\Verify\VerifyFile
  */
-function verify_file()
+function verify_file(...$args)
 {
-    switch (\func_num_args()) {
+    switch (\count($args)) {
         case 1:
-            return new VerifyFile(\func_get_arg(0));
+            return new VerifyFile($args[0]);
         case 2:
-            return new VerifyFile(\func_get_arg(1), \func_get_arg(0));
+            return new VerifyFile($args[1], $args[0]);
         default:
             throw new \BadFunctionCallException('verify_file() must be called with exactly 1 or 2 arguments.');
     }
@@ -64,13 +64,13 @@ function verify_file()
  *
  * @return \BeBat\Verify\VerifyDirectory
  */
-function verify_directory()
+function verify_directory(...$args)
 {
-    switch (\func_num_args()) {
+    switch (\count($args)) {
         case 1:
-            return new VerifyDirectory(\func_get_arg(0));
+            return new VerifyDirectory($args[0]);
         case 2:
-            return new VerifyDirectory(\func_get_arg(1), \func_get_arg(0));
+            return new VerifyDirectory($args[1], $args[0]);
         default:
             throw new \BadFunctionCallException('verify_directory() must be called with exactly 1 or 2 arguments.');
     }

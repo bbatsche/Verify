@@ -4,65 +4,89 @@ declare(strict_types=1);
 
 namespace BeBat\Verify\Test;
 
+use BadFunctionCallException;
 use BeBat\Verify\Verify;
 use BeBat\Verify\VerifyDirectory;
 use BeBat\Verify\VerifyFile;
 use PHPUnit\Framework\TestCase;
+use ReflectionObject;
 
-class FunctionsTest extends TestCase
+/**
+ * @internal
+ */
+final class FunctionsTest extends TestCase
 {
     /**
      * Test verify*() methods' default behavior.
      *
-     * @param string $functionName
-     * @param string $className
+     * @param class-string $className
      *
      * @dataProvider verifyFunctions
+     *
+     * @return void
      */
     public function testFunction(string $functionName, string $className)
     {
         $object = $functionName('no message');
 
         $this->assertInstanceOf($className, $object);
-        $this->assertAttributeSame('no message', 'actual', $object);
+
+        $reflection = new ReflectionObject($object);
+
+        $actual = $reflection->getProperty('actual');
+        $actual->setAccessible(true);
+
+        $this->assertSame('no message', $actual->getValue($object));
+
+        $actual->setAccessible(false);
 
         $object = $functionName('some message', 'message included');
 
         $this->assertInstanceOf($className, $object);
-        $this->assertAttributeSame('message included', 'actual', $object);
-        $this->assertAttributeSame('some message', 'description', $object);
+
+        $reflection = new ReflectionObject($object);
+
+        $actual      = $reflection->getProperty('actual');
+        $description = $reflection->getProperty('description');
+
+        $actual->setAccessible(true);
+        $description->setAccessible(true);
+
+        $this->assertSame('message included', $actual->getValue($object));
+        $this->assertSame('some message', $description->getValue($object));
+
+        $actual->setAccessible(false);
+        $description->setAccessible(false);
     }
 
     /**
      * Test exception thrown with zero arguments.
      *
-     * @param string $functionName
-     *
      * @dataProvider verifyFunctions
+     *
+     * @return void
      */
     public function testFunctionNoArguments(string $functionName)
     {
-        $this->expectException(\BadFunctionCallException::class);
+        $this->expectException(BadFunctionCallException::class);
         $functionName();
     }
 
     /**
      * Test exception thrown with too many arguments.
      *
-     * @param string $functionName
-     *
      * @dataProvider verifyFunctions
+     *
+     * @return void
      */
     public function testFunctionTooManyArguments(string $functionName)
     {
-        $this->expectException(\BadFunctionCallException::class);
+        $this->expectException(BadFunctionCallException::class);
         $functionName('param 1', 'param 2', 'param 3');
     }
 
     /**
      * All verify functions and their corresponding classes.
-     *
-     * @return array
      */
     public function verifyFunctions(): array
     {

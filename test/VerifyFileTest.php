@@ -6,22 +6,24 @@ namespace BeBat\Verify\Test;
 
 use BeBat\Verify\VerifyFile;
 use Mockery;
+use phpmock\mockery\PHPMockery;
 
-class VerifyFileTest extends UnitTestBase
+/**
+ * @internal
+ */
+final class VerifyFileTest extends UnitTestBase
 {
     protected $defaultActualValue = 'file under test';
 
-    public function setUp()
-    {
-        $this->subject = new VerifyFile($this->defaultActualValue, 'some message');
-
-        parent::setUp();
-    }
+    /**
+     * VerifyFile class.
+     *
+     * @var \BeBat\Verify\VerifyFile
+     */
+    protected $subject;
 
     /**
      * All VerifyFile methods.
-     *
-     * @return array
      */
     public function allMethods(): array
     {
@@ -37,8 +39,6 @@ class VerifyFileTest extends UnitTestBase
 
     /**
      * PHPUnit assertions used by VerifyFile::equalTo().
-     *
-     * @return array
      */
     public function equalToMethods(): array
     {
@@ -50,8 +50,6 @@ class VerifyFileTest extends UnitTestBase
 
     /**
      * All VerifyFile methods and their PHPUnit assertions that do not take a value for comparison.
-     *
-     * @return array
      */
     public function noParamMethods(): array
     {
@@ -67,8 +65,6 @@ class VerifyFileTest extends UnitTestBase
 
     /**
      * All VerifyFile methods and their PHPUnit assertions that take in a single parameter.
-     *
-     * @return array
      */
     public function singleParamMethods(): array
     {
@@ -83,10 +79,9 @@ class VerifyFileTest extends UnitTestBase
     /**
      * Test VerifyFile::equalTo().
      *
-     * @param bool   $modifierConition
-     * @param string $assertMethod
-     *
      * @dataProvider equalToMethods
+     *
+     * @return void
      */
     public function testEqualTo(bool $modifierConition, string $assertMethod)
     {
@@ -115,5 +110,41 @@ class VerifyFileTest extends UnitTestBase
             ->once();
 
         $this->assertSame($this->subject, $this->subject->withoutCase()->equalTo('expected file w/o case'));
+    }
+
+    /**
+     * Test VerifyFile::equalTo() will call assertFileEqualsIgnoringCase() if available.
+     *
+     * @runInSeparateProcess
+     *
+     * @return void
+     */
+    public function testEqualToSpecificMethods()
+    {
+        PHPMockery::mock('BeBat\\Verify', 'method_exists')->andReturn(true);
+
+        $this->mockAssert->shouldNotReceive('assertFileEquals');
+        $this->mockAssert->shouldNotReceive('assertFileNotEquals');
+
+        $this->setModifierCondition(true);
+
+        $this->mockAssert->shouldReceive('assertFileEqualsIgnoringCase')
+            ->with('case insensitive filename', 'file under test', 'some message')
+            ->once();
+
+        $this->assertSame($this->subject, $this->subject->withoutCase()->equalTo('case insensitive filename'));
+
+        $this->setModifierCondition(false);
+
+        $this->mockAssert->shouldReceive('assertFileNotEqualsIgnoringCase')
+            ->with('different insensitive filename', 'file under test', 'some message')
+            ->once();
+
+        $this->assertSame($this->subject, $this->subject->withoutCase()->equalTo('different insensitive filename'));
+    }
+
+    protected function initSubject()
+    {
+        $this->subject = new VerifyFile($this->defaultActualValue, 'some message');
     }
 }
