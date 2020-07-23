@@ -93,6 +93,8 @@ class Verify extends VerifyBase
             throw new MissingConditionException();
         }
 
+        $this->testForUnimplementedMethod('assertIsArray', __FUNCTION__);
+
         if ($this->modifierCondition) {
             a::assertIsArray($this->getActualValue(), $this->description);
         } else {
@@ -151,6 +153,8 @@ class Verify extends VerifyBase
             throw new MissingConditionException();
         }
 
+        $this->testForUnimplementedMethod('assertIsBool', __FUNCTION__);
+
         if ($this->modifierCondition) {
             a::assertIsBool($this->getActualValue(), $this->description);
         } else {
@@ -168,6 +172,8 @@ class Verify extends VerifyBase
         if (!isset($this->modifierCondition)) {
             throw new MissingConditionException();
         }
+
+        $this->testForUnimplementedMethod('assertIsCallable', __FUNCTION__);
 
         if ($this->modifierCondition) {
             a::assertIsCallable($this->getActualValue(), $this->description);
@@ -569,6 +575,8 @@ class Verify extends VerifyBase
             throw new MissingConditionException();
         }
 
+        $this->testForUnimplementedMethod('assertIsFloat', __FUNCTION__);
+
         if ($this->modifierCondition) {
             a::assertIsFloat($this->getActualValue(), $this->description);
         } else {
@@ -665,6 +673,8 @@ class Verify extends VerifyBase
             throw new MissingConditionException();
         }
 
+        $this->testForUnimplementedMethod('assertIsInt', __FUNCTION__);
+
         if ($this->modifierCondition) {
             a::assertIsInt($this->getActualValue(), $this->description);
         } else {
@@ -685,6 +695,8 @@ class Verify extends VerifyBase
             throw new MissingConditionException();
         }
 
+        $this->testForRemovedMethod('assertInternalType', __FUNCTION__);
+
         if ($this->modifierCondition) {
             a::assertInternalType($type, $this->getActualValue(), $this->description);
         } else {
@@ -702,6 +714,8 @@ class Verify extends VerifyBase
         if (!isset($this->modifierCondition)) {
             throw new MissingConditionException();
         }
+
+        $this->testForUnimplementedMethod('assertIsIterable', __FUNCTION__);
 
         if ($this->modifierCondition) {
             a::assertIsIterable($this->getActualValue(), $this->description);
@@ -899,6 +913,8 @@ class Verify extends VerifyBase
             throw new MissingConditionException();
         }
 
+        $this->testForUnimplementedMethod('assertIsNumeric', __FUNCTION__);
+
         if ($this->modifierCondition) {
             a::assertIsNumeric($this->getActualValue(), $this->description);
         } else {
@@ -917,6 +933,8 @@ class Verify extends VerifyBase
             throw new MissingConditionException();
         }
 
+        $this->testForUnimplementedMethod('assertIsObject', __FUNCTION__);
+
         if ($this->modifierCondition) {
             a::assertIsObject($this->getActualValue(), $this->description);
         } else {
@@ -934,6 +952,8 @@ class Verify extends VerifyBase
         if (!isset($this->modifierCondition)) {
             throw new MissingConditionException();
         }
+
+        $this->testForUnimplementedMethod('assertIsResource', __FUNCTION__);
 
         if ($this->modifierCondition) {
             a::assertIsResource($this->getActualValue(), $this->description);
@@ -993,6 +1013,8 @@ class Verify extends VerifyBase
             throw new MissingConditionException();
         }
 
+        $this->testForUnimplementedMethod('assertIsScalar', __FUNCTION__);
+
         if ($this->modifierCondition) {
             a::assertIsScalar($this->getActualValue(), $this->description);
         } else {
@@ -1051,6 +1073,8 @@ class Verify extends VerifyBase
             throw new MissingConditionException();
         }
 
+        $this->testForUnimplementedMethod('assertIsString', __FUNCTION__);
+
         if ($this->modifierCondition) {
             a::assertIsString($this->getActualValue(), $this->description);
         } else {
@@ -1070,6 +1094,8 @@ class Verify extends VerifyBase
         if (!isset($this->modifierCondition)) {
             throw new MissingConditionException();
         }
+
+        $this->testForRemovedMethod('assertArraySubset', __FUNCTION__);
 
         if ($this->modifierCondition) {
             a::assertArraySubset($array, $this->getActualValue(), $this->dataType, $this->description);
@@ -1288,5 +1314,33 @@ class Verify extends VerifyBase
         }
 
         throw new InvalidSubjectException('Subject must be either an object or class name.');
+    }
+
+    /**
+     * Test if a required PHPUnit method has been removed.
+     *
+     * @throws BadMethodCallException if the method is missing
+     *
+     * @return void
+     */
+    private function testForRemovedMethod(string $phpunitMethod, string $verifyMethod)
+    {
+        if (!method_exists(a::class, $phpunitMethod)) {
+            throw new BadMethodCallException("The underlying method for {$verifyMethod}() has been removed. You should update your test accordingly.");
+        }
+    }
+
+    /**
+     * Test if a required PHPUnit method comes from a newer version.
+     *
+     * @throws BadMethodCallException if the method is missing
+     *
+     * @return void
+     */
+    private function testForUnimplementedMethod(string $phpunitMethod, string $verifyMethod)
+    {
+        if (!method_exists(a::class, $phpunitMethod)) {
+            throw new BadMethodCallException("The underlying method for {$verifyMethod}() comes from a newer version of PHPUnit. You should update your project's dependencies.");
+        }
     }
 }

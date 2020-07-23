@@ -949,10 +949,14 @@ final class VerifyTest extends UnitTestBase
     /**
      * Test Verify::subset().
      *
+     * @runInSeparateProcess
+     *
      * @return void
      */
     public function testSubset()
     {
+        PHPMockery::mock('BeBat\\Verify', 'method_exists')->andReturn(true);
+
         $this->setModifierCondition(true);
 
         $this->mockAssert->shouldReceive('assertArraySubset')
@@ -986,11 +990,14 @@ final class VerifyTest extends UnitTestBase
      * @param mixed $value
      *
      * @dataProvider methodsWithoutNegativeCondition
+     * @runInSeparateProcess
      *
      * @return void
      */
     public function testUnsupportedNegativeCondition(string $methodName, $value = 'dummy value')
     {
+        PHPMockery::mock('BeBat\\Verify', 'method_exists')->andReturn(true);
+
         $this->setModifierCondition(false);
 
         $this->expectException(BadMethodCallException::class);

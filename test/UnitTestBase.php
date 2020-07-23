@@ -6,6 +6,7 @@ namespace BeBat\Verify\Test;
 
 use BeBat\Verify\MissingConditionException;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use phpmock\mockery\PHPMockery;
 use PHPUnit\Framework\TestCase;
 use ReflectionObject;
 
@@ -48,11 +49,14 @@ abstract class UnitTestBase extends TestCase
      * Test VerifyFile methods that don't take any value.
      *
      * @dataProvider noParamMethods
+     * @runInSeparateProcess
      *
      * @return void
      */
     public function testNoParamMethods(bool $modifierCondition, string $verifyMethod, string $assertMethod)
     {
+        PHPMockery::mock('BeBat\\Verify', 'method_exists')->andReturn(true);
+
         $this->setModifierCondition($modifierCondition);
 
         $this->mockAssert->shouldReceive($assertMethod)
@@ -68,6 +72,7 @@ abstract class UnitTestBase extends TestCase
      * @param mixed $expectedValue
      *
      * @dataProvider singleParamMethods
+     * @runInSeparateProcess
      *
      * @return void
      */
@@ -77,6 +82,8 @@ abstract class UnitTestBase extends TestCase
         string $assertMethod,
         $expectedValue = 'some value'
     ) {
+        PHPMockery::mock('BeBat\\Verify', 'method_exists')->andReturn(true);
+
         $this->setModifierCondition($modifierCondition);
 
         $this->mockAssert->shouldReceive($assertMethod)
