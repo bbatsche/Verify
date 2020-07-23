@@ -228,7 +228,7 @@ class Verify extends VerifyBase
             } else {
                 a::assertNotContains(
                     $needle,
-                    $this->getActualValue(),
+                    $value,
                     $this->description,
                     $this->ignoreCase,
                     $this->objectIdentity,
@@ -387,7 +387,7 @@ class Verify extends VerifyBase
             } else {
                 a::assertNotEquals(
                     $expected,
-                    $this->getActualValue(),
+                    $value,
                     $this->description,
                     $this->floatDelta,
                     $this->maxDepth,
