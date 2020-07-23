@@ -1,0 +1,42 @@
+# Ignorable errors specific to PHPUnit 7
+
+includes:
+  - phpstan.neon.dist
+
+parameters:
+  ignoreErrors:
+    -
+      message: '/Call to an undefined static method .+Assert::assertInternalType/'
+      path: %currentWorkingDirectory%/src/Verify.php
+    -
+      message: '/Call to an undefined static method .+Assert::assertNotInternalType/'
+      path: %currentWorkingDirectory%/src/Verify.php
+    -
+      message: '/Call to an undefined static method .+Assert::assertArraySubset/'
+      path: %currentWorkingDirectory%/src/Verify.php
+
+    -
+      message: '/Assert::assertContains\(\) invoked with \d+ parameters, \d+-\d+ required/'
+      path: %currentWorkingDirectory%/src/Verify.php
+    -
+      message: '/Assert::assertNotContains\(\) invoked with \d+ parameters, \d+-\d+ required/'
+      path: %currentWorkingDirectory%/src/Verify.php
+    -
+      message: '/Assert::assertEquals\(\) invoked with \d+ parameters, \d+-\d+ required/'
+      path: %currentWorkingDirectory%/src/Verify.php
+    -
+      message: '/Assert::assertNotEquals\(\) invoked with \d+ parameters, \d+-\d+ required/'
+      path: %currentWorkingDirectory%/src/Verify.php
+    -
+      message: '/Assert::assertStringEqualsFile\(\) invoked with \d+ parameters, \d+-\d+ required/'
+      path: %currentWorkingDirectory%/src/Verify.php
+    -
+      message: '/Assert::assertStringNotEqualsFile\(\) invoked with \d+ parameters, \d+-\d+ required/'
+      path: %currentWorkingDirectory%/src/Verify.php
+
+    -
+      message: '/Assert::assertFileEquals\(\) invoked with \d+ parameters, \d+-\d+ required/'
+      path: %currentWorkingDirectory%/src/VerifyFile.php
+    -
+      message: '/Assert::assertFileNotEquals\(\) invoked with \d+ parameters, \d+-\d+ required/'
+      path: %currentWorkingDirectory%/src/VerifyFile.php

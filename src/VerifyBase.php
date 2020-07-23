@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace BeBat\Verify;
 
+use BadMethodCallException;
+
 /**
  * VerifyBase Class.
  *
@@ -25,10 +27,13 @@ namespace BeBat\Verify;
  */
 abstract class VerifyBase
 {
+    /** @var string[] */
     public static $negativeConjunctions = ['doesNot', 'isNot', 'willNot'];
 
+    /** @var string[] */
     public static $neutralConjunctions = ['and', 'be', 'have'];
 
+    /** @var string[] */
     public static $positiveConjunctions = ['does', 'has', 'is', 'will'];
 
     /**
@@ -74,36 +79,33 @@ abstract class VerifyBase
     /**
      * Set positive or negative modifier and chain method calls along.
      *
-     * @param string $method
-     * @param array  $arguments
-     *
-     * @return self
+     * @return static
      */
     public function __call(string $method, array $arguments = []): self
     {
-        if (\in_array($method, self::$positiveConjunctions)) {
+        if (\in_array($method, self::$positiveConjunctions, true)) {
             $this->modifierCondition = true;
 
             return $this;
         }
 
-        if (\in_array($method, self::$negativeConjunctions)) {
+        if (\in_array($method, self::$negativeConjunctions, true)) {
             $this->modifierCondition = false;
 
             return $this;
         }
 
-        if (\in_array($method, self::$neutralConjunctions)) {
+        if (\in_array($method, self::$neutralConjunctions, true)) {
             return $this;
         }
 
-        throw new \BadMethodCallException("Unknown method {$method}.");
+        throw new BadMethodCallException("Unknown method {$method}.");
     }
 
     /**
      * Turn on case sensitivity when checking SUT.
      *
-     * @return self
+     * @return static
      */
     public function withCase(): self
     {
@@ -115,7 +117,7 @@ abstract class VerifyBase
     /**
      * Turn off case sensitivity when checking SUT.
      *
-     * @return self
+     * @return static
      */
     public function withoutCase(): self
     {

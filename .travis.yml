@@ -1,28 +1,81 @@
 language: php
 
 php:
-  - 7
+  - 7.0
   - 7.1
   - 7.2
+  - 7.3
+  - 7.4
 
 env:
-  - PHPUNIT_VERSION=6.0
-  - PHPUNIT_VERSION=7.0
+  - PHPUNIT_VERSION=6 TEST_SUITE=unit
+  - PHPUNIT_VERSION=7 TEST_SUITE=static
+  - PHPUNIT_VERSION=7 TEST_SUITE=unit
+  - PHPUNIT_VERSION=8 TEST_SUITE=static
+  - PHPUNIT_VERSION=8 TEST_SUITE=unit
+  - PHPUNIT_VERSION=9 TEST_SUITE=static
+  - PHPUNIT_VERSION=9 TEST_SUITE=unit
 
 matrix:
   exclude:
-    - php: 7
-      env: PHPUNIT_VERSION=7.0
+      # PHP 7.0
+    - php: 7.0
+      env: PHPUNIT_VERSION=7 TEST_SUITE=static
+    - php: 7.0
+      env: PHPUNIT_VERSION=7 TEST_SUITE=unit
+    - php: 7.0
+      env: PHPUNIT_VERSION=8 TEST_SUITE=static
+    - php: 7.0
+      env: PHPUNIT_VERSION=8 TEST_SUITE=unit
+    - php: 7.0
+      env: PHPUNIT_VERSION=9 TEST_SUITE=static
+    - php: 7.0
+      env: PHPUNIT_VERSION=9 TEST_SUITE=unit
+
+      # PHP 7.1
+    - php: 7.1
+      env: PHPUNIT_VERSION=8 TEST_SUITE=static
+    - php: 7.1
+      env: PHPUNIT_VERSION=8 TEST_SUITE=unit
+    - php: 7.1
+      env: PHPUNIT_VERSION=9 TEST_SUITE=static
+    - php: 7.1
+      env: PHPUNIT_VERSION=9 TEST_SUITE=unit
+
+      # PHP 7.2
+    - php: 7.2
+      env: PHPUNIT_VERSION=9 TEST_SUITE=static
+    - php: 7.2
+      env: PHPUNIT_VERSION=9 TEST_SUITE=unit
+
+      # PHP 7.3
+    - php: 7.3
+      env: PHPUNIT_VERSION=6 TEST_SUITE=unit
+
+      # PHP 7.4
+    - php: 7.4
+      env: PHPUNIT_VERSION=6 TEST_SUITE=unit
+    - php: 7.4
+      env: PHPUNIT_VERSION=7 TEST_SUITE=static
+    - php: 7.4
+      env: PHPUNIT_VERSION=7 TEST_SUITE=unit
 
 sudo: false
 
+before_install:
+  # Remove some dependencies that aren't needed for static test suite and are incompatible with PHP 7 or PHPUnit 6
+  - if [ $TEST_SUITE == "unit" ]; then composer remove --dev ergebnis/composer-normalize maglnet/composer-require-checker phpstan/phpstan phpstan/phpstan-mockery phpstan/phpstan-phpunit phpstan/phpstan-strict-rules; fi
+
 install:
-  - composer require phpunit/phpunit:^$PHPUNIT_VERSION --update-no-dev --no-interaction --prefer-dist --no-progress --no-suggest --update-with-all-dependencies
+  - if [ -e composer.lock ]; then rm -rf composer.lock vendor; fi
+  - if [ -e phpstan.phpunit${PHPUNIT_VERSION}.neon ]; then cp phpstan.phpunit${PHPUNIT_VERSION}.neon phpstan.neon; fi
+  - composer require phpunit/phpunit:^${PHPUNIT_VERSION}.0 --update-no-dev --no-interaction --prefer-dist --no-progress --no-suggest --update-with-all-dependencies
   - travis_retry composer install --dev --no-interaction --prefer-dist
 
 script:
-  - composer cs-check
-  - composer test-coverage
+  - if [ $TEST_SUITE == "static" ]; then composer style:check; fi
+  - if [ $TEST_SUITE == "static" ]; then composer test:static; fi
+  - if [ $TEST_SUITE == "unit" ]; then composer test:coverage; fi
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)

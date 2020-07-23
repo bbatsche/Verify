@@ -1,0 +1,28 @@
+parameters:
+  level: 8
+  paths:
+    - src
+    - test
+  checkMissingIterableValueType: false
+  ignoreErrors:
+    -
+      message: '/PHPDoc tag @param references unknown parameter: \$actual/'
+      path: %currentWorkingDirectory%/src/function.php
+    -
+      message: '/PHPDoc tag @param references unknown parameter: \$description/'
+      path: %currentWorkingDirectory%/src/function.php
+    -
+      message: '/has parameter \$args with no typehint specified/'
+      path: %currentWorkingDirectory%/src/function.php
+    -
+      message: '/Negated boolean expression is always false/'
+      path: %currentWorkingDirectory%/src/Verify.php
+    -
+      message: '/Trying to invoke string but it might not be a callable/'
+      path: %currentWorkingDirectory%/test/FunctionsTest.php
+    -
+      message: '/Call to an undefined method BeBat\\Verify\\Verify::[a-z_]+_conjunction\(\)/'
+      path: %currentWorkingDirectory%/test/VerifyTest.php
+    - '/Mockery\\LegacyMockInterface::shouldNotReceive/'
+    - '/Mockery\\LegacyMockInterface::shouldReceive/'
+    - '/Mockery\\HigherOrderMessage::with/'

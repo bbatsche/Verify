@@ -15,8 +15,6 @@ class VerifyDirectory extends VerifyBase
 {
     /**
      * Assert SUT does or does not exist in the filesystem.
-     *
-     * @return self
      */
     public function exist(): self
     {
@@ -35,8 +33,6 @@ class VerifyDirectory extends VerifyBase
 
     /**
      * Assert SUT is or is not readable.
-     *
-     * @return self
      */
     public function readable(): self
     {
@@ -55,8 +51,6 @@ class VerifyDirectory extends VerifyBase
 
     /**
      * Assert SUT is or is not writable.
-     *
-     * @return self
      */
     public function writable(): self
     {
