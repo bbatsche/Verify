@@ -19,17 +19,17 @@ env:
 matrix:
   exclude:
       # PHP 7.0
-    - php: 7
+    - php: 7.0
       env: PHPUNIT_VERSION=7 TEST_SUITE=static
-    - php: 7
+    - php: 7.0
       env: PHPUNIT_VERSION=7 TEST_SUITE=unit
-    - php: 7
+    - php: 7.0
       env: PHPUNIT_VERSION=8 TEST_SUITE=static
-    - php: 7
+    - php: 7.0
       env: PHPUNIT_VERSION=8 TEST_SUITE=unit
-    - php: 7
+    - php: 7.0
       env: PHPUNIT_VERSION=9 TEST_SUITE=static
-    - php: 7
+    - php: 7.0
       env: PHPUNIT_VERSION=9 TEST_SUITE=unit
 
       # PHP 7.1
@@ -69,7 +69,7 @@ before_install:
 install:
   - if [ -e composer.lock ]; then rm -rf composer.lock vendor; fi
   - if [ -e phpstan.phpunit${PHPUNIT_VERSION}.neon ]; then cp phpstan.phpunit${PHPUNIT_VERSION}.neon phpstan.neon; fi
-  - composer require phpunit/phpunit:^$PHPUNIT_VERSION --update-no-dev --no-interaction --prefer-dist --no-progress --no-suggest --update-with-all-dependencies
+  - composer require phpunit/phpunit:^${PHPUNIT_VERSION}.0 --update-no-dev --no-interaction --prefer-dist --no-progress --no-suggest --update-with-all-dependencies
   - travis_retry composer install --dev --no-interaction --prefer-dist
 
 script:
